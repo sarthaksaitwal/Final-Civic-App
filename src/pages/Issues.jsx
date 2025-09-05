@@ -6,14 +6,19 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIssuesStore } from '@/store/issues';
-import { 
-  Search, 
-  Filter, 
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import {
+  Search,
+  Filter,
   Calendar,
   MapPin,
   Clock,
-  AlertTriangle
+  AlertTriangle,
+  List,
+  Map
 } from 'lucide-react';
 
 export default function Issues() {
@@ -197,89 +202,139 @@ export default function Issues() {
           </CardContent>
         </Card>
 
-        {/* Issues List */}
-        <div className="grid gap-4">
-          {filteredIssues.length === 0 ? (
+        {/* Issues View */}
+        <Tabs defaultValue="list" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="list" className="flex items-center gap-2">
+              <List className="h-4 w-4" />
+              List View
+            </TabsTrigger>
+            <TabsTrigger value="map" className="flex items-center gap-2">
+              <Map className="h-4 w-4" />
+              Map View
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="list" className="mt-6">
+            <div className="grid gap-4">
+              {filteredIssues.length === 0 ? (
+                <Card className="shadow-card">
+                  <CardContent className="text-center py-8">
+                    <div className="text-muted-foreground">
+                      <AlertTriangle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p className="text-lg font-medium">No issues found</p>
+                      <p>Try adjusting your filters or search terms.</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                filteredIssues.map((issue) => (
+                  <Card
+                    key={issue.id}
+                    className="shadow-card hover:shadow-hover transition-all duration-200 cursor-pointer"
+                    onClick={() => navigate(`/issues/${issue.id}`)}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 space-y-3">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h3 className="text-lg font-semibold text-foreground">
+                                {issue.title}
+                              </h3>
+                              <p className="text-sm text-muted-foreground">
+                                Issue #{issue.id}
+                              </p>
+                            </div>
+                            <Badge variant={getStatusBadgeVariant(issue.status)}>
+                              {issue.status}
+                            </Badge>
+                          </div>
+
+                          <p className="text-muted-foreground">
+                            {issue.description}
+                          </p>
+
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-1">
+                              <MapPin className="h-4 w-4" />
+                              {issue.location.address}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4" />
+                              Reported: {issue.dateReported.toLocaleDateString()}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-4 w-4" />
+                              {formatDeadline(issue.deadline)}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline">{issue.category}</Badge>
+                            <Badge variant={getPriorityBadgeVariant(issue.priority)}>
+                              {issue.priority} priority
+                            </Badge>
+                            {issue.assignedTo && (
+                              <Badge variant="secondary">
+                                Assigned to: {issue.assignedTo}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+
+                        {issue.photos.length > 0 && (
+                          <div className="ml-4">
+                            <img
+                              src={issue.photos[0]}
+                              alt={issue.title}
+                              className="w-20 h-20 object-cover rounded-lg border border-border"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="map" className="mt-6">
             <Card className="shadow-card">
-              <CardContent className="text-center py-8">
-                <div className="text-muted-foreground">
-                  <AlertTriangle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-medium">No issues found</p>
-                  <p>Try adjusting your filters or search terms.</p>
+              <CardContent className="p-0">
+                <div className="h-96 w-full">
+                  <MapContainer
+                    center={[40.7128, -74.0060]}
+                    zoom={10}
+                    style={{ height: '100%', width: '100%' }}
+                  >
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    {filteredIssues.map((issue) => (
+                      <Marker
+                        key={issue.id}
+                        position={issue.location.coordinates}
+                        eventHandlers={{
+                          click: () => navigate(`/issues/${issue.id}`),
+                        }}
+                      >
+                        <Popup>
+                          <div className="p-2">
+                            <h3 className="font-semibold">{issue.title}</h3>
+                            <p className="text-sm text-muted-foreground">{issue.location.address}</p>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    ))}
+                  </MapContainer>
                 </div>
               </CardContent>
             </Card>
-          ) : (
-            filteredIssues.map((issue) => (
-              <Card 
-                key={issue.id} 
-                className="shadow-card hover:shadow-hover transition-all duration-200 cursor-pointer"
-                onClick={() => navigate(`/issues/${issue.id}`)}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 space-y-3">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="text-lg font-semibold text-foreground">
-                            {issue.title}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            Issue #{issue.id}
-                          </p>
-                        </div>
-                        <Badge variant={getStatusBadgeVariant(issue.status)}>
-                          {issue.status}
-                        </Badge>
-                      </div>
-
-                      <p className="text-muted-foreground">
-                        {issue.description}
-                      </p>
-
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
-                          {issue.location.address}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          Reported: {issue.dateReported.toLocaleDateString()}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          {formatDeadline(issue.deadline)}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">{issue.category}</Badge>
-                        <Badge variant={getPriorityBadgeVariant(issue.priority)}>
-                          {issue.priority} priority
-                        </Badge>
-                        {issue.assignedTo && (
-                          <Badge variant="secondary">
-                            Assigned to: {issue.assignedTo}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-
-                    {issue.photos.length > 0 && (
-                      <div className="ml-4">
-                        <img
-                          src={issue.photos[0]}
-                          alt={issue.title}
-                          className="w-20 h-20 object-cover rounded-lg border border-border"
-                        />
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </DashboardLayout>
   );

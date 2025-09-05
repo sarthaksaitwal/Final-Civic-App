@@ -1,13 +1,16 @@
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useIssuesStore } from '@/store/issues';
-import { 
-  FileX, 
-  Clock, 
-  CheckCircle, 
-  RotateCcw, 
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import {
+  FileX,
+  Clock,
+  CheckCircle,
+  RotateCcw,
   Settings,
   MapPin,
   Calendar,
@@ -50,14 +53,35 @@ const statusConfig = {
 export default function Dashboard() {
   const { issues, getIssuesByStatus } = useIssuesStore();
   const navigate = useNavigate();
+  const [markerSize, setMarkerSize] = useState({ width: 20, height: 26 });
+
+  // Responsive marker sizing
+  useEffect(() => {
+    const updateMarkerSize = () => {
+      const width = window.innerWidth;
+      if (width < 640) { // Mobile
+        setMarkerSize({ width: 14, height: 18 });
+      } else if (width < 1024) { // Tablet
+        setMarkerSize({ width: 16, height: 20 });
+      } else { // Desktop
+        setMarkerSize({ width: 20, height: 26 });
+      }
+    };
+
+    updateMarkerSize();
+    window.addEventListener('resize', updateMarkerSize);
+    return () => window.removeEventListener('resize', updateMarkerSize);
+  }, []);
 
   const handleCategoryClick = (status) => {
     navigate('/issues', { state: { filterStatus: status } });
   };
 
-  const recentIssues = issues.slice(0, 5);
-  const totalIssues = issues.length;
-  const completedIssues = getIssuesByStatus('completed').length;
+  // Filter issues to only show Jharkhand state
+  const jharkhandIssues = issues.filter(issue => issue.location.state === 'Jharkhand');
+  const recentIssues = jharkhandIssues.slice(0, 5);
+  const totalIssues = jharkhandIssues.length;
+  const completedIssues = getIssuesByStatus('completed').filter(issue => issue.location.state === 'Jharkhand').length;
   const completionRate = Math.round((completedIssues / totalIssues) * 100);
 
   return (
@@ -89,28 +113,87 @@ export default function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="h-[320px] rounded-b-lg overflow-hidden bg-muted/20 flex items-center justify-center relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-accent/5 to-primary/10" />
-                  <div className="text-center z-10">
-                    <MapPin className="h-12 w-12 text-primary mx-auto mb-4" />
-                    <p className="text-lg font-semibold text-foreground mb-2">Interactive Map</p>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Real-time issue locations across the city
-                    </p>
-                    <div className="flex flex-wrap gap-2 justify-center">
-                      {issues.slice(0, 6).map((issue) => (
-                        <div key={issue.id} className="flex items-center gap-1 text-xs bg-card/80 px-2 py-1 rounded">
-                          <div className={`h-2 w-2 rounded-full ${
-                            issue.status === 'completed' ? 'bg-success' :
-                            issue.status === 'pending' ? 'bg-warning' :
-                            issue.status === 'new' ? 'bg-primary' :
-                            'bg-destructive'
-                          }`} />
-                          <span className="text-muted-foreground">{issue.location.address.split(',')[0]}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                <div className="h-[320px] rounded-b-lg overflow-hidden">
+                  <MapContainer
+                    center={[23.3441, 85.3096]}
+                    zoom={8}
+                    scrollWheelZoom={true}
+                    className="h-full w-full rounded-b-lg"
+                  >
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    {jharkhandIssues.map((issue) => (
+                      <Marker
+                        key={issue.id}
+                        position={issue.location.coordinates}
+                        icon={L.divIcon({
+                          className: `custom-pin-marker`,
+                          html: `
+                            <div style="
+                              position: relative;
+                              width: ${markerSize.width}px;
+                              height: ${markerSize.height}px;
+                              display: flex;
+                              flex-direction: column;
+                              align-items: center;
+                              cursor: pointer;
+                              ">
+                              <div style="
+                                width: ${markerSize.width}px;
+                                height: ${markerSize.width}px;
+                                background-color: red;
+                                border-radius: 50%;
+                                position: relative;
+                                box-shadow: 0 0 8px rgba(0,0,0,0.5);
+                              ">
+                                <div style="
+                                  position: absolute;
+                                  top: 25%;
+                                  right: 20%;
+                                  width: ${markerSize.width * 0.4}px;
+                                  height: ${markerSize.width * 0.4}px;
+                                  background: rgba(255, 255, 255, 0.3);
+                                  border-radius: 50%;
+                                "></div>
+                              </div>
+                              <div style="
+                                width: 4px;
+                                height: ${markerSize.height * 0.6}px;
+                                background-color: gray;
+                                border-radius: 2px;
+                                margin-top: -4px;
+                              "></div>
+                            </div>
+                          `,
+                          iconSize: [markerSize.width, markerSize.height],
+                          iconAnchor: [markerSize.width / 2, markerSize.height]
+                        })}
+                        eventHandlers={{
+                          click: () => {
+                            navigate(`/issues/${issue.id}`);
+                          },
+                          mouseover: (e) => {
+                            e.target.openPopup();
+                          },
+                          mouseout: (e) => {
+                            e.target.closePopup();
+                          }
+                        }}
+                      >
+                        <Popup>
+                          <div className="p-2">
+                            <strong className="block text-sm font-semibold">{issue.title}</strong>
+                            <span className="block text-xs text-gray-600">{issue.location.address}</span>
+                            <span className="block text-xs mt-1">
+                              Status: <Badge variant="outline" className="text-xs">{issue.status}</Badge>
+                            </span>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    ))}
+                  </MapContainer>
                 </div>
               </CardContent>
             </Card>
@@ -120,7 +203,7 @@ export default function Dashboard() {
           <div className="space-y-3">
             {Object.keys(statusConfig).map((status) => {
               const config = statusConfig[status];
-              const count = getIssuesByStatus(status).length;
+              const count = getIssuesByStatus(status).filter(issue => issue.location.state === 'Jharkhand').length;
               const IconComponent = config.icon;
 
               return (
@@ -182,8 +265,8 @@ export default function Dashboard() {
                         <p className="text-sm text-muted-foreground">{issue.location.address}</p>
                         <div className="flex items-center gap-2 mt-2">
                           <Badge variant="outline">{issue.category}</Badge>
-                          <Badge 
-                            variant={issue.priority === 'high' ? 'destructive' : 
+                          <Badge
+                            variant={issue.priority === 'high' ? 'destructive' :
                                    issue.priority === 'medium' ? 'default' : 'secondary'}
                           >
                             {issue.priority} priority
@@ -223,7 +306,7 @@ export default function Dashboard() {
                       <div className="bg-primary h-2 rounded-full" style={{ width: '100%' }}></div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-sm text-muted-foreground">Completed</span>
@@ -233,14 +316,14 @@ export default function Dashboard() {
                       <div className="bg-success h-2 rounded-full" style={{ width: `${completionRate}%` }}></div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-sm text-muted-foreground">Success Rate</span>
                       <span className="text-sm font-semibold text-success">{completionRate}%</span>
                     </div>
                   </div>
-                  
+
                   <div>
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-sm text-muted-foreground">Avg Response</span>

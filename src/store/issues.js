@@ -8,8 +8,9 @@ const mockIssues = [
     description: 'Large pothole causing traffic issues near intersection',
     status: 'pending',
     location: {
-      address: '123 Main St, Downtown',
-      coordinates: [40.7128, -74.0060]
+      address: '123 Main St, Ranchi',
+      coordinates: [23.3441, 85.3096],
+      state: 'Jharkhand'
     },
     dateReported: new Date('2024-01-15'),
     deadline: new Date('2024-02-15'),
@@ -24,8 +25,9 @@ const mockIssues = [
     description: 'Street light not working on Oak Avenue',
     status: 'new',
     location: {
-      address: '456 Oak Ave, Residential',
-      coordinates: [40.7580, -73.9855]
+      address: '456 Oak Ave, Jamshedpur',
+      coordinates: [22.8046, 86.2029],
+      state: 'Jharkhand'
     },
     dateReported: new Date('2024-01-20'),
     deadline: new Date('2024-02-01'),
@@ -40,8 +42,9 @@ const mockIssues = [
     description: 'Cracked sidewalk poses safety hazard',
     status: 'completed',
     location: {
-      address: '789 Pine St, Shopping District',
-      coordinates: [40.7505, -73.9934]
+      address: '789 Pine St, Dhanbad',
+      coordinates: [23.7957, 86.4304],
+      state: 'Jharkhand'
     },
     dateReported: new Date('2024-01-10'),
     deadline: new Date('2024-01-25'),
@@ -57,8 +60,9 @@ const mockIssues = [
     description: 'Traffic light stuck on red at busy intersection',
     status: 'manual',
     location: {
-      address: 'Elm St & 2nd Ave',
-      coordinates: [40.7439, -73.9889]
+      address: 'Elm St & 2nd Ave, Bokaro',
+      coordinates: [23.6693, 86.1511],
+      state: 'Jharkhand'
     },
     dateReported: new Date('2024-01-22'),
     deadline: new Date('2024-01-23'),
@@ -73,8 +77,9 @@ const mockIssues = [
     description: 'Vandalism on public building wall',
     status: 'reverted',
     location: {
-      address: '321 City Hall Plaza',
-      coordinates: [40.7282, -74.0776]
+      address: '321 City Hall Plaza, Deoghar',
+      coordinates: [24.4809, 86.6917],
+      state: 'Jharkhand'
     },
     dateReported: new Date('2024-01-18'),
     deadline: new Date('2024-02-05'),
