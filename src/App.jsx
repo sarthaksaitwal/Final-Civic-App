@@ -9,6 +9,8 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Issues from "./pages/Issues";
 import IssueDetails from "./pages/IssueDetails";
+import AssignWorker from "./pages/AssignWorker";
+import WorkerDetails from "./pages/WorkerDetails";
 import Profile from "./pages/Profile";
 import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
@@ -40,6 +42,8 @@ const App = () => (
           <Route path="/issues/:id" element={<ProtectedRoute><IssueDetails /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+          <Route path="/assign-worker" element={<ProtectedRoute><AssignWorker /></ProtectedRoute>} />
+          <Route path="/workers/:id" element={<ProtectedRoute><WorkerDetails /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

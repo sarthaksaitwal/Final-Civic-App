@@ -106,10 +106,7 @@ export default function IssueDetails() {
   };
 
   const handleAssign = () => {
-    toast({
-      title: "Assignment feature",
-      description: "Worker assignment feature will be implemented in the next version.",
-    });
+    navigate('/assign-worker', { state: { issueId: issue.id } });
   };
 
   const getStatusBadgeVariant = (status) => {

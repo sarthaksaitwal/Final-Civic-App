@@ -43,7 +43,7 @@ const statusConfig = {
     textColor: 'text-destructive-foreground'
   },
   manual: {
-    title: 'Manual Issues',
+    title: 'Review & Approve',
     icon: Settings,
     color: 'bg-accent',
     textColor: 'text-accent-foreground'
@@ -94,7 +94,7 @@ export default function Dashboard() {
             <p className="text-muted-foreground">Overview of civic issues and system status</p>
           </div>
           <Badge variant="secondary" className="text-sm">
-            Last updated: {new Date().toLocaleTimeString()}
+            {new Date().toLocaleString()}
           </Badge>
         </div>
 
@@ -108,12 +108,9 @@ export default function Dashboard() {
                   <MapPin className="h-5 w-5 text-primary" />
                   Issue Locations Map
                 </CardTitle>
-                <CardDescription>
-                  Real-time view of reported issues across the city
-                </CardDescription>
               </CardHeader>
-              <CardContent className="p-0">
-                <div className="h-[320px] rounded-b-lg overflow-hidden">
+              <CardContent className="p-0 border-t border-border">
+                <div className="h-[320px] w-full overflow-hidden rounded-b-lg">
                   <MapContainer
                     center={[23.3441, 85.3096]}
                     zoom={8}

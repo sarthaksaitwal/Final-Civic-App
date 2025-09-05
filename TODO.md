@@ -1,13 +1,7 @@
-# TODO: Implement Hover Popup for Pinpoint Locations
+# Task: Change "Manual Issues" to "Review & Approved" and add to sidebar
 
-## Tasks
-- [x] Modify marker icon HTML in Dashboard.jsx to include larger invisible hover area above pinpoint
-- [x] Attach mouseover/mouseout handlers to the hover area to open/close popup
-- [ ] Test hover behavior on the map
-
-## Status
-- [x] Analyze current implementation
-- [x] Create plan
-- [x] Get user confirmation
-- [x] Implement changes
-- [x] Test functionality - Fixed hover confusion by removing problematic invisible hover-area
+## Progress
+- [x] Update Dashboard.jsx: Change statusConfig 'manual' title to 'Review & Approved'
+- [x] Update Sidebar.jsx: Add new navigation item 'Review & Approved' that navigates to '/issues' with filterStatus: 'manual'
+- [x] Update Issues.jsx: Change display text for 'manual' status to 'Review & Approved' in the filter dropdown
+- [x] Test navigation and filtering

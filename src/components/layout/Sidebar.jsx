@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { CheckCircle } from 'lucide-react';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -17,6 +18,7 @@ import { cn } from '@/lib/utils';
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Issues', href: '/issues', icon: FileText },
+  { name: 'Review & Approve', href: '/issues', icon: CheckCircle, special: true },
   { name: 'Reports & Analytics', href: '/reports', icon: BarChart3 },
   { name: 'Profile', href: '/profile', icon: User },
 ];
@@ -79,22 +81,37 @@ export function Sidebar({ className }) {
         <ul className="space-y-1">
           {navigation.map((item) => (
             <li key={item.name}>
-              <NavLink
-                to={item.href}
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                    isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+              {item.special ? (
+                <button
+                  onClick={() => navigate('/issues', { state: { filterStatus: 'manual' } })}
+                  className={cn(
+                    "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors w-full",
+                    "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                     collapsed ? "justify-center" : "justify-start"
-                  )
-                }
-                title={collapsed ? item.name : undefined}
-              >
-                <item.icon className={cn("h-5 w-5", !collapsed && "mr-3")} />
-                {!collapsed && <span>{item.name}</span>}
-              </NavLink>
+                  )}
+                  title={collapsed ? item.name : undefined}
+                >
+                  <item.icon className={cn("h-5 w-5", !collapsed && "mr-3")} />
+                  {!collapsed && <span>{item.name}</span>}
+                </button>
+              ) : (
+                <NavLink
+                  to={item.href}
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                      collapsed ? "justify-center" : "justify-start"
+                    )
+                  }
+                  title={collapsed ? item.name : undefined}
+                >
+                  <item.icon className={cn("h-5 w-5", !collapsed && "mr-3")} />
+                  {!collapsed && <span>{item.name}</span>}
+                </NavLink>
+              )}
             </li>
           ))}
         </ul>

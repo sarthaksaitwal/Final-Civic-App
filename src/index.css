@@ -135,3 +135,12 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-hover);
   }
 }
+
+/* Hide scrollbars globally */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  scrollbar-width: none;
+}

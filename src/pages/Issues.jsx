@@ -157,7 +157,7 @@ export default function Issues() {
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
                   <SelectItem value="reverted">Reverted</SelectItem>
-                  <SelectItem value="manual">Manual</SelectItem>
+                  <SelectItem value="manual">Review & Approve</SelectItem>
                 </SelectContent>
               </Select>
 
