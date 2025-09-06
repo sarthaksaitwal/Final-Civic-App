@@ -4,6 +4,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useIssuesStore } from '@/store/issues';
+import { Loader2 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import {
@@ -51,9 +52,16 @@ const statusConfig = {
 };
 
 export default function Dashboard() {
-  const { issues, getIssuesByStatus } = useIssuesStore();
+
+  const { issues, getIssuesByStatus, fetchIssues, loading } = useIssuesStore();
   const navigate = useNavigate();
   const [markerSize, setMarkerSize] = useState({ width: 20, height: 26 });
+
+  // Fetch issues on mount
+  useEffect(() => {
+    fetchIssues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only on mount, always subscribe
 
   // Responsive marker sizing
   useEffect(() => {
@@ -77,12 +85,23 @@ export default function Dashboard() {
     navigate('/issues', { state: { filterStatus: status } });
   };
 
-  // Filter issues to only show Jharkhand state
-  const jharkhandIssues = issues.filter(issue => issue.location.state === 'Jharkhand');
-  const recentIssues = jharkhandIssues.slice(0, 5);
-  const totalIssues = jharkhandIssues.length;
-  const completedIssues = getIssuesByStatus('completed').filter(issue => issue.location.state === 'Jharkhand').length;
-  const completionRate = Math.round((completedIssues / totalIssues) * 100);
+  // Show all issues, no location filter
+  const allIssues = issues;
+  const recentIssues = allIssues.slice(0, 5);
+  const totalIssues = allIssues.length;
+  const completedIssues = getIssuesByStatus('completed').length;
+  const completionRate = totalIssues > 0 ? Math.round((completedIssues / totalIssues) * 100) : 0;
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-full">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <span className="ml-4 text-muted-foreground">Loading issues...</span>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -121,68 +140,18 @@ export default function Dashboard() {
                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    {jharkhandIssues.map((issue) => (
+                    {allIssues.filter(issue => Array.isArray(issue.coordinates) && issue.coordinates.length === 2 && issue.coordinates[0] !== 0 && issue.coordinates[1] !== 0 && !isNaN(issue.coordinates[0]) && !isNaN(issue.coordinates[1])).map((issue) => (
                       <Marker
                         key={issue.id}
-                        position={issue.location.coordinates}
-                        icon={L.divIcon({
-                          className: `custom-pin-marker`,
-                          html: `
-                            <div style="
-                              position: relative;
-                              width: ${markerSize.width}px;
-                              height: ${markerSize.height}px;
-                              display: flex;
-                              flex-direction: column;
-                              align-items: center;
-                              cursor: pointer;
-                              ">
-                              <div style="
-                                width: ${markerSize.width}px;
-                                height: ${markerSize.width}px;
-                                background-color: red;
-                                border-radius: 50%;
-                                position: relative;
-                                box-shadow: 0 0 8px rgba(0,0,0,0.5);
-                              ">
-                                <div style="
-                                  position: absolute;
-                                  top: 25%;
-                                  right: 20%;
-                                  width: ${markerSize.width * 0.4}px;
-                                  height: ${markerSize.width * 0.4}px;
-                                  background: rgba(255, 255, 255, 0.3);
-                                  border-radius: 50%;
-                                "></div>
-                              </div>
-                              <div style="
-                                width: 4px;
-                                height: ${markerSize.height * 0.6}px;
-                                background-color: gray;
-                                border-radius: 2px;
-                                margin-top: -4px;
-                              "></div>
-                            </div>
-                          `,
-                          iconSize: [markerSize.width, markerSize.height],
-                          iconAnchor: [markerSize.width / 2, markerSize.height]
-                        })}
+                        position={issue.coordinates}
                         eventHandlers={{
-                          click: () => {
-                            navigate(`/issues/${issue.id}`);
-                          },
-                          mouseover: (e) => {
-                            e.target.openPopup();
-                          },
-                          mouseout: (e) => {
-                            e.target.closePopup();
-                          }
+                          click: () => navigate(`/issues/${issue.id}`),
                         }}
                       >
                         <Popup>
                           <div className="p-2">
                             <strong className="block text-sm font-semibold">{issue.title}</strong>
-                            <span className="block text-xs text-gray-600">{issue.location.address}</span>
+                            <span className="block text-xs text-gray-600">{issue.location}</span>
                             <span className="block text-xs mt-1">
                               Status: <Badge variant="outline" className="text-xs">{issue.status}</Badge>
                             </span>
@@ -200,7 +169,7 @@ export default function Dashboard() {
           <div className="space-y-3">
             {Object.keys(statusConfig).map((status) => {
               const config = statusConfig[status];
-              const count = getIssuesByStatus(status).filter(issue => issue.location.state === 'Jharkhand').length;
+              const count = getIssuesByStatus(status).length;
               const IconComponent = config.icon;
 
               return (
@@ -259,7 +228,7 @@ export default function Dashboard() {
                     >
                       <div className="flex-1">
                         <h4 className="font-medium text-foreground">{issue.title}</h4>
-                        <p className="text-sm text-muted-foreground">{issue.location.address}</p>
+                        <p className="text-sm text-muted-foreground">{issue.location}</p>
                         <div className="flex items-center gap-2 mt-2">
                           <Badge variant="outline">{issue.category}</Badge>
                           <Badge

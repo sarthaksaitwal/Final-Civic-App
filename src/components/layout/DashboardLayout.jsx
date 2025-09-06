@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth';
 import { Sidebar } from './Sidebar.jsx';
+import Navbar from './Navbar.jsx';
 import { Loader2 } from 'lucide-react';
 
 export function DashboardLayout({ children }) {
@@ -21,13 +22,15 @@ export function DashboardLayout({ children }) {
       </div>
     );
   }
-
   return (
-    <div className="flex h-screen bg-background">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Navbar />
+      <div className="flex flex-1">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6 lg:p-8">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

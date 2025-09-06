@@ -21,30 +21,33 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      const success = await login(username, password);
-      if (success) {
-        toast({
-          title: "Login successful",
-          description: "Welcome to CivicTracker!",
-        });
-        navigate('/dashboard');
-      } else {
-        toast({
-          title: "Login failed",
-          description: "Please check your credentials and try again.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
+    // Only allow login if username and password are both 'admin'
+    if (username === 'admin' && password === 'admin') {
+      const mockUser = {
+        id: 'mock-user-id',
+        name: 'Admin User',
+        email: 'admin@civictracker.com',
+        role: 'Civic Administrator',
+        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
+      };
+      useAuthStore.setState({
+        user: mockUser,
+        isAuthenticated: true,
+        isLoading: false
       });
-    } finally {
-      setIsLoading(false);
+      toast({
+        title: "Login successful",
+        description: "Welcome to CivicTracker!",
+      });
+      navigate('/dashboard');
+    } else {
+      toast({
+        title: "Invalid credentials",
+        description: "Username or password is incorrect.",
+        variant: "destructive"
+      });
     }
+    setIsLoading(false);
   };
 
   return (

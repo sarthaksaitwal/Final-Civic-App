@@ -24,7 +24,7 @@ import {
 export default function Issues() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { issues } = useIssuesStore();
+  const { issues, fetchIssues } = useIssuesStore();
   
   const [filteredIssues, setFilteredIssues] = useState(issues);
   const [searchTerm, setSearchTerm] = useState('');
@@ -40,15 +40,20 @@ export default function Issues() {
     }
   }, [location.state]);
 
+  // Fetch issues on component mount
+  useEffect(() => {
+    fetchIssues();
+  }, [fetchIssues]);
+
   // Apply filters
   useEffect(() => {
     let filtered = issues;
 
     if (searchTerm) {
       filtered = filtered.filter(issue =>
-        issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        issue.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        issue.location.address.toLowerCase().includes(searchTerm.toLowerCase())
+        (issue.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (issue.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (issue.location || '').toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -90,6 +95,7 @@ export default function Issues() {
   };
 
   const formatDeadline = (deadline) => {
+    if (!deadline) return 'No deadline';
     const now = new Date();
     const diffTime = deadline.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -240,7 +246,7 @@ export default function Issues() {
                           <div className="flex items-start justify-between">
                             <div>
                               <h3 className="text-lg font-semibold text-foreground">
-                                {issue.title}
+                                {issue.title || 'Untitled Issue'}
                               </h3>
                               <p className="text-sm text-muted-foreground">
                                 Issue #{issue.id}
@@ -252,29 +258,37 @@ export default function Issues() {
                           </div>
 
                           <p className="text-muted-foreground">
-                            {issue.description}
+                            {issue.description || 'No description provided'}
                           </p>
 
                           <div className="flex items-center gap-4 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1">
                               <MapPin className="h-4 w-4" />
-                              {issue.location.address}
+                              {issue.location || 'N/A'}
                             </div>
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4" />
-                              Reported: {issue.dateReported.toLocaleDateString()}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              {formatDeadline(issue.deadline)}
-                            </div>
+                            {issue.dateReported && (
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-4 w-4" />
+                                Reported: {issue.dateReported.toLocaleDateString()}
+                              </div>
+                            )}
+                            {issue.deadline && (
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-4 w-4" />
+                                {formatDeadline(issue.deadline)}
+                              </div>
+                            )}
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <Badge variant="outline">{issue.category}</Badge>
-                            <Badge variant={getPriorityBadgeVariant(issue.priority)}>
-                              {issue.priority} priority
-                            </Badge>
+                            {issue.category && (
+                              <Badge variant="outline">{issue.category}</Badge>
+                            )}
+                            {issue.priority && (
+                              <Badge variant={getPriorityBadgeVariant(issue.priority)}>
+                                {issue.priority} priority
+                              </Badge>
+                            )}
                             {issue.assignedTo && (
                               <Badge variant="secondary">
                                 Assigned to: {issue.assignedTo}
@@ -283,13 +297,23 @@ export default function Issues() {
                           </div>
                         </div>
 
-                        {issue.photos.length > 0 && (
+                        {issue.photos && issue.photos.length > 0 && (
                           <div className="ml-4">
                             <img
                               src={issue.photos[0]}
                               alt={issue.title}
                               className="w-20 h-20 object-cover rounded-lg border border-border"
                             />
+                          </div>
+                        )}
+                        {issue.audio && issue.audio.length > 0 && (
+                          <div className="mt-2">
+                            {issue.audio.map((audioUrl, index) => (
+                              <audio key={index} controls className="w-full">
+                                <source src={audioUrl} type="audio/mpeg" />
+                                Your browser does not support the audio element.
+                              </audio>
+                            ))}
                           </div>
                         )}
                       </div>
@@ -316,15 +340,21 @@ export default function Issues() {
                     {filteredIssues.map((issue) => (
                       <Marker
                         key={issue.id}
-                        position={issue.location.coordinates}
+                        position={
+                          issue.coordinates && issue.coordinates.length === 2
+                            ? issue.coordinates
+                            : [0, 0]
+                        }
                         eventHandlers={{
                           click: () => navigate(`/issues/${issue.id}`),
                         }}
                       >
                         <Popup>
                           <div className="p-2">
-                            <h3 className="font-semibold">{issue.title}</h3>
-                            <p className="text-sm text-muted-foreground">{issue.location.address}</p>
+                            <h3 className="font-semibold">{issue.title || 'Untitled Issue'}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {issue.location || 'N/A'}
+                            </p>
                           </div>
                         </Popup>
                       </Marker>

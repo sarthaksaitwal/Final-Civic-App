@@ -101,29 +101,33 @@ export default function AssignWorker() {
           {filteredWorkers.map((worker) => (
             <Card
               key={worker.id}
-              className="cursor-pointer shadow-card hover:shadow-lg transition-shadow"
+              className="flex flex-col sm:flex-row items-center justify-between cursor-pointer shadow-card hover:shadow-lg transition-shadow p-4 gap-4"
               onClick={() => handleWorkerClick(worker)}
             >
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  {worker.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>
-                  <strong>Current Task:</strong> {worker.currentTask || 'None'}
-                </p>
-                <p>
-                  <strong>Availability:</strong>{' '}
-                  <Badge variant={worker.availability === 'Available' ? 'success' : 'destructive'}>
-                    {worker.availability}
-                  </Badge>
-                </p>
-                <p>
-                  <strong>Location:</strong> {worker.location}
-                </p>
-              </CardContent>
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <User className="h-8 w-8 text-primary shrink-0" />
+                <div className="min-w-0">
+                  <div className="font-semibold text-lg truncate">{worker.name}</div>
+                  <div className="text-sm text-muted-foreground truncate">{worker.location}</div>
+                  <div className="text-xs mt-1"><strong>Current Task:</strong> {worker.currentTask || 'None'}</div>
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                <Badge variant={worker.availability === 'Available' ? 'success' : 'destructive'}>
+                  {worker.availability}
+                </Badge>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={e => {
+                    e.stopPropagation();
+                    handleWorkerClick(worker);
+                  }}
+                >
+                  View Details
+                </Button>
+              </div>
             </Card>
           ))}
         </div>
