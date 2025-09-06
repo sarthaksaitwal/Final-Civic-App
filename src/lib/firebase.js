@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
+import { getAuth } from "firebase/auth";
 
 // TODO: Replace the following with your app's Firebase project configuration
 const firebaseConfig = {
@@ -15,13 +14,7 @@ const firebaseConfig = {
   measurementId: "G-899FH4NFHB"
 };
 
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Initialize Firestore, Auth and Realtime Database
-const db = getFirestore(app);
-const auth = getAuth(app);
-const realtimeDb = getDatabase(app);
-
-export { db, auth, realtimeDb };
+export const realtimeDb = getDatabase(app);
+export const auth = getAuth(app);

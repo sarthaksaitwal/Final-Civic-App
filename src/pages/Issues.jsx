@@ -117,13 +117,14 @@ export default function Issues() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Issues Management</h1>
-            <p className="text-muted-foreground">
+            <h3 className="text-3xl font-bold text-foreground">Manage and track all civic issues</h3>
+
+            {/* <h3 className="text-muted-foreground">
               {statusFilter !== 'all' 
                 ? `Showing ${statusFilter} issues (${filteredIssues.length})` 
                 : `Manage and track all civic issues (${filteredIssues.length} total)`
               }
-            </p>
+            </h3> */}
           </div>
           <Button onClick={() => navigate('/dashboard')}>
             Back to Dashboard

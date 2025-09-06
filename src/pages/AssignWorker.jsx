@@ -11,7 +11,7 @@ import { Loader2, User, Filter } from 'lucide-react';
 export default function AssignWorker() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { workers } = useWorkersStore();
+  const { workers, fetchWorkers } = useWorkersStore();
   const [isLoading, setIsLoading] = useState(true);
   const [availabilityFilter, setAvailabilityFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
@@ -20,8 +20,8 @@ export default function AssignWorker() {
   const issueId = location.state?.issueId || null;
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 300);
-    return () => clearTimeout(timer);
+    fetchWorkers().finally(() => setIsLoading(false));
+    // eslint-disable-next-line
   }, []);
 
   // Get unique locations for filter
@@ -141,3 +141,5 @@ export default function AssignWorker() {
     </DashboardLayout>
   );
 }
+
+

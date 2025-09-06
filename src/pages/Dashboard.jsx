@@ -109,11 +109,11 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-            <p className="text-muted-foreground">Overview of civic issues and system status</p>
+            <h3 className="text-3xl font-bold text-foreground">Overview of civic issues and system status</h3>
+         
           </div>
           <Badge variant="secondary" className="text-sm">
-            {new Date().toLocaleString()}
+            {/* {new Date().toLocaleString()} */}
           </Badge>
         </div>
 

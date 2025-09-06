@@ -1,13 +1,14 @@
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth';
-import { Sidebar } from './Sidebar.jsx';
-import Navbar from './Navbar.jsx';
-import { Loader2 } from 'lucide-react';
+import { Sidebar } from './Sidebar';
+import Navbar from './Navbar';
+
 
 export function DashboardLayout({ children }) {
   const { isAuthenticated, isLoading } = useAuthStore();
   const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
@@ -23,14 +24,14 @@ export function DashboardLayout({ children }) {
     );
   }
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <>
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Navbar />
-      <div className="flex flex-1">
-        <Sidebar />
-        <main className="flex-1 p-4 md:p-6 lg:p-8">
-          {children}
-        </main>
+      <div
+        className={`transition-all duration-300 pt-16 px-4  ${collapsed ? 'ml-16' : 'ml-64'}`}
+      >
+        <main>{children}</main>
       </div>
-    </div>
+    </>
   );
 }

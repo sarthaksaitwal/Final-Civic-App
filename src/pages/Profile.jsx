@@ -57,8 +57,8 @@ export default function Profile() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Profile</h1>
-            <p className="text-muted-foreground">Manage your account settings and view activity</p>
+            <h3 className="text-3xl font-bold text-foreground">Manage your account settings and view activity</h3>
+            
           </div>
           <Button variant="outline">
             <Settings className="h-4 w-4 mr-2" />

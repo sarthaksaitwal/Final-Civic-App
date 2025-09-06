@@ -3,28 +3,39 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useWorkersStore } from '@/store/workers';
 import { useIssuesStore } from '@/store/issues';
 import { useEffect, useState } from 'react';
 import { Loader2, User, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ref, get } from "firebase/database";
+import { realtimeDb } from "@/lib/firebase";
 
 export default function WorkerDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { getWorkerById, assignWorkerToIssue } = useWorkersStore();
+  const { assignWorkerToIssue } = useWorkersStore ? useWorkersStore() : {};
   const { issues } = useIssuesStore();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [worker, setWorker] = useState(null);
 
   const issueId = location.state?.issueId || null;
-  const worker = getWorkerById(id);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 300);
-    return () => clearTimeout(timer);
-  }, []);
+    async function fetchWorker() {
+      setIsLoading(true);
+      const snap = await get(ref(realtimeDb, `workers/${id}`));
+      if (snap.exists()) {
+        setWorker({ ...snap.val(), id });
+      } else {
+        setWorker(null);
+      }
+      setIsLoading(false);
+    }
+    fetchWorker();
+    // eslint-disable-next-line
+  }, [id]);
 
   if (isLoading) {
     return (
@@ -67,12 +78,14 @@ export default function WorkerDetails() {
       return;
     }
 
-    assignWorkerToIssue(worker.id, issueId, issue.title);
-    toast({
-      title: "Worker Assigned",
-      description: `${worker.name} has been assigned to ${issue.title}`,
-    });
-    navigate(`/issues/${issueId}`);
+    if (assignWorkerToIssue) {
+      assignWorkerToIssue(worker.id, issueId, issue.title);
+      toast({
+        title: "Worker Assigned",
+        description: `${worker.name} has been assigned to ${issue.title}`,
+      });
+      navigate(`/issues/${issueId}`);
+    }
   };
 
   return (
@@ -94,23 +107,23 @@ export default function WorkerDetails() {
                 Worker Information
               </CardTitle>
             </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <strong>Name:</strong> {worker.name}
-                </div>
-                <div>
-                  <strong>Current Task:</strong> {worker.currentTask || 'None'}
-                </div>
-                <div>
-                  <strong>Availability:</strong>{' '}
-                  <Badge variant={worker.availability === 'Available' ? 'success' : 'destructive'}>
-                    {worker.availability}
-                  </Badge>
-                </div>
-                <div>
-                  <strong>Location:</strong> {worker.location}
-                </div>
-              </CardContent>
+            <CardContent className="space-y-4">
+              <div>
+                <strong>Name:</strong> {worker.name}
+              </div>
+              <div>
+                <strong>Current Task:</strong> {worker.currentTask || 'None'}
+              </div>
+              <div>
+                <strong>Availability:</strong>{' '}
+                <Badge variant={worker.availability === 'Available' ? 'success' : 'destructive'}>
+                  {worker.availability}
+                </Badge>
+              </div>
+              <div>
+                <strong>Location:</strong> {worker.location}
+              </div>
+            </CardContent>
           </Card>
 
           <Card className="shadow-card">
@@ -118,7 +131,7 @@ export default function WorkerDetails() {
               <CardTitle>Assigned Tasks</CardTitle>
             </CardHeader>
             <CardContent>
-              {worker.assignedTasks.length > 0 ? (
+              {worker.assignedTasks && worker.assignedTasks.length > 0 ? (
                 <ul className="space-y-2">
                   {worker.assignedTasks.map((task) => (
                     <li key={task.id} className="flex items-center justify-between">

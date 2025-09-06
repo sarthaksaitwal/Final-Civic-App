@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { realtimeDb } from '../lib/firebase';
-import { ref, get, update } from 'firebase/database';
+import { create } from "zustand";
+import { get, ref, update } from "firebase/database";
+import { realtimeDb } from "@/lib/firebase";
 
 export const useWorkersStore = create((set, get) => ({
   workers: [],
@@ -12,7 +12,6 @@ export const useWorkersStore = create((set, get) => ({
   fetchWorkers: async () => {
     set({ loading: true, error: null });
     try {
-      const dbRef = ref(realtimeDb);
       const snapshot = await get(ref(realtimeDb, 'workers'));
       if (snapshot.exists()) {
         const data = snapshot.val();
@@ -38,23 +37,28 @@ export const useWorkersStore = create((set, get) => ({
   assignWorkerToIssue: async (workerId, issueId, issueTitle) => {
     try {
       const workerRef = ref(realtimeDb, `workers/${workerId}`);
-      const worker = get().workers.find(w => w.id === workerId);
-      const updatedTasks = [...worker.assignedTasks, { id: issueId, title: issueTitle, status: 'in-progress' }];
+      const worker = get().getWorkerById(workerId);
+      if (!worker) {
+        set({ error: "Worker not found." });
+        return;
+      }
+      // Fallback to empty array if assignedTasks is undefined
+      const updatedTasks = [...(worker.assignedTasks || []), { id: issueId, title: issueTitle, status: 'in-progress' }];
       await update(workerRef, {
         currentTask: issueTitle,
         availability: 'Busy',
         assignedTasks: updatedTasks
       });
       set(state => ({
-        workers: state.workers.map(worker =>
-          worker.id === workerId
+        workers: state.workers.map(w =>
+          w.id === workerId
             ? {
-                ...worker,
+                ...w,
                 currentTask: issueTitle,
                 availability: 'Busy',
                 assignedTasks: updatedTasks
               }
-            : worker
+            : w
         )
       }));
     } catch (error) {

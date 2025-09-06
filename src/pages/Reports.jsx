@@ -83,8 +83,8 @@ export default function Reports() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Reports & Analytics</h1>
-            <p className="text-muted-foreground">Comprehensive insights into civic issue management</p>
+            <h3 className="text-3xl font-bold text-foreground">Comprehensive insights into civic issue management</h3>
+            
           </div>
           <div className="flex gap-2">
             <Button variant="outline">
