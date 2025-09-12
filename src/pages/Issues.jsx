@@ -72,6 +72,12 @@ export default function Issues() {
     setFilteredIssues(filtered);
   }, [issues, searchTerm, statusFilter, categoryFilter, priorityFilter]);
 
+  // Sort issues by dateReported descending (newest first)
+  const sortedIssues = [...filteredIssues].sort((a, b) => {
+    if (!a.dateReported || !b.dateReported) return 0;
+    return b.dateReported - a.dateReported;
+  });
+
   const categories = [...new Set(issues.map(issue => issue.category))];
 
   const getStatusBadgeVariant = (status) => {
@@ -235,7 +241,7 @@ export default function Issues() {
                   </CardContent>
                 </Card>
               ) : (
-                filteredIssues.map((issue) => (
+                sortedIssues.map((issue) => (
                   <Card
                     key={issue.id}
                     className="shadow-card hover:shadow-hover transition-all duration-200 cursor-pointer"

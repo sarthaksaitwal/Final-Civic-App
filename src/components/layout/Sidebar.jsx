@@ -44,8 +44,21 @@ export function Sidebar({ className, collapsed, setCollapsed }) {
         background: "rgba(255,255,255,0.95)",
         backdropFilter: "blur(8px)",
         border: "1px solid #e5e7eb", // subtle gray border
+        display: 'flex',
+        flexDirection: 'column'
       }}
     >
+      {/* Collapse Button Section */}
+      <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-end'} p-2`}>
+        <button
+          onClick={() => setCollapsed && setCollapsed(!collapsed)}
+          className="p-1 rounded-md bg-white shadow hover:bg-accent transition-colors"
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          type="button"
+        >
+          {collapsed ? <Menu className="w-5 h-5" /> : <X className="w-5 h-5" />}
+        </button>
+      </div>
       {/* Navigation */}
       <nav className="flex-1 p-2 flex flex-col h-full">
         <ul className="space-y-1 flex-1">
@@ -86,13 +99,13 @@ export function Sidebar({ className, collapsed, setCollapsed }) {
           ))}
         </ul>
         {/* Logout at the bottom */}
-        <div className="mt-auto p-2 border-t border-border">
+        <div className={`mt-auto p-2 border-t border-border flex ${collapsed ? 'justify-center' : 'justify-start'}`}>
           <Button
             variant="ghost"
             onClick={handleLogout}
             className={cn(
               "w-full justify-start text-red-600 hover:text-white hover:bg-red-600",
-              collapsed ? "px-3" : ""
+              collapsed ? "px-3 justify-center" : ""
             )}
             title={collapsed ? "Logout" : undefined}
           >
