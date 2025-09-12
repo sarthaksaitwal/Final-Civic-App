@@ -51,6 +51,20 @@ const statusConfig = {
   }
 };
 
+const ISSUE_TYPE_MAP = {
+  RDG: "Road Damage",
+  DRN: "Drainage & Sewage",
+  WTR: "Water",
+  GBG: "Garbage",
+  SLT: "StreetLight",
+};
+
+const getIssueTypeFromToken = (id) => {
+  if (!id) return "Unknown";
+  const prefix = id.split("-")[0];
+  return ISSUE_TYPE_MAP[prefix] || "Unknown";
+};
+
 export default function Dashboard() {
 
   const { issues, getIssuesByStatus, fetchIssues, loading } = useIssuesStore();
@@ -129,12 +143,13 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0 border-t border-border">
-                <div className="h-[320px] w-full overflow-hidden rounded-b-lg">
+                <div className="h-[320px] w-full overflow-hidden rounded-b-lg relative">
                   <MapContainer
-                    center={[23.3441, 85.3096]}
-                    zoom={8}
+                    center={[22.5937, 78.9629]} // Center of India
+                    zoom={5} // Suitable zoom for India
                     scrollWheelZoom={true}
                     className="h-full w-full rounded-b-lg"
+                    style={{ position: "relative", zIndex: 1 }}
                   >
                     <TileLayer
                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -227,7 +242,9 @@ export default function Dashboard() {
                       onClick={() => navigate(`/issues/${issue.id}`)}
                     >
                       <div className="flex-1">
-                        <h4 className="font-medium text-foreground">{issue.title}</h4>
+                        <h4 className="font-medium text-foreground">
+                              {issue.title || getIssueTypeFromToken(issue.id) || "Untitled Issue"}
+                        </h4>
                         <p className="text-sm text-muted-foreground">{issue.location}</p>
                         <div className="flex items-center gap-2 mt-2">
                           <Badge variant="outline">{issue.category}</Badge>

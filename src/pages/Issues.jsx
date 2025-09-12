@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIssuesStore } from '@/store/issues';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
   Search,
@@ -25,7 +24,7 @@ export default function Issues() {
   const location = useLocation();
   const navigate = useNavigate();
   const { issues, fetchIssues } = useIssuesStore();
-  
+
   const [filteredIssues, setFilteredIssues] = useState(issues);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -105,7 +104,6 @@ export default function Issues() {
     const now = new Date();
     const diffTime = deadline.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
     if (diffDays < 0) {
       return `${Math.abs(diffDays)} days overdue`;
     } else if (diffDays === 0) {
@@ -117,6 +115,21 @@ export default function Issues() {
     }
   };
 
+  // Helper to get issue type from token
+  const ISSUE_TYPE_MAP = {
+    RDG: "Road Damage",
+    DRN: "Drainage & Sewage",
+    WTR: "Water",
+    GBG: "Garbage",
+    SLT: "StreetLight",
+  };
+
+  const getIssueTypeFromToken = (id) => {
+    if (!id) return "Unknown";
+    const prefix = id.split("-")[0];
+    return ISSUE_TYPE_MAP[prefix] || "Unknown";
+  };
+
   return (
     <DashboardLayout>
       <div className="p-6 space-y-6">
@@ -124,24 +137,14 @@ export default function Issues() {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-3xl font-bold text-foreground">Manage and track all civic issues</h3>
-
-            {/* <h3 className="text-muted-foreground">
-              {statusFilter !== 'all' 
-                ? `Showing ${statusFilter} issues (${filteredIssues.length})` 
-                : `Manage and track all civic issues (${filteredIssues.length} total)`
-              }
-            </h3> */}
           </div>
-          <Button onClick={() => navigate('/dashboard')}>
-            Back to Dashboard
-          </Button>
         </div>
 
         {/* Filters */}
         <Card className="shadow-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Filter className="h-5 w-5 text-primary" />
+              <Filter className="h-4 w-4 text-primary" />
               Filters
             </CardTitle>
             <CardDescription>
@@ -215,163 +218,107 @@ export default function Issues() {
           </CardContent>
         </Card>
 
-        {/* Issues View */}
-        <Tabs defaultValue="list" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="list" className="flex items-center gap-2">
-              <List className="h-4 w-4" />
-              List View
-            </TabsTrigger>
-            <TabsTrigger value="map" className="flex items-center gap-2">
-              <Map className="h-4 w-4" />
-              Map View
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="list" className="mt-6">
-            <div className="grid gap-4">
-              {filteredIssues.length === 0 ? (
-                <Card className="shadow-card">
-                  <CardContent className="text-center py-8">
-                    <div className="text-muted-foreground">
-                      <AlertTriangle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p className="text-lg font-medium">No issues found</p>
-                      <p>Try adjusting your filters or search terms.</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                sortedIssues.map((issue) => (
-                  <Card
-                    key={issue.id}
-                    className="shadow-card hover:shadow-hover transition-all duration-200 cursor-pointer"
-                    onClick={() => navigate(`/issues/${issue.id}`)}
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 space-y-3">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <h3 className="text-lg font-semibold text-foreground">
-                                {issue.title || 'Untitled Issue'}
-                              </h3>
-                              <p className="text-sm text-muted-foreground">
-                                Issue #{issue.id}
-                              </p>
-                            </div>
-                            <Badge variant={getStatusBadgeVariant(issue.status)}>
-                              {issue.status}
-                            </Badge>
-                          </div>
-
-                          <p className="text-muted-foreground">
-                            {issue.description || 'No description provided'}
-                          </p>
-
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <MapPin className="h-4 w-4" />
-                              {issue.location || 'N/A'}
-                            </div>
-                            {issue.dateReported && (
-                              <div className="flex items-center gap-1">
-                                <Calendar className="h-4 w-4" />
-                                Reported: {issue.dateReported.toLocaleDateString()}
-                              </div>
-                            )}
-                            {issue.deadline && (
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-4 w-4" />
-                                {formatDeadline(issue.deadline)}
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            {issue.category && (
-                              <Badge variant="outline">{issue.category}</Badge>
-                            )}
-                            {issue.priority && (
-                              <Badge variant={getPriorityBadgeVariant(issue.priority)}>
-                                {issue.priority} priority
-                              </Badge>
-                            )}
-                            {issue.assignedTo && (
-                              <Badge variant="secondary">
-                                Assigned to: {issue.assignedTo}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-
-                        {issue.photos && issue.photos.length > 0 && (
-                          <div className="ml-4">
-                            <img
-                              src={issue.photos[0]}
-                              alt={issue.title}
-                              className="w-20 h-20 object-cover rounded-lg border border-border"
-                            />
-                          </div>
-                        )}
-                        {issue.audio && issue.audio.length > 0 && (
-                          <div className="mt-2">
-                            {issue.audio.map((audioUrl, index) => (
-                              <audio key={index} controls className="w-full">
-                                <source src={audioUrl} type="audio/mpeg" />
-                                Your browser does not support the audio element.
-                              </audio>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="map" className="mt-6">
+        {/* Issues List */}
+        <div className="grid gap-4 mt-6">
+          {filteredIssues.length === 0 ? (
             <Card className="shadow-card">
-              <CardContent className="p-0">
-                <div className="h-96 w-full">
-                  <MapContainer
-                    center={[40.7128, -74.0060]}
-                    zoom={10}
-                    style={{ height: '100%', width: '100%' }}
-                  >
-                    <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    {filteredIssues.map((issue) => (
-                      <Marker
-                        key={issue.id}
-                        position={
-                          issue.coordinates && issue.coordinates.length === 2
-                            ? issue.coordinates
-                            : [0, 0]
-                        }
-                        eventHandlers={{
-                          click: () => navigate(`/issues/${issue.id}`),
-                        }}
-                      >
-                        <Popup>
-                          <div className="p-2">
-                            <h3 className="font-semibold">{issue.title || 'Untitled Issue'}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {issue.location || 'N/A'}
-                            </p>
-                          </div>
-                        </Popup>
-                      </Marker>
-                    ))}
-                  </MapContainer>
+              <CardContent className="text-center py-8">
+                <div className="text-muted-foreground">
+                  <AlertTriangle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg font-medium">No issues found</p>
+                  <p>Try adjusting your filters or search terms.</p>
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          ) : (
+            sortedIssues.map((issue) => (
+              <Card
+                key={issue.id}
+                className="shadow-card hover:shadow-hover transition-all duration-200 cursor-pointer"
+                onClick={() => navigate(`/issues/${issue.id}`)}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold text-foreground">
+                            {issue.title || getIssueTypeFromToken(issue.id) || 'Untitled Issue'}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            Issue #{issue.id}
+                          </p>
+                        </div>
+                        <Badge variant={getStatusBadgeVariant(issue.status)}>
+                          {issue.status}
+                        </Badge>
+                      </div>
+
+                      <p className="text-muted-foreground">
+                        {issue.description || 'No description provided'}
+                      </p>
+
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <MapPin className="h-4 w-4" />
+                          {issue.location || 'N/A'}
+                        </div>
+                        {issue.dateReported && (
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-4 w-4" />
+                            Reported: {issue.dateReported.toLocaleDateString()}
+                          </div>
+                        )}
+                        {issue.deadline && (
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            {formatDeadline(issue.deadline)}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {issue.category && (
+                          <Badge variant="outline">{issue.category}</Badge>
+                        )}
+                        {issue.priority && (
+                          <Badge variant={getPriorityBadgeVariant(issue.priority)}>
+                            {issue.priority} priority
+                          </Badge>
+                        )}
+                        {issue.assignedTo && (
+                          <Badge variant="secondary">
+                            Assigned to: {issue.assignedTo}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    {issue.photos && issue.photos.length > 0 && (
+                      <div className="ml-4">
+                        <img
+                          src={issue.photos[0]}
+                          alt={issue.title}
+                          className="w-20 h-20 object-cover rounded-lg border border-border"
+                        />
+                      </div>
+                    )}
+                    {issue.audio && issue.audio.length > 0 && (
+                      <div className="mt-2">
+                        {issue.audio.map((audioUrl, index) => (
+                          <audio key={index} controls className="w-full">
+                            <source src={audioUrl} type="audio/mpeg" />
+                            Your browser does not support the audio element.
+                          </audio>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
       </div>
     </DashboardLayout>
   );

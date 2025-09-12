@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import {
@@ -12,7 +12,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useIssuesStore } from "@/store/issues";
 import { useToast } from "@/components/ui/use-toast";
-import { MapPin, Calendar, Clock, ArrowLeft } from "lucide-react";
+import { MapPin, Calendar, Clock, ArrowLeft, CheckCircle } from "lucide-react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+
+const ISSUE_TYPE_MAP = {
+  RDG: "Road Damage",
+  DRN: "Drainage & Sewage",
+  WTR: "Water",
+  GBG: "Garbage",
+  SLT: "StreetLight",
+};
 
 export default function IssueDetails() {
   const { id } = useParams();
@@ -22,6 +31,10 @@ export default function IssueDetails() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showMap, setShowMap] = useState(false);
+
+  // Add state for photo modal
+  const [openPhoto, setOpenPhoto] = useState(null);
 
   // Ensure issues are fetched if not already
   useEffect(() => {
@@ -48,6 +61,13 @@ export default function IssueDetails() {
       title: "Status Updated",
       description: `Issue status has been updated to ${newStatus}`,
     });
+  };
+
+  // Helper to get issue type from token
+  const getIssueTypeFromToken = (id) => {
+    if (!id) return "Unknown";
+    const prefix = id.split("-")[0];
+    return ISSUE_TYPE_MAP[prefix] || "Unknown";
   };
 
   if (isLoading) {
@@ -104,32 +124,36 @@ export default function IssueDetails() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6">
+      <div className="p-4 sm:p-6 md:p-8 max-w-5xl mx-auto space-y-6">
         {/* Back Button */}
-        <Button
-          variant="ghost"
-          className="flex items-center gap-2"
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Button>
+        <div className="mb-2">
+          <Button
+            variant="ghost"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-base sm:text-sm"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+        </div>
 
         {/* Issue Details Card */}
         <Card className="shadow-card">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>{issue.title}</span>
-              <Badge variant={getStatusBadgeVariant(issue.status)}>
+            <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <span className="text-xl sm:text-2xl font-bold break-words">
+                {issue.title || getIssueTypeFromToken(issue.id) || "Untitled Issue"}
+              </span>
+              <Badge variant={getStatusBadgeVariant(issue.status)} className="self-start sm:self-center">
                 {issue.status}
               </Badge>
             </CardTitle>
-            <CardDescription>Issue #{issue.id}</CardDescription>
+            <CardDescription className="text-sm mt-1">Issue #{issue.id}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-muted-foreground">{issue.description}</p>
 
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <MapPin className="h-4 w-4" />
                 {issue.location || "N/A"}
@@ -151,7 +175,7 @@ export default function IssueDetails() {
             </div>
 
             {/* Tags */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge variant="outline">{issue.category}</Badge>
               <Badge variant={getPriorityBadgeVariant(issue.priority)}>
                 {issue.priority} priority
@@ -163,13 +187,15 @@ export default function IssueDetails() {
 
             {/* Photos */}
             {issue.photos && issue.photos.length > 0 && (
-              <div className="flex gap-2 mt-4">
+              <div className="flex flex-wrap gap-2 mt-4">
                 {issue.photos.map((photoUrl, index) => (
                   <img
                     key={index}
                     src={photoUrl}
                     alt={`Photo ${index + 1}`}
-                    className="w-32 h-32 object-cover rounded-lg border border-border"
+                    className="w-28 h-28 object-cover rounded-lg border border-border cursor-pointer transition-transform duration-200 hover:scale-105 hover:shadow-lg"
+                    onClick={() => setOpenPhoto(photoUrl)}
+                    title="Click to view"
                   />
                 ))}
               </div>
@@ -188,30 +214,93 @@ export default function IssueDetails() {
             )}
 
             {/* Status Update Buttons & Assign to Worker Button */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-6 w-full">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-6 w-full">
               <div className="flex flex-row flex-wrap gap-2">
                 {["pending", "completed", "reverted"].map((status) => (
                   <Button
                     key={status}
-                    variant={
-                      issue.status === status ? "default" : "outline"
-                    }
+                    variant={issue.status === status ? "default" : "outline"}
                     onClick={() => handleStatusChange(status)}
+                    className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                   >
                     Mark {status}
                   </Button>
                 ))}
               </div>
-              <Button
-                variant="primary"
-                className="w-full sm:w-auto"
-                onClick={() => navigate('/assign-worker', { state: { issueId: id } })}
-              >
-                Assign to Worker
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <Button
+                  variant="primary"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3 rounded-xl font-semibold text-base bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200"
+                  onClick={() => navigate('/assign-worker', { state: { issueId: id } })}
+                >
+                  <CheckCircle className="h-5 w-5" />
+                  Assign to Worker
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => setShowMap(true)}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3 rounded-xl font-semibold text-base bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200"
+                >
+                  <MapPin className="h-5 w-5" />
+                  View on Map
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* Map Modal/Section */}
+        {showMap && issue.coordinates && Array.isArray(issue.coordinates) && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="bg-white rounded-lg shadow-lg p-4 relative w-full max-w-xl">
+              <button
+                className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-2xl"
+                onClick={() => setShowMap(false)}
+                aria-label="Close map"
+              >
+                ✕
+              </button>
+              <h3 className="text-lg font-semibold mb-2">Issue Location</h3>
+              <div className="h-80 w-full rounded-lg overflow-hidden">
+                <MapContainer
+                  center={issue.coordinates}
+                  zoom={16}
+                  style={{ height: "100%", width: "100%" }}
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <Marker position={issue.coordinates}>
+                    <Popup>
+                      {issue.title || "Issue Location"}
+                    </Popup>
+                  </Marker>
+                </MapContainer>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Photo Modal */}
+        {openPhoto && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+            <div className="relative">
+              <button
+                className="absolute top-2 right-2 text-white bg-black/60 rounded-full p-2 hover:bg-black/90 transition"
+                onClick={() => setOpenPhoto(null)}
+                aria-label="Close photo"
+              >
+                ✕
+              </button>
+              <img
+                src={openPhoto}
+                alt="Full size"
+                className="max-h-[80vh] max-w-[90vw] rounded-lg shadow-2xl border-4 border-white"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
