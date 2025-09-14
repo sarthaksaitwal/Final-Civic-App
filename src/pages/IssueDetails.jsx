@@ -398,9 +398,9 @@ export default function IssueDetails() {
   // --- Section: Worker Completion (Photos, Description, Voice Note) ---
   const workerCompletionSection =
     issue.status?.toLowerCase() === "resolved" &&
-    (issue.completionPhotos?.length > 0 ||
-      issue.completionNotes ||
-      issue.completionVoiceNote) ? (
+    (Array.isArray(issue.completionPhotos) && issue.completionPhotos.length > 0 ||
+      !!issue.completionNotes ||
+      !!issue.completionVoiceNote) ? (
       <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
@@ -410,7 +410,7 @@ export default function IssueDetails() {
         </CardHeader>
         <CardContent className="pt-2 pb-6 px-6">
           {/* Photos */}
-          {issue.completionPhotos && issue.completionPhotos.length > 0 && (
+          {Array.isArray(issue.completionPhotos) && issue.completionPhotos.length > 0 && (
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-2 font-bold text-black">
                 <ImageIcon className="h-5 w-5 text-black" />
@@ -418,32 +418,43 @@ export default function IssueDetails() {
               </div>
               <div className="flex gap-3 flex-wrap">
                 {issue.completionPhotos.map((photoUrl, index) => (
-                  <div key={index} className="relative flex flex-col items-center">
+                  <div
+                    key={index}
+                    className="relative flex flex-col items-center"
+                  >
                     <img
                       src={photoUrl}
                       alt={`Completion Photo ${index + 1}`}
                       className="w-36 h-36 object-cover rounded-xl border border-gray-200 cursor-pointer transition-transform duration-200 hover:scale-105 hover:shadow-lg"
                       title="Worker Uploaded Photo"
+                      onClick={() => setOpenPhoto(photoUrl)}
                     />
-                    {/* Timestamp overlay if available */}
-                    {issue.completionTimestamps && issue.completionTimestamps[index] && (
-                      <span
-                        className="absolute bottom-1 left-1 right-1 px-2 py-0.5 text-xs text-white bg-black/60 rounded-b-xl text-center"
-                        style={{
-                          fontSize: "0.75rem",
-                          lineHeight: "1rem",
-                          borderBottomLeftRadius: "0.75rem",
-                          borderBottomRightRadius: "0.75rem",
-                        }}
-                      >
-                        {new Date(issue.completionTimestamps[index]).toLocaleString("en-IN", {
-                          day: "2-digit",
-                          month: "short",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                    )}
+                    {/* Timestamp below the photo */}
+                    <span
+                      className="absolute bottom-1 left-1 right-1 px-2 py-0.5 text-xs text-white bg-black/60 rounded-b-xl text-center"
+                      style={{
+                        fontSize: "0.75rem",
+                        lineHeight: "1rem",
+                        borderBottomLeftRadius: "0.75rem",
+                        borderBottomRightRadius: "0.75rem",
+                      }}
+                    >
+                      {Array.isArray(issue.completionTimestamps) && issue.completionTimestamps[index]
+                        ? new Date(issue.completionTimestamps[index]).toLocaleString("en-IN", {
+                            day: "2-digit",
+                            month: "short",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : issue.completionTimestamp
+                        ? new Date(issue.completionTimestamp).toLocaleString("en-IN", {
+                            day: "2-digit",
+                            month: "short",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : ""}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -548,10 +559,10 @@ export default function IssueDetails() {
     },
   ];
 
-  const currentStepIndex = timelineSteps.findIndex((step) => step.active);
   const lastActiveIndex = Math.max(
     ...timelineSteps.map((step, idx) => (step.active ? idx : -1))
   );
+  const assignedStepIndex = timelineSteps.findIndex((step) => step.title === "Assigned");
 
   const timelineSection = (
     <div>
@@ -626,10 +637,17 @@ export default function IssueDetails() {
   );
 
   // --- Section: Actions ---
+  // Show "Assign to Worker" if not assigned or timeline is before "Assigned"
+  // Show "Reassign to Worker" if timeline is at "Assigned" or ahead
+
+  const currentStepIndex = timelineSteps.findIndex((step) => step.active);
+  const lastActiveStepIndex = Math.max(
+    ...timelineSteps.map((step, idx) => (step.active ? idx : -1))
+  );
+
   const actionsSection = (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4 mt-8">
-      {/* Show "Assign to Worker" if not assigned, else show "Reassign to Worker" if status is Assigned */}
-      {issue.status === "Assigned" ? (
+      {lastActiveStepIndex >= assignedStepIndex ? (
         <Button
           variant="primary"
           className="flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-base bg-blue-600 text-white shadow-lg hover:bg-blue-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-all duration-200"
@@ -711,7 +729,7 @@ export default function IssueDetails() {
   const photoModal = openPhoto ? (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
       <div className="relative">
-        {/* Close button (larger, more visible) */}
+        {/* Close button */}
         <button
           className="absolute top-3 right-3 text-white bg-black/70 rounded-full p-2 hover:bg-red-600 hover:text-white transition text-2xl z-10"
           onClick={() => setOpenPhoto(null)}
@@ -736,8 +754,8 @@ export default function IssueDetails() {
             }}
           >
             {(() => {
-              // Find the index of the open photo
-              const idx = issue.photos?.findIndex((url) => url === openPhoto);
+              // Check if openPhoto is a citizen photo
+              let idx = issue.photos?.findIndex((url) => url === openPhoto);
               if (idx !== undefined && idx !== -1) {
                 if (issue.photoTimestamps && issue.photoTimestamps[idx]) {
                   return new Date(issue.photoTimestamps[idx]).toLocaleString("en-IN", {
@@ -748,6 +766,26 @@ export default function IssueDetails() {
                   });
                 } else if (issue.dateReported instanceof Date) {
                   return issue.dateReported.toLocaleString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
+                }
+              }
+              // Check if openPhoto is a worker completion photo
+              idx = issue.completionPhotos?.findIndex((url) => url === openPhoto);
+              if (idx !== undefined && idx !== -1) {
+                if (issue.completionTimestamps && issue.completionTimestamps[idx]) {
+                  return new Date(issue.completionTimestamps[idx]).toLocaleString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
+                } else if (issue.completionTimestamp) {
+                  // fallback to single completionTimestamp if available
+                  return new Date(issue.completionTimestamp).toLocaleString("en-IN", {
                     day: "2-digit",
                     month: "short",
                     hour: "2-digit",
