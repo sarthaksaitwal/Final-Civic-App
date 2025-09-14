@@ -33,6 +33,8 @@ import {
   Image as ImageIcon, // <-- Add this import for the image icon
 } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { ref, onValue, off } from "firebase/database";
+import { realtimeDb } from "@/lib/firebase";
 
 const ISSUE_TYPE_MAP = {
   RDG: "Road Damage",
@@ -53,23 +55,33 @@ export default function IssueDetails() {
   const [error, setError] = useState(null);
   const [showMap, setShowMap] = useState(false);
   const [openPhoto, setOpenPhoto] = useState(null);
+  const [realtimeIssue, setRealtimeIssue] = useState(null);
+  const [showVoiceNote, setShowVoiceNote] = useState(false); // <-- move here
+  const [showCompletionVoiceNote, setShowCompletionVoiceNote] = useState(false);
 
+  // --- Realtime Issue State ---
   useEffect(() => {
-    const loadIssue = async () => {
-      try {
-        if (issues.length === 0) {
-          await fetchIssues();
-        }
+    if (!id) return;
+    const issueRef = ref(realtimeDb, `complaints/${id}`);
+    const handleValue = (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        // Convert date fields to Date objects if present
+        if (data.dateTime) data.dateReported = new Date(data.dateTime);
+        if (data.deadline) data.deadline = new Date(data.deadline);
+        setRealtimeIssue({ ...data, id });
         setIsLoading(false);
-      } catch (err) {
-        setError("Failed to load issue details.");
+      } else {
+        setRealtimeIssue(null);
         setIsLoading(false);
       }
     };
-    loadIssue();
-  }, [fetchIssues, issues.length]);
+    onValue(issueRef, handleValue);
+    return () => off(issueRef, "value", handleValue);
+  }, [id]);
 
-  const issue = issues.find((i) => i.id === id);
+  // Use the real-time issue if available, else fallback to store
+  const issue = realtimeIssue || issues.find((i) => i.id === id);
 
   // Helper to get issue type from token
   const getIssueTypeFromToken = (id) => {
@@ -154,7 +166,7 @@ export default function IssueDetails() {
                 <img
                   src={photoUrl}
                   alt={`Photo ${index + 1}`}
-                  className="w-28 h-28 object-cover rounded-lg border border-gray-200 cursor-pointer transition-transform duration-200 hover:scale-105 hover:shadow-lg"
+                  className="w-44 h-44 object-cover rounded-lg border border-gray-200 cursor-pointer transition-transform duration-200 hover:scale-105 hover:shadow-lg"
                   onClick={() => setOpenPhoto(photoUrl)}
                   title="Click to view"
                 />
@@ -189,7 +201,7 @@ export default function IssueDetails() {
           </div>
         </div>
       )}
-      {/* Audio */}
+      {/* Audio Evidence (multiple audio files, if any) */}
       {issue.audio && issue.audio.length > 0 && (
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2 font-semibold">
@@ -206,14 +218,14 @@ export default function IssueDetails() {
           </div>
         </div>
       )}
+      {/* Voice Note REMOVED from this section */}
     </div>
   );
 
   // --- Section: Details ---
   const detailsSection = (
-    <div className="space-y-3">
-      {/* Top row: Location (left), View on Map (right) */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2 text-gray-700">
           <MapPin className="h-5 w-5 text-blue-700" />
           <span className="font-medium">Location:</span>
@@ -226,17 +238,18 @@ export default function IssueDetails() {
               .join(", ")}
           </span>
         </div>
-        {issue.coordinates && Array.isArray(issue.coordinates) && (
+        {(Array.isArray(issue.coordinates) && issue.coordinates.length === 2) ||
+        (typeof issue.gps === "string" && issue.gps.split(",").length === 2) ? (
           <Button
             size="sm"
             variant="outline"
-            className="mt-2 sm:mt-0 px-3 py-1 text-xs whitespace-nowrap flex items-center gap-1"
+            className="px-3 py-1 text-xs whitespace-nowrap flex items-center gap-1 z-10"
             onClick={() => setShowMap(true)}
           >
             <MapIcon className="h-4 w-4" />
             View on Map
           </Button>
-        )}
+        ) : null}
       </div>
       {/* Rest of the details in a grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -301,16 +314,179 @@ export default function IssueDetails() {
     </div>
   );
 
-  // --- Section: Description ---
-  const descriptionSection = (
+  // --- Section: Citizen Submission (Photos, Description, Voice Note) ---
+  const citizenSubmissionsSection = (
     <div>
-      <p className="text-gray-800 text-base">
-        {issue.description || "No description provided"}
-      </p>
+      {/* Photos */}
+      {issue.photos && issue.photos.length > 0 && (
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-2 font-bold text-black">
+            <ImageIcon className="h-5 w-5 text-black" />
+            Photos
+          </div>
+          <div className="flex gap-3 flex-wrap">
+            {issue.photos.map((photoUrl, index) => (
+              <div key={index} className="relative flex flex-col items-center">
+                <img
+                  src={photoUrl}
+                  alt={`Photo ${index + 1}`}
+                  className="w-36 h-36 object-cover rounded-xl border border-gray-200 cursor-pointer transition-transform duration-200 hover:scale-105 hover:shadow-lg"
+                  onClick={() => setOpenPhoto(photoUrl)}
+                  title="Click to view"
+                />
+                {/* Timestamp overlay on photo */}
+                <span
+                  className="absolute bottom-1 left-1 right-1 px-2 py-0.5 text-xs text-white bg-black/60 rounded-b-xl text-center"
+                  style={{
+                    fontSize: "0.75rem",
+                    lineHeight: "1rem",
+                    borderBottomLeftRadius: "0.75rem",
+                    borderBottomRightRadius: "0.75rem",
+                  }}
+                >
+                  {issue.photoTimestamps && issue.photoTimestamps[index]
+                    ? new Date(issue.photoTimestamps[index]).toLocaleString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : issue.dateReported instanceof Date
+                    ? issue.dateReported.toLocaleString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : ""}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Description */}
+      <div className="mb-2 font-semibold text-lg text-gray-800">Description</div>
+      <div className="bg-gray-100 rounded-xl px-4 py-3 mb-4 text-base font-semibold text-gray-900">
+        {issue.description || <span className="text-gray-500">No description provided</span>}
+      </div>
+
+      {/* Play Voice Note Button (old style) */}
+      {issue.voiceNote && (
+        <div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="mb-2"
+            onClick={() => setShowVoiceNote((v) => !v)}
+          >
+            <Volume2 className="h-4 w-4 mr-1" />
+            {showVoiceNote ? "Hide Voice Note" : "Play Voice Note"}
+          </Button>
+          {showVoiceNote && (
+            <audio controls className="w-full rounded-lg border border-gray-200 mt-2">
+              <source src={issue.voiceNote} type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+          )}
+        </div>
+      )}
     </div>
   );
 
+  // --- Section: Worker Completion (Photos, Description, Voice Note) ---
+  const workerCompletionSection =
+    issue.status?.toLowerCase() === "resolved" &&
+    (issue.completionPhotos?.length > 0 ||
+      issue.completionNotes ||
+      issue.completionVoiceNote) ? (
+      <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
+            <UserCheck className="h-6 w-6 text-blue-700" />
+            Worker Completion
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-2 pb-6 px-6">
+          {/* Photos */}
+          {issue.completionPhotos && issue.completionPhotos.length > 0 && (
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-2 font-bold text-black">
+                <ImageIcon className="h-5 w-5 text-black" />
+                Photos
+              </div>
+              <div className="flex gap-3 flex-wrap">
+                {issue.completionPhotos.map((photoUrl, index) => (
+                  <div key={index} className="relative flex flex-col items-center">
+                    <img
+                      src={photoUrl}
+                      alt={`Completion Photo ${index + 1}`}
+                      className="w-36 h-36 object-cover rounded-xl border border-gray-200 cursor-pointer transition-transform duration-200 hover:scale-105 hover:shadow-lg"
+                      title="Worker Uploaded Photo"
+                    />
+                    {/* Timestamp overlay if available */}
+                    {issue.completionTimestamps && issue.completionTimestamps[index] && (
+                      <span
+                        className="absolute bottom-1 left-1 right-1 px-2 py-0.5 text-xs text-white bg-black/60 rounded-b-xl text-center"
+                        style={{
+                          fontSize: "0.75rem",
+                          lineHeight: "1rem",
+                          borderBottomLeftRadius: "0.75rem",
+                          borderBottomRightRadius: "0.75rem",
+                        }}
+                      >
+                        {new Date(issue.completionTimestamps[index]).toLocaleString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Description */}
+          {issue.completionNotes && (
+            <>
+              <div className="mb-2 font-semibold text-lg text-gray-800">Description</div>
+              <div className="bg-gray-100 rounded-xl px-4 py-3 mb-4 text-base font-semibold text-gray-900">
+                {issue.completionNotes}
+              </div>
+            </>
+          )}
+
+          {/* Play Voice Note Button */}
+          {issue.completionVoiceNote && (
+            <div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="mb-2"
+                onClick={() => setShowCompletionVoiceNote((v) => !v)}
+              >
+                <Volume2 className="h-4 w-4 mr-1" />
+                {showCompletionVoiceNote ? "Hide Voice Note" : "Play Voice Note"}
+              </Button>
+              {showCompletionVoiceNote && (
+                <audio controls className="w-full rounded-lg border border-gray-200 mt-2">
+                  <source src={issue.completionVoiceNote} type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    ) : null;
+
   // --- Section: Horizontal Timeline ---
+  const status = (issue.status || "").toLowerCase();
+
   const timelineSteps = [
     {
       icon: <CheckCircle className="h-7 w-7 text-green-600" />,
@@ -325,17 +501,17 @@ export default function IssueDetails() {
               minute: "2-digit",
             })
           : "N/A",
-      desc: "", // Removed the success message
+      desc: "",
       color: "text-green-700",
       active: true,
     },
     {
       icon: <Hourglass className="h-7 w-7 text-yellow-500" />,
       title: "Pending Review",
-      subtitle: "Completed",
+      subtitle: status === "pending" ? "In Progress" : "",
       desc: "Waiting for worker assignment",
       color: "text-yellow-700",
-      active: ["pending", "Assigned", "completed"].includes(issue.status),
+      active: ["pending", "assigned", "in progress", "resolved", "completed"].includes(status),
     },
     {
       icon: <UserCircle2 className="h-7 w-7 text-purple-600" />,
@@ -352,23 +528,23 @@ export default function IssueDetails() {
           : "Current Stage",
       desc: "Your complaint has been assigned to a municipal worker",
       color: "text-purple-700",
-      active: ["Assigned", "completed"].includes(issue.status),
+      active: ["assigned", "in progress", "resolved", "completed"].includes(status),
     },
     {
       icon: <Wrench className="h-7 w-7 text-blue-500" />,
       title: "In Progress",
-      subtitle: issue.status === "completed" ? "Completed" : "Not Yet",
+      subtitle: ["in progress", "resolved", "completed"].includes(status) ? "Work Started" : "Not Yet",
       desc: "Work has started on your complaint.",
       color: "text-blue-700",
-      active: issue.status === "completed",
+      active: ["in progress", "resolved", "completed"].includes(status),
     },
     {
       icon: <BadgeCheck className="h-7 w-7 text-gray-400" />,
       title: "Resolved",
-      subtitle: issue.status === "completed" ? "Completed" : "Not Yet",
+      subtitle: ["resolved", "completed"].includes(status) ? "Completed" : "Not Yet",
       desc: "The issue has been resolved.",
       color: "text-gray-500",
-      active: issue.status === "completed",
+      active: ["resolved", "completed"].includes(status),
     },
   ];
 
@@ -382,7 +558,7 @@ export default function IssueDetails() {
       {/* <div className="font-semibold mb-4 text-lg">Status Timeline</div> */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-8 sm:gap-0 relative">
         {timelineSteps.map((step, idx, arr) => (
-          <React.Fragment key={step.title}>
+          <React.Fragment key={`timeline-step-${idx}`}>
             <div className="flex flex-col items-center flex-1 min-w-[120px] relative z-10">
               {/* Icon with highlight for current step */}
               <div className="mb-2">
@@ -431,12 +607,13 @@ export default function IssueDetails() {
             </div>
             {/* Connector line */}
             {idx !== arr.length - 1 && (
-              <div className="hidden sm:flex flex-1 h-2 relative z-0">
+              <div
+                key={`timeline-connector-${idx}`}
+                className="hidden sm:flex flex-1 h-2 relative z-0"
+              >
                 <div
                   className={`absolute top-1/2 left-0 right-0 h-1 rounded-full ${
-                    idx < lastActiveIndex
-                      ? "bg-blue-400"
-                      : "bg-gray-200"
+                    idx < lastActiveIndex ? "bg-blue-400" : "bg-gray-200"
                   }`}
                   style={{ transform: "translateY(-50%)" }}
                 />
@@ -491,8 +668,14 @@ export default function IssueDetails() {
   );
 
   // --- Section: Map Modal ---
+  const mapCoordinates = Array.isArray(issue.coordinates) && issue.coordinates.length === 2
+    ? issue.coordinates
+    : typeof issue.gps === "string" && issue.gps.split(",").length === 2
+      ? issue.gps.split(",").map(Number)
+      : null;
+
   const mapModal =
-    showMap && issue.coordinates && Array.isArray(issue.coordinates) ? (
+    showMap && mapCoordinates ? (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
         <div className="bg-white rounded-2xl shadow-2xl p-6 relative w-full max-w-2xl">
           <button
@@ -507,7 +690,7 @@ export default function IssueDetails() {
           </h3>
           <div className="h-96 w-full rounded-xl overflow-hidden border border-gray-200">
             <MapContainer
-              center={issue.coordinates}
+              center={mapCoordinates}
               zoom={16}
               style={{ height: "100%", width: "100%" }}
             >
@@ -515,7 +698,7 @@ export default function IssueDetails() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              <Marker position={issue.coordinates}>
+              <Marker position={mapCoordinates}>
                 <Popup>{issue.title || "Issue Location"}</Popup>
               </Marker>
             </MapContainer>
@@ -588,42 +771,43 @@ export default function IssueDetails() {
         {headerSection}
 
         {/* Details FIRST */}
-        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-background">
-          <CardHeader>
-            <CardTitle className="text-lg font-bold text-blue-700">
+        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
+              <Folder className="h-6 w-6 text-blue-700" />
               Issue Details
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">{detailsSection}</CardContent>
+          <CardContent className="pt-2 pb-6 px-6">{detailsSection}</CardContent>
         </Card>
 
-        {/* Photos (Media) SECOND */}
-        {(issue.photos?.length > 0 || issue.audio?.length > 0) && (
-          <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-background">
-            <CardContent className="p-6">{mediaSection}</CardContent>
+        {/* Citizen Submissions (Description, Voice Note, Photos) */}
+        {(issue.description || (issue.photos && issue.photos.length > 0) || issue.voiceNote) && (
+          <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
+                <ImageIcon className="h-6 w-6 text-blue-700" />
+                Citizen Submission
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-2 pb-6 px-6">
+              {citizenSubmissionsSection}
+            </CardContent>
           </Card>
         )}
 
-        {/* Description */}
-        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-background">
-          <CardHeader>
-            <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
-              <ImageIcon className="h-6 w-6 text-blue-700" />
-              Issue Description
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">{descriptionSection}</CardContent>
-        </Card>
+        {/* Worker Completion Section (only if resolved) */}
+        {workerCompletionSection}
 
         {/* Timeline */}
-        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-background">
-          <CardHeader>
+        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
+          <CardHeader className="pb-2">
             <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
               <Wrench className="h-6 w-6 text-blue-700" />
               Status Timeline
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">{timelineSection}</CardContent>
+          <CardContent className="pt-2 pb-6 px-6">{timelineSection}</CardContent>
         </Card>
 
         {/* Actions */}

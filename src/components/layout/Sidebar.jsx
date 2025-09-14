@@ -21,6 +21,7 @@ const navigation = [
   { name: 'Review & Approve', href: '/issues', icon: CheckCircle, special: true },
   { name: 'Reports & Analytics', href: '/reports', icon: BarChart3 },
   { name: 'Create Worker', href: '/create-profile', icon: User },
+  { name: 'Worker List', href: '/assign-worker', icon: User }, // <-- Added Worker List
   { name: 'Profile', href: '/profile', icon: User },
 ];
 

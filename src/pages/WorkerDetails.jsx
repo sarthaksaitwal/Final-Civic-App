@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useWorkersStore } from '@/store/workers';
 import { useIssuesStore } from '@/store/issues';
 import { useToast } from '@/components/ui/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, BadgeCheck, FileText, User, Phone, Briefcase, MapPin, Hash } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 
 export default function WorkerDetails() {
@@ -14,8 +14,7 @@ export default function WorkerDetails() {
   const navigate = useNavigate();
   const location = useLocation();
   const { workers, fetchWorkers } = useWorkersStore();
-  const { assignWorker, fetchIssues } = useIssuesStore();
-  const { toast } = useToast();
+  const { issues, fetchIssues } = useIssuesStore();
   const [worker, setWorker] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -24,6 +23,9 @@ export default function WorkerDetails() {
       try {
         if (workers.length === 0) {
           await fetchWorkers();
+        }
+        if (issues.length === 0) {
+          await fetchIssues();
         }
         const foundWorker = workers.find(w => w.id === id);
         setWorker(foundWorker || null);
@@ -34,12 +36,13 @@ export default function WorkerDetails() {
       }
     };
     loadWorker();
-  }, [id, workers, fetchWorkers]);
+    // eslint-disable-next-line
+  }, [id, workers.length, issues.length, fetchWorkers, fetchIssues]);
 
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="p-6 flex justify-center items-center min-h-[400px]">
+        <div className="flex justify-center items-center h-full min-h-[400px]">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
         </div>
       </DashboardLayout>
@@ -59,93 +62,120 @@ export default function WorkerDetails() {
     );
   }
 
+  // Find assigned issue for this worker
+  const assignedIssue = issues.find(
+    (issue) =>
+      (typeof issue.assignedTo === "object"
+        ? issue.assignedTo.id
+        : issue.assignedTo) === worker.id
+  );
+
+  // Determine availability
+  const availability =
+    assignedIssue && assignedIssue.status !== "completed"
+      ? "Busy"
+      : worker.availability || "Available";
+
+  // --- Section: Header ---
+  const headerSection = (
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h2 className="text-2xl sm:text-3xl font-bold text-blue-700 flex items-center gap-2">
+          <BadgeCheck className="h-7 w-7" />
+          {worker.name || 'Unnamed Worker'}
+        </h2>
+        <div className="text-sm text-muted-foreground mt-1 font-bold gap-2">
+          Worker ID: <span className="font-mono text-base sm:text-lg">{worker.id}</span>
+        </div>
+      </div>
+      <Badge
+        variant={availability === "Available" ? "success" : "secondary"}
+        className="text-base px-4 py-1 rounded-full capitalize"
+      >
+        {availability}
+      </Badge>
+    </div>
+  );
+
+  // --- Section: Details ---
+  const detailsSection = (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="flex items-center gap-2 text-gray-700">
+        <Briefcase className="h-5 w-5 text-blue-700" />
+        <span className="font-medium">Department:</span>
+        <span>{worker.department || 'N/A'}</span>
+      </div>
+      <div className="flex items-center gap-2 text-gray-700">
+        <Phone className="h-5 w-5 text-blue-700" />
+        <span className="font-medium">Phone:</span>
+        <span>{worker.phone || 'N/A'}</span>
+      </div>
+      <div className="flex items-center gap-2 text-gray-700">
+        <MapPin className="h-5 w-5 text-blue-700" />
+        <span className="font-medium">Location:</span>
+        <span>{worker.location || 'N/A'}</span>
+      </div>
+      <div className="flex items-center gap-2 text-gray-700">
+        <Hash className="h-5 w-5 text-blue-700" />
+        <span className="font-medium">Pincode:</span>
+        <span>{worker.pincode || 'N/A'}</span>
+      </div>
+    </div>
+  );
+
+  // --- Section: Assigned Issue ---
+  const assignedSection = assignedIssue ? (
+    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+      <div className="font-semibold text-blue-800 mb-1 flex items-center gap-2">
+        <FileText className="h-4 w-4" />
+        Assigned to Issue:
+        <span className="ml-2">{assignedIssue.title || assignedIssue.id}</span>
+        <Badge variant="secondary" className="ml-2">{assignedIssue.status}</Badge>
+      </div>
+      <div className="text-sm text-gray-700">
+        This worker is currently assigned to the above issue.
+      </div>
+      <Button
+        className="mt-3"
+        variant="outline"
+        onClick={() => navigate(`/issues/${assignedIssue.id}`)}
+      >
+        View Issue Details
+      </Button>
+    </div>
+  ) : (
+    <div className="text-green-700 font-semibold">
+      This worker is not currently assigned to any issue.
+    </div>
+  );
+
   return (
     <DashboardLayout>
-      <div className="p-6 max-w-3xl mx-auto space-y-6">
-        <Button variant="ghost" onClick={() => navigate(-1)}>
-          Back
-        </Button>
-        <Card className="shadow-card border border-gray-200 rounded-2xl bg-gray-50">
-          <CardHeader className="bg-gray-100 border-b border-gray-200 rounded-t-2xl">
-            <CardTitle className="text-2xl font-bold text-blue-700 flex items-center gap-2">
-              <span>{worker.name || 'Unnamed Worker'}</span>
-              <Badge variant={worker.availability === "Available" ? "success" : "secondary"}>
-                {worker.availability || "Unknown"}
-              </Badge>
+      <div className="p-4 sm:p-8 md:p-12 max-w-4xl mx-auto space-y-8 bg-background rounded-xl shadow-none">
+        {/* Header */}
+        {headerSection}
+
+        {/* Details Section */}
+        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
+          <CardHeader>
+            <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
+              <User className="h-6 w-6 text-blue-700" />
+              Worker Details
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">Department</div>
-                <div className="font-medium">{worker.department || 'N/A'}</div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">Phone</div>
-                <div className="font-medium">{worker.phone || 'N/A'}</div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">Pincode</div>
-                <div className="font-medium">{worker.pincode || 'N/A'}</div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">Current Task</div>
-                <div className="font-medium">
-                  {worker.currentTask && worker.currentTask !== "None" ? (
-                    <span className="inline-flex items-center gap-2">
-                      <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-200">
-                        {worker.currentTask}
-                      </Badge>
-                      <span className="text-xs text-gray-500">(Assigned)</span>
-                    </span>
-                  ) : (
-                    <span className="text-gray-500">None</span>
-                  )}
-                </div>
-              </div>
-            </div>
-            {/* Show assigned issue/task details if available */}
-            {worker.currentTask && worker.currentTask !== "None" && (
-              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <div className="font-semibold text-blue-800 mb-1 flex items-center gap-2">
-                  Assigned to Task:
-                  <Badge variant="secondary" className="ml-2">{worker.currentTask}</Badge>
-                </div>
-                <div className="text-sm text-gray-700">
-                  This worker is currently assigned to the above issue/task.
-                </div>
-              </div>
-            )}
-          </CardContent>
+          <CardContent className="p-6">{detailsSection}</CardContent>
         </Card>
-        {/*
-          Add "Assign to Issue" button if issueId is passed in location state
-        */}
-        {location.state?.issueId && (
-          <Button
-            variant="primary"
-            className="mt-4"
-            onClick={async () => {
-              try {
-                await assignWorker(location.state.issueId, worker); // pass the full worker object
-                await fetchIssues(); // <-- force refresh
-                toast({
-                  title: "Worker Assigned",
-                  description: `${worker.name} has been assigned to the issue.`,
-                });
-                navigate(`/issues/${location.state.issueId}`);
-              } catch (error) {
-                toast({
-                  title: "Error",
-                  description: "Failed to assign worker to the issue.",
-                  variant: "destructive",
-                });
-              }
-            }}
-          >
-            Assign to Issue
-          </Button>
-        )}
+
+        {/* Assigned Issue Section */}
+        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
+          <CardHeader>
+            <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
+              <FileText className="h-6 w-6 text-blue-700" />
+              Assigned Issue
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">{assignedSection}</CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );
