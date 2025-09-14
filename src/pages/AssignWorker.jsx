@@ -10,13 +10,14 @@ import { useToast } from '@/components/ui/use-toast';
 import { useEffect, useState } from 'react';
 import { Loader2, User, Filter, Phone, MapPin, Briefcase, Hash, ShieldCheck } from 'lucide-react';
 
+
 export default function AssignWorker() {
   const normalize = str => (str || '').toLowerCase().replace(/\s+/g, '');
 
   const navigate = useNavigate();
   const location = useLocation();
   const { workers, fetchWorkers } = useWorkersStore();
-  const { assignWorker } = useIssuesStore();
+  const { assignWorker, issues } = useIssuesStore(); // <-- add issues here
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [availabilityFilter, setAvailabilityFilter] = useState('all');
@@ -60,7 +61,10 @@ export default function AssignWorker() {
 
   // Filter workers based on selected filters
   const filteredWorkers = workers.filter(worker => {
-    const matchesAvailability = availabilityFilter === 'all' || worker.availability === availabilityFilter;
+    const matchesAvailability =
+      availabilityFilter === 'all' ||
+      (availabilityFilter === 'assigned' && !!worker.assignedIssueId) ||
+      (availabilityFilter === 'available' && !worker.assignedIssueId);
     const matchesLocation = locationFilter === 'all' || worker.location === locationFilter;
     const normalize = str => (str || '').toLowerCase().replace(/\s+/g, '');
     const matchesDepartment =
@@ -106,8 +110,8 @@ export default function AssignWorker() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="Available">Available</SelectItem>
-                    <SelectItem value="Busy">Busy</SelectItem>
+                    <SelectItem value="assigned">Assigned</SelectItem>
+                    <SelectItem value="available">Available</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -177,7 +181,23 @@ export default function AssignWorker() {
                         <span className="font-bold text-lg text-gray-900 truncate">
                           {worker.name || "Unnamed"}
                         </span>
+                        {/* Availability Badge */}
+                        <span
+                          className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            worker.assignedIssueId
+                              ? "bg-yellow-100 text-yellow-700 border border-yellow-300"
+                              : "bg-green-100 text-green-700 border border-green-300"
+                          }`}
+                        >
+                          {worker.assignedIssueId ? "Assigned" : "Available"}
+                        </span>
                       </div>
+                      {/* Assigned Issue ID */}
+                      {worker.assignedIssueId && (
+                        <div className="text-xs text-blue-700 font-semibold mt-1">
+                          Assigned to Issue: <span className="font-mono">{worker.assignedIssueId}</span>
+                        </div>
+                      )}
                       {/* Department and Phone horizontally aligned */}
                       <div className="flex flex-row gap-4">
                         <div className="flex items-center gap-2 text-gray-700 text-base font-semibold">
@@ -217,6 +237,7 @@ export default function AssignWorker() {
                           size="sm"
                           variant="primary"
                           className="w-full sm:w-auto bg-primary text-primary-foreground font-semibold shadow hover:bg-primary/90 rounded-xl transition-all duration-200"
+                          disabled={!!worker.assignedIssueId || !!issues.find(issue => issue.id === issueId)?.assignedTo}
                           onClick={async (e) => {
                             e.stopPropagation();
                             try {
@@ -229,7 +250,7 @@ export default function AssignWorker() {
                             } catch (error) {
                               toast({
                                 title: "Error",
-                                description: "Failed to assign worker to the issue.",
+                                description: error.message || "Failed to assign worker to the issue.",
                                 variant: "destructive",
                               });
                             }

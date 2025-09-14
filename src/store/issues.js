@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { realtimeDb } from '../lib/firebase';
-import { ref, get, update, onValue, off } from 'firebase/database';
+import { ref, get, update, onValue, off, set } from 'firebase/database';
 import { useWorkersStore } from "@/store/workers";
 
 export const useIssuesStore = create((set, getState) => ({
@@ -85,13 +85,39 @@ export const useIssuesStore = create((set, getState) => ({
   // Assign worker to issue
   assignWorker: async (issueId, worker) => {
     try {
-      const assignedTo = worker?.id || "Unknown"; // Only store the worker's ID
+      // Fetch the latest worker data from the database
+      const workerKey = worker.workerId || worker.id;
+      const workerRef = ref(realtimeDb, `workers/${workerKey}`);
+      const workerSnapshot = await get(workerRef);
+      const workerData = workerSnapshot.exists() ? workerSnapshot.val() : {};
 
-      // Get current date/time in ISO format
+      // Prevent assignment if worker is already assigned
+      if (workerData.assignedIssueId && workerData.assignedIssueId !== "") {
+        throw new Error(
+          `Worker is already assigned to issue ${workerData.assignedIssueId}. Unassign first.`
+        );
+      }
+
+      // Fetch the latest issue data from the database
+      const issueRef = ref(realtimeDb, `complaints/${issueId}`);
+      const issueSnapshot = await get(issueRef);
+      const issueData = issueSnapshot.exists() ? issueSnapshot.val() : {};
+
+      // Prevent assignment if issue already has a worker assigned
+      if (issueData.assignedTo && issueData.assignedTo !== "" && issueData.assignedTo !== workerKey) {
+        throw new Error(
+          `This issue is already assigned to another worker (${issueData.assignedTo}). Unassign first.`
+        );
+      }
+
+      const assignedTo = workerKey;
       const assignedDate = new Date().toISOString();
 
-      const issueRef = ref(realtimeDb, `complaints/${issueId}`);
+      // Update the issue
       await update(issueRef, { assignedTo, status: 'Assigned', assignedDate });
+
+      // Update the worker: set assignedIssueId
+      await update(workerRef, { assignedIssueId: issueId });
 
       set(state => ({
         issues: state.issues.map(issue =>
@@ -100,7 +126,52 @@ export const useIssuesStore = create((set, getState) => ({
       }));
     } catch (error) {
       set({ error: error.message });
+      throw error; // So UI can show toast
+    }
+  },
+
+  // Unassign worker from issue
+  unassignWorker: async (workerId) => {
+    try {
+      // Remove assignedIssueId from worker
+      const workerRef = ref(realtimeDb, `workers/${workerId}`);
+      await update(workerRef, { assignedIssueId: "" });
+
+      // Optionally, also update the issue to remove assignedTo if needed
+      // (You may want to find the issueId first if you want to clear it)
+    } catch (error) {
+      set({ error: error.message });
+      throw error;
+    }
+  },
+
+  // When creating a new worker
+  createWorker: async (workerId, workerData) => {
+    try {
+      const newWorker = {
+        ...workerData,
+        assignedIssueId: "", // Always add this field
+      };
+      await set(ref(realtimeDb, `workers/${workerId}`), newWorker);
+    } catch (error) {
+      set({ error: error.message });
     }
   }
 }));
+
+// Run this once in your admin panel or Node script
+
+async function addAssignedIssueIdToAllWorkers() {
+  const workersRef = ref(realtimeDb, "workers");
+  const snapshot = await get(workersRef);
+  if (snapshot.exists()) {
+    const workers = snapshot.val();
+    for (const workerId in workers) {
+      if (!workers[workerId].assignedIssueId) {
+        await update(ref(realtimeDb, `workers/${workerId}`), { assignedIssueId: "" });
+      }
+    }
+  }
+}
+addAssignedIssueIdToAllWorkers();
 

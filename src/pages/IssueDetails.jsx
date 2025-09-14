@@ -33,7 +33,7 @@ import {
   Image as ImageIcon, // <-- Add this import for the image icon
 } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { ref, onValue, off } from "firebase/database";
+import { ref, onValue, off, update, get } from "firebase/database";
 import { realtimeDb } from "@/lib/firebase";
 
 const ISSUE_TYPE_MAP = {

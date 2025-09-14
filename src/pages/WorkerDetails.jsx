@@ -8,15 +8,18 @@ import { useIssuesStore } from '@/store/issues';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2, BadgeCheck, FileText, User, Phone, Briefcase, MapPin, Hash } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 export default function WorkerDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { workers, fetchWorkers } = useWorkersStore();
-  const { issues, fetchIssues } = useIssuesStore();
+  const { issues, fetchIssues, unassignWorker } = useIssuesStore();
   const [worker, setWorker] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [availabilityFilter, setAvailabilityFilter] = useState('all');
+  const { toast } = useToast();
 
   useEffect(() => {
     const loadWorker = async () => {
@@ -70,11 +73,53 @@ export default function WorkerDetails() {
         : issue.assignedTo) === worker.id
   );
 
-  // Determine availability
-  const availability =
-    assignedIssue && assignedIssue.status !== "completed"
-      ? "Busy"
-      : worker.availability || "Available";
+  // --- Section: Assigned Issue ---
+  const assignedSection = assignedIssue ? (
+    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+      <div className="font-semibold text-blue-800 mb-1 flex items-center gap-2">
+        <FileText className="h-4 w-4" />
+        Assigned to Issue:
+        <span className="ml-2">{assignedIssue.title || assignedIssue.id}</span>
+        <Badge variant="secondary" className="ml-2">{assignedIssue.status}</Badge>
+      </div>
+      <div className="text-sm text-gray-700">
+        This worker is currently assigned to the above issue.
+      </div>
+      <Button
+        className="mt-3"
+        variant="outline"
+        onClick={async () => {
+          try {
+            await unassignWorker(worker.id || worker.workerId);
+            // Optionally, refresh worker/issue data here
+            toast({
+              title: "Worker Unassigned",
+              description: "The worker has been unassigned from the issue.",
+            });
+          } catch (error) {
+            toast({
+              title: "Error",
+              description: error.message || "Failed to unassign worker.",
+              variant: "destructive",
+            });
+          }
+        }}
+      >
+        Unassign from Issue
+      </Button>
+      <Button
+        className="mt-3 ml-3"
+        variant="outline"
+        onClick={() => navigate(`/issues/${assignedIssue.id}`)}
+      >
+        View Issue Details
+      </Button>
+    </div>
+  ) : (
+    <div className="text-green-700 font-semibold">
+      This worker is not currently assigned to any issue.
+    </div>
+  );
 
   // --- Section: Header ---
   const headerSection = (
@@ -88,12 +133,15 @@ export default function WorkerDetails() {
           Worker ID: <span className="font-mono text-base sm:text-lg">{worker.id}</span>
         </div>
       </div>
-      <Badge
-        variant={availability === "Available" ? "success" : "secondary"}
-        className="text-base px-4 py-1 rounded-full capitalize"
+      <span
+        className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
+          worker.assignedIssueId
+            ? "bg-yellow-100 text-yellow-700 border border-yellow-300"
+            : "bg-green-100 text-green-700 border border-green-300"
+        }`}
       >
-        {availability}
-      </Badge>
+        {worker.assignedIssueId ? "Assigned" : "Available"}
+      </span>
     </div>
   );
 
@@ -123,37 +171,33 @@ export default function WorkerDetails() {
     </div>
   );
 
-  // --- Section: Assigned Issue ---
-  const assignedSection = assignedIssue ? (
-    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-      <div className="font-semibold text-blue-800 mb-1 flex items-center gap-2">
-        <FileText className="h-4 w-4" />
-        Assigned to Issue:
-        <span className="ml-2">{assignedIssue.title || assignedIssue.id}</span>
-        <Badge variant="secondary" className="ml-2">{assignedIssue.status}</Badge>
-      </div>
-      <div className="text-sm text-gray-700">
-        This worker is currently assigned to the above issue.
-      </div>
-      <Button
-        className="mt-3"
-        variant="outline"
-        onClick={() => navigate(`/issues/${assignedIssue.id}`)}
-      >
-        View Issue Details
-      </Button>
-    </div>
-  ) : (
-    <div className="text-green-700 font-semibold">
-      This worker is not currently assigned to any issue.
-    </div>
-  );
+  // Filter workers based on availability
+  const matchesAvailability =
+    availabilityFilter === 'all' ||
+    (availabilityFilter === 'assigned' && !!worker.assignedIssueId) ||
+    (availabilityFilter === 'available' && !worker.assignedIssueId);
 
   return (
     <DashboardLayout>
       <div className="p-4 sm:p-8 md:p-12 max-w-4xl mx-auto space-y-8 bg-background rounded-xl shadow-none">
         {/* Header */}
         {headerSection}
+
+        {/* Filter Section - New Addition
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex-1 min-w-[200px]">
+            <Select value={availabilityFilter} onValueChange={setAvailabilityFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select availability" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="assigned">Assigned</SelectItem>
+                <SelectItem value="available">Available</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div> */}
 
         {/* Details Section */}
         <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
