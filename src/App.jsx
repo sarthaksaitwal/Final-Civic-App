@@ -16,6 +16,7 @@ import Reports from "./pages/Reports";
 
 import CreateProfile from "./pages/CreateProfile";
 import NotFound from "./pages/NotFound";
+import WorkerCreated from "./pages/WorkerCreated";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/assign-worker" element={<AssignWorker />} />
           <Route path="/workers/:id" element={<WorkerDetails />} />
           <Route path="/create-profile" element={<CreateProfile />} />
+          <Route path="/worker-created" element={<WorkerCreated />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

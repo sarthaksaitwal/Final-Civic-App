@@ -41,9 +41,9 @@ export function Sidebar({ className, collapsed, setCollapsed }) {
         height: 'calc(100vh - 5rem)', // Fill below the navbar
         boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.10)",
         borderRadius: "1rem",
-        background: "rgba(255,255,255,0.95)",
+        background: "hsl(var(--background) / 0.95)",
         backdropFilter: "blur(8px)",
-        border: "1px solid #e5e7eb", // subtle gray border
+        border: "1px solid hsl(var(--border))",
         display: 'flex',
         flexDirection: 'column'
       }}
@@ -52,11 +52,11 @@ export function Sidebar({ className, collapsed, setCollapsed }) {
       <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-end'} p-2`}>
         <button
           onClick={() => setCollapsed && setCollapsed(!collapsed)}
-          className="p-1 rounded-md bg-white shadow hover:bg-accent transition-colors"
+          className="p-1 rounded-md bg-muted shadow hover:bg-accent transition-colors"
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           type="button"
         >
-          {collapsed ? <Menu className="w-5 h-5" /> : <X className="w-5 h-5" />}
+          {collapsed ? <Menu className="w-5 h-5 text-muted-foreground" /> : <X className="w-5 h-5 text-muted-foreground" />}
         </button>
       </div>
       {/* Navigation */}

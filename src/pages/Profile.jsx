@@ -55,7 +55,7 @@ export default function Profile() {
     <DashboardLayout>
       <div className="p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center">
           <div>
             <h3 className="text-3xl font-bold text-foreground">Manage your account settings and view activity</h3>
             

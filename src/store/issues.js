@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { realtimeDb } from '../lib/firebase';
 import { ref, get, update, onValue, off } from 'firebase/database';
+import { useWorkersStore } from "@/store/workers";
 
 export const useIssuesStore = create((set, getState) => ({
   issues: [],
@@ -79,5 +80,27 @@ export const useIssuesStore = create((set, getState) => ({
     // This would typically be handled by a form submission
     // For now, just refetch after adding
     await getState().fetchIssues();
+  },
+
+  // Assign worker to issue
+  assignWorker: async (issueId, worker) => {
+    try {
+      const assignedTo = worker?.id || "Unknown"; // Only store the worker's ID
+
+      // Get current date/time in ISO format
+      const assignedDate = new Date().toISOString();
+
+      const issueRef = ref(realtimeDb, `complaints/${issueId}`);
+      await update(issueRef, { assignedTo, status: 'Assigned', assignedDate });
+
+      set(state => ({
+        issues: state.issues.map(issue =>
+          issue.id === issueId ? { ...issue, assignedTo, status: 'Assigned', assignedDate } : issue
+        )
+      }));
+    } catch (error) {
+      set({ error: error.message });
+    }
   }
 }));
+

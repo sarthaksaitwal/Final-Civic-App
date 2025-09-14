@@ -9,10 +9,15 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import {
   FileX,
-  Clock,
-  CheckCircle,
   RotateCcw,
   Settings,
+  AlertTriangle,
+  CheckCircle,
+  Lightbulb,
+  Trash2,
+  Droplet,
+  Wrench,
+  Waves, // If this fails, use Settings or another fallback
   MapPin,
   Calendar,
   TrendingUp
@@ -27,7 +32,7 @@ const statusConfig = {
   },
   pending: {
     title: 'Pending Issues',
-    icon: Clock,
+    icon: RotateCcw,
     color: 'bg-warning',
     textColor: 'text-warning-foreground'
   },
@@ -37,12 +42,12 @@ const statusConfig = {
     color: 'bg-success',
     textColor: 'text-success-foreground'
   },
-  reverted: {
-    title: 'Reverted Issues',
-    icon: RotateCcw,
-    color: 'bg-destructive',
-    textColor: 'text-destructive-foreground'
-  },
+  // reverted: {
+  //   title: 'Reverted Issues',
+  //   icon: RotateCcw,
+  //   color: 'bg-destructive',
+  //   textColor: 'text-destructive-foreground'
+  // },
   manual: {
     title: 'Review & Approve',
     icon: Settings,
@@ -59,10 +64,34 @@ const ISSUE_TYPE_MAP = {
   SLT: "StreetLight",
 };
 
+// Map categories to icons (use available icons only)
+const CATEGORY_ICON = {
+  "Road Damage": Settings,         // No Road icon, use Settings as fallback
+  "Drainage & Sewage": RotateCcw,  // Or use Settings/Waves if available
+  "Water": Droplet,
+  "Garbage": Trash2,
+  "StreetLight": Lightbulb,
+  "Review & Approve": Wrench,
+  "Unknown": FileX
+};
+
+const ISSUE_TYPE_ICON = {
+  "Road Damage": FileX,
+  "Drainage & Sewage": RotateCcw,
+  "Water": Settings,
+  "Garbage": AlertTriangle,
+  "StreetLight": CheckCircle,
+  "Unknown": FileX
+};
+
 const getIssueTypeFromToken = (id) => {
   if (!id) return "Unknown";
   const prefix = id.split("-")[0];
   return ISSUE_TYPE_MAP[prefix] || "Unknown";
+};
+
+const getIssueIcon = (type) => {
+  return ISSUE_TYPE_ICON[type] || FileX;
 };
 
 export default function Dashboard() {
@@ -119,36 +148,30 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6">
+      <div className="p-4 sm:p-8 md:p-12 space-y-8 bg-background min-h-screen">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-3xl font-bold text-foreground">Overview of civic issues and system status</h3>
-         
-          </div>
-          <Badge variant="secondary" className="text-sm">
-            {/* {new Date().toLocaleString()} */}
-          </Badge>
+        <div className="flex flex-col items-start items-center justify-center gap-4 mb-4">
+          <h3 className="text-2xl sm:text-3xl font-bold text-gray-800">Overview of Civic Issues and System Status</h3>
         </div>
 
         {/* Top Section */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Map */}
           <div className="lg:col-span-2">
-            <Card className="h-[400px] shadow-card">
+            <Card className="h-[400px] shadow-card border border-gray-200 rounded-2xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5 text-primary" />
+                <CardTitle className="flex items-center gap-2 text-blue-800 text-lg sm:text-xl">
+                  <MapPin className="h-5 w-5" />
                   Issue Locations Map
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-0 border-t border-border">
-                <div className="h-[320px] w-full overflow-hidden rounded-b-lg relative">
+              <CardContent className="p-0 border-t border-gray-200">
+                <div className="h-[320px] w-full overflow-hidden rounded-b-2xl relative">
                   <MapContainer
                     center={[22.5937, 78.9629]} // Center of India
                     zoom={5} // Suitable zoom for India
                     scrollWheelZoom={true}
-                    className="h-full w-full rounded-b-lg"
+                    className="h-full w-full rounded-b-2xl"
                     style={{ position: "relative", zIndex: 1 }}
                   >
                     <TileLayer
@@ -179,144 +202,101 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </div>
-
           {/* Status Cards */}
           <div className="space-y-3">
-            {Object.keys(statusConfig).map((status) => {
-              const config = statusConfig[status];
-              const count = getIssuesByStatus(status).length;
-              const IconComponent = config.icon;
+            {Object.keys(statusConfig)
+              .filter(status => status !== "reverted")
+              .map((status) => {
+                const config = statusConfig[status];
+                const count = getIssuesByStatus(status).length;
+                const IconComponent = config.icon;
 
-              return (
-                <Card
-                  key={status}
-                  className="cursor-pointer shadow-card hover:shadow-hover transition-all duration-200 transform hover:-translate-y-1"
-                  onClick={() => handleCategoryClick(status)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className={`p-2 rounded-lg ${config.color}`}>
-                          <IconComponent className={`h-4 w-4 ${config.textColor}`} />
+                return (
+                  <Card
+                    key={status}
+                    className="cursor-pointer shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1 border border-gray-200"
+                    onClick={() => handleCategoryClick(status)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className={`p-2 rounded-lg ${config.color}`}>
+                            <IconComponent className={`h-4 w-4 ${config.textColor}`} />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-800">
+                              {config.title}
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              Click to view all
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-foreground">
-                            {config.title}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Click to view all
-                          </p>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-gray-900">{count}</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-foreground">{count}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                    </CardContent>
+                  </Card>
+                );
+              })}
           </div>
         </div>
 
         {/* Bottom Section - Recent Issues */}
-        <div className="grid lg:grid-cols-4 gap-6">
+        <div className="w-full">
           {/* Recent Issues List */}
-          <div className="lg:col-span-3">
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  Recent Issues
-                </CardTitle>
-                <CardDescription>
-                  Latest reported issues requiring attention
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentIssues.map((issue) => (
+          <Card className="shadow-lg border border-gray-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-blue-800">
+                <Calendar className="h-5 w-5" />
+                Recent Issues
+              </CardTitle>
+              <CardDescription>
+                Latest reported issues requiring attention
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentIssues.map((issue) => {
+                  // Use category or fallback to type
+                  const category = issue.category || getIssueTypeFromToken(issue.id) || "Unknown";
+                  const Icon = CATEGORY_ICON[category] || FileX;
+                  return (
                     <div
                       key={issue.id}
-                      className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                      className="flex justify-between items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                       onClick={() => navigate(`/issues/${issue.id}`)}
                     >
-                      <div className="flex-1">
-                        <h4 className="font-medium text-foreground">
-                              {issue.title || getIssueTypeFromToken(issue.id) || "Untitled Issue"}
-                        </h4>
-                        <p className="text-sm text-muted-foreground">{issue.location}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge variant="outline">{issue.category}</Badge>
-                          <Badge
-                            variant={issue.priority === 'high' ? 'destructive' :
-                                   issue.priority === 'medium' ? 'default' : 'secondary'}
-                          >
-                            {issue.priority} priority
-                          </Badge>
+                      {/* Left: Issue details */}
+                      <div className="flex flex-col gap-1 flex-1">
+                        <div className="flex items-center gap-2">
+                          <Icon className="h-5 w-5 text-blue-600" />
+                          <span className="font-medium text-gray-900">{issue.title || category || "Untitled Issue"}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-600 text-sm">
+                          <MapPin className="h-4 w-4" />
+                          <span>{issue.location}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-600 text-sm">
+                          <Calendar className="h-4 w-4" />
+                          <span>
+                            {issue.dateReported instanceof Date
+                              ? issue.dateReported.toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit", year: "2-digit" })
+                              : "N/A"}
+                          </span>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <Badge variant="secondary">{issue.status}</Badge>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {issue.dateReported.toLocaleDateString()}
-                        </p>
+                      {/* Right: Status badge */}
+                      <div className="ml-4 flex flex-col items-end">
+                        <Badge variant="secondary" className="bg-gray-200 text-gray-800 mb-2">{issue.status}</Badge>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="space-y-4">
-            <Card className="shadow-card">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-success" />
-                  Quick Stats
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm text-muted-foreground">Total Issues</span>
-                      <span className="text-sm font-semibold">{totalIssues}</span>
-                    </div>
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div className="bg-primary h-2 rounded-full" style={{ width: '100%' }}></div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm text-muted-foreground">Completed</span>
-                      <span className="text-sm font-semibold">{completedIssues}</span>
-                    </div>
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div className="bg-success h-2 rounded-full" style={{ width: `${completionRate}%` }}></div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm text-muted-foreground">Success Rate</span>
-                      <span className="text-sm font-semibold text-success">{completionRate}%</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm text-muted-foreground">Avg Response</span>
-                      <span className="text-sm font-semibold">2.3 days</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </DashboardLayout>

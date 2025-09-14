@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { get, set, ref, query, orderByChild, equalTo } from "firebase/database";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { ref, push, get, query, orderByChild, equalTo, set } from "firebase/database";
 import { realtimeDb } from "@/lib/firebase";
+import { useNavigate } from "react-router-dom";
+import WorkerCreated from "@/pages/WorkerCreated";
 
 const CATEGORY_CODES = {
   garbage: 'GBG',
@@ -54,7 +55,6 @@ export default function CreateProfile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Phone validation: must be 10 digits
     if (!/^[0-9]{10}$/.test(form.phone)) {
       setError('Phone number must be exactly 10 digits.');
       return;
@@ -62,16 +62,41 @@ export default function CreateProfile() {
     setLoading(true);
     setError('');
     try {
+      // Fetch all workers (no index needed)
+      const workersRef = ref(realtimeDb, 'workers');
+      const allWorkersSnap = await get(workersRef);
+      let duplicate = false;
+      if (allWorkersSnap.exists()) {
+        const allWorkers = Object.values(allWorkersSnap.val());
+        // Check for duplicate phone
+        duplicate = allWorkers.some(w => w.phone === form.phone);
+        // Optionally, check for duplicate by name + department + pincode
+        // duplicate = duplicate || allWorkers.some(
+        //   w => w.name === form.name && w.department === form.department && w.pincode === form.pincode
+        // );
+      }
+      if (duplicate) {
+        setError('A worker with this phone number already exists.');
+        setLoading(false);
+        return;
+      }
+
       const id = await generateWorkerId(form.department, form.pincode);
       setWorkerId(id);
-      await set(ref(realtimeDb, `workers/${id}`), {
+
+      const workerData = {
         ...form,
-        password: '12345678',
         workerId: id,
         department_pincode: `${form.department}_${form.pincode}`,
-      });
+      };
+
+      await set(ref(realtimeDb, `workers/${id}`), workerData);
+
       setLoading(false);
       setShowSuccess(true);
+
+      // Redirect to WorkerCreated page with worker info
+      navigate("/worker-created", { state: { worker: workerData } });
     } catch (err) {
       setError('Failed to create worker.');
       setLoading(false);

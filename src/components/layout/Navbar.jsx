@@ -40,10 +40,10 @@ export default function Navbar() {
       <span className="text-lg font-semibold text-foreground">CivicTracker</span>
       {/* Center: Page Title */}
       <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <span className="text-3xl font-extrabold text-primary">{getPageTitle()}</span>
+        <span className="text-3xl font-extrabold text-gray-800">{getPageTitle()}</span>
       </div>
       {/* Right: Date/Time */}
-      <span className="flex items-center gap-2 bg-primary px-3 py-1 rounded-full shadow text-base font-semibold text-primary-foreground border border-primary">
+      <span className="flex items-center gap-2 bg-muted px-3 py-1 rounded-full shadow text-base font-semibold text-muted-foreground border border-border">
         {/* <svg className="w-5 h-5 text-primary-foreground" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />

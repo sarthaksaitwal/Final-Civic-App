@@ -1,47 +1,46 @@
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useWorkersStore } from '@/store/workers';
 import { useIssuesStore } from '@/store/issues';
-import { useEffect, useState } from 'react';
-import { Loader2, User, ArrowLeft, CheckCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { ref, get } from "firebase/database";
-import { realtimeDb } from "@/lib/firebase";
+import { useToast } from '@/components/ui/use-toast';
+import { Loader2 } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
 
 export default function WorkerDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { assignWorkerToIssue } = useWorkersStore ? useWorkersStore() : {};
-  const { issues } = useIssuesStore();
+  const { workers, fetchWorkers } = useWorkersStore();
+  const { assignWorker, fetchIssues } = useIssuesStore();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
   const [worker, setWorker] = useState(null);
-
-  const issueId = location.state?.issueId || null;
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchWorker() {
-      setIsLoading(true);
-      const snap = await get(ref(realtimeDb, `workers/${id}`));
-      if (snap.exists()) {
-        setWorker({ ...snap.val(), id });
-      } else {
+    const loadWorker = async () => {
+      try {
+        if (workers.length === 0) {
+          await fetchWorkers();
+        }
+        const foundWorker = workers.find(w => w.id === id);
+        setWorker(foundWorker || null);
+        setIsLoading(false);
+      } catch (error) {
         setWorker(null);
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    }
-    fetchWorker();
-    // eslint-disable-next-line
-  }, [id]);
+    };
+    loadWorker();
+  }, [id, workers, fetchWorkers]);
 
   if (isLoading) {
     return (
       <DashboardLayout>
         <div className="p-6 flex justify-center items-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
         </div>
       </DashboardLayout>
     );
@@ -50,112 +49,102 @@ export default function WorkerDetails() {
   if (!worker) {
     return (
       <DashboardLayout>
-        <div className="p-6 text-center">
-          <h1 className="text-2xl font-bold">Worker Not Found</h1>
-          <Button onClick={() => navigate('/assign-worker')} className="mt-4">
-            Back to Workers
+        <div className="p-6 text-center text-gray-600">
+          Worker not found.
+          <Button className="mt-4" onClick={() => navigate(-1)}>
+            Go Back
           </Button>
         </div>
       </DashboardLayout>
     );
   }
 
-  const handleAssign = () => {
-    if (!issueId) {
-      toast({
-        title: "No Issue Selected",
-        description: "Please select an issue to assign this worker.",
-      });
-      return;
-    }
-
-    const issue = issues.find(i => i.id === issueId);
-    if (!issue) {
-      toast({
-        title: "Issue Not Found",
-        description: "The selected issue could not be found.",
-      });
-      return;
-    }
-
-    if (assignWorkerToIssue) {
-      assignWorkerToIssue(worker.id, issueId, issue.title);
-      toast({
-        title: "Worker Assigned",
-        description: `${worker.name} has been assigned to ${issue.title}`,
-      });
-      navigate(`/issues/${issueId}`);
-    }
-  };
-
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => navigate('/assign-worker')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Workers
-          </Button>
-          <h1 className="text-3xl font-bold text-foreground">{worker.name}</h1>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-6">
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Worker Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+      <div className="p-6 max-w-3xl mx-auto space-y-6">
+        <Button variant="ghost" onClick={() => navigate(-1)}>
+          Back
+        </Button>
+        <Card className="shadow-card border border-gray-200 rounded-2xl bg-gray-50">
+          <CardHeader className="bg-gray-100 border-b border-gray-200 rounded-t-2xl">
+            <CardTitle className="text-2xl font-bold text-blue-700 flex items-center gap-2">
+              <span>{worker.name || 'Unnamed Worker'}</span>
+              <Badge variant={worker.availability === "Available" ? "success" : "secondary"}>
+                {worker.availability || "Unknown"}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <strong>Name:</strong> {worker.name}
+                <div className="text-sm text-muted-foreground mb-1">Department</div>
+                <div className="font-medium">{worker.department || 'N/A'}</div>
               </div>
               <div>
-                <strong>Current Task:</strong> {worker.currentTask || 'None'}
+                <div className="text-sm text-muted-foreground mb-1">Phone</div>
+                <div className="font-medium">{worker.phone || 'N/A'}</div>
               </div>
               <div>
-                <strong>Availability:</strong>{' '}
-                <Badge variant={worker.availability === 'Available' ? 'success' : 'destructive'}>
-                  {worker.availability}
-                </Badge>
+                <div className="text-sm text-muted-foreground mb-1">Pincode</div>
+                <div className="font-medium">{worker.pincode || 'N/A'}</div>
               </div>
               <div>
-                <strong>Location:</strong> {worker.location}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle>Assigned Tasks</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {worker.assignedTasks && worker.assignedTasks.length > 0 ? (
-                <ul className="space-y-2">
-                  {worker.assignedTasks.map((task) => (
-                    <li key={task.id} className="flex items-center justify-between">
-                      <span>{task.title}</span>
-                      <Badge variant={task.status === 'completed' ? 'outline' : 'default'}>
-                        {task.status}
+                <div className="text-sm text-muted-foreground mb-1">Current Task</div>
+                <div className="font-medium">
+                  {worker.currentTask && worker.currentTask !== "None" ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-200">
+                        {worker.currentTask}
                       </Badge>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-muted-foreground">No assigned tasks</p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {issueId && (
-          <div className="flex justify-center">
-            <Button onClick={handleAssign} className="w-full max-w-md">
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Assign to Issue
-            </Button>
-          </div>
+                      <span className="text-xs text-gray-500">(Assigned)</span>
+                    </span>
+                  ) : (
+                    <span className="text-gray-500">None</span>
+                  )}
+                </div>
+              </div>
+            </div>
+            {/* Show assigned issue/task details if available */}
+            {worker.currentTask && worker.currentTask !== "None" && (
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="font-semibold text-blue-800 mb-1 flex items-center gap-2">
+                  Assigned to Task:
+                  <Badge variant="secondary" className="ml-2">{worker.currentTask}</Badge>
+                </div>
+                <div className="text-sm text-gray-700">
+                  This worker is currently assigned to the above issue/task.
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        {/*
+          Add "Assign to Issue" button if issueId is passed in location state
+        */}
+        {location.state?.issueId && (
+          <Button
+            variant="primary"
+            className="mt-4"
+            onClick={async () => {
+              try {
+                await assignWorker(location.state.issueId, worker); // pass the full worker object
+                await fetchIssues(); // <-- force refresh
+                toast({
+                  title: "Worker Assigned",
+                  description: `${worker.name} has been assigned to the issue.`,
+                });
+                navigate(`/issues/${location.state.issueId}`);
+              } catch (error) {
+                toast({
+                  title: "Error",
+                  description: "Failed to assign worker to the issue.",
+                  variant: "destructive",
+                });
+              }
+            }}
+          >
+            Assign to Issue
+          </Button>
         )}
       </div>
     </DashboardLayout>

@@ -17,7 +17,13 @@ import {
   Clock,
   AlertTriangle,
   List,
-  Map
+  Map,
+  Tag,
+  Trash2,
+  Droplet,
+  Lightbulb,
+  RotateCcw,
+  Settings
 } from 'lucide-react';
 
 export default function Issues() {
@@ -29,7 +35,6 @@ export default function Issues() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [priorityFilter, setPriorityFilter] = useState('all');
 
   // Get initial filter from navigation state
   useEffect(() => {
@@ -64,12 +69,8 @@ export default function Issues() {
       filtered = filtered.filter(issue => issue.category === categoryFilter);
     }
 
-    if (priorityFilter !== 'all') {
-      filtered = filtered.filter(issue => issue.priority === priorityFilter);
-    }
-
     setFilteredIssues(filtered);
-  }, [issues, searchTerm, statusFilter, categoryFilter, priorityFilter]);
+  }, [issues, searchTerm, statusFilter, categoryFilter]);
 
   // Sort issues by dateReported descending (newest first)
   const sortedIssues = [...filteredIssues].sort((a, b) => {
@@ -130,11 +131,19 @@ export default function Issues() {
     return ISSUE_TYPE_MAP[prefix] || "Unknown";
   };
 
+  const CATEGORY_ICON = {
+    "Garbage": Trash2,
+    "Water": Droplet,
+    "StreetLight": Lightbulb,
+    "Drainage & Sewage": RotateCcw,
+    "Road Damage": Settings,
+  };
+
   return (
     <DashboardLayout>
       <div className="p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center">
           <div>
             <h3 className="text-3xl font-bold text-foreground">Manage and track all civic issues</h3>
           </div>
@@ -172,7 +181,7 @@ export default function Issues() {
                   <SelectItem value="new">New</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="reverted">Reverted</SelectItem>
+                  {/* <SelectItem value="reverted">Reverted</SelectItem> */}
                   <SelectItem value="manual">Review & Approve</SelectItem>
                 </SelectContent>
               </Select>
@@ -191,25 +200,12 @@ export default function Issues() {
                 </SelectContent>
               </Select>
 
-              <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Priorities" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Priorities</SelectItem>
-                  <SelectItem value="high">High Priority</SelectItem>
-                  <SelectItem value="medium">Medium Priority</SelectItem>
-                  <SelectItem value="low">Low Priority</SelectItem>
-                </SelectContent>
-              </Select>
-
               <Button 
                 variant="outline" 
                 onClick={() => {
                   setSearchTerm('');
                   setStatusFilter('all');
                   setCategoryFilter('all');
-                  setPriorityFilter('all');
                 }}
               >
                 Clear Filters
@@ -246,7 +242,7 @@ export default function Issues() {
                             {issue.title || getIssueTypeFromToken(issue.id) || 'Untitled Issue'}
                           </h3>
                           <p className="text-sm text-muted-foreground">
-                            Issue #{issue.id}
+                            #{issue.id}
                           </p>
                         </div>
                         <Badge variant={getStatusBadgeVariant(issue.status)}>
@@ -254,9 +250,9 @@ export default function Issues() {
                         </Badge>
                       </div>
 
-                      <p className="text-muted-foreground">
+                      {/* <p className="text-muted-foreground">
                         {issue.description || 'No description provided'}
-                      </p>
+                      </p> */}
 
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
@@ -266,7 +262,7 @@ export default function Issues() {
                         {issue.dateReported && (
                           <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
-                            Reported: {issue.dateReported.toLocaleDateString()}
+                            Reported: {issue.dateReported.toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit", year: "2-digit" })}
                           </div>
                         )}
                         {issue.deadline && (
@@ -278,23 +274,23 @@ export default function Issues() {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        {issue.category && (
+                        {/* {issue.category && (
                           <Badge variant="outline">{issue.category}</Badge>
-                        )}
+                        )} */}
                         {issue.priority && (
                           <Badge variant={getPriorityBadgeVariant(issue.priority)}>
                             {issue.priority} priority
                           </Badge>
                         )}
-                        {issue.assignedTo && (
+                        {/* {issue.assignedTo && (
                           <Badge variant="secondary">
-                            Assigned to: {issue.assignedTo}
+                            Assigned to: {typeof issue.assignedTo === "object" ? issue.assignedTo.name : issue.assignedTo}
                           </Badge>
-                        )}
+                        )} */}
                       </div>
                     </div>
 
-                    {issue.photos && issue.photos.length > 0 && (
+                    {/* {issue.photos && issue.photos.length > 0 && (
                       <div className="ml-4">
                         <img
                           src={issue.photos[0]}
@@ -302,7 +298,7 @@ export default function Issues() {
                           className="w-20 h-20 object-cover rounded-lg border border-border"
                         />
                       </div>
-                    )}
+                    )} */}
                     {issue.audio && issue.audio.length > 0 && (
                       <div className="mt-2">
                         {issue.audio.map((audioUrl, index) => (
