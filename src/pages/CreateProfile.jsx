@@ -175,7 +175,9 @@ export default function CreateProfile() {
             </div>
           )}
           {error && <div className="text-red-600 text-sm">{error}</div>}
-          <Button type="submit" loading={loading} className="w-full md:w-1/2 mx-auto">Create Worker</Button>
+          <Button type="submit" disabled={loading} className="w-full md:w-1/2 mx-auto">
+            {loading ? "Creating..." : "Create Worker"}
+          </Button>
         </form>
       </div>
     </DashboardLayout>

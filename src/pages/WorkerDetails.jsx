@@ -1,25 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useWorkersStore } from '@/store/workers';
 import { useIssuesStore } from '@/store/issues';
-import { useToast } from '@/components/ui/use-toast';
 import { Loader2, BadgeCheck, FileText, User, Phone, Briefcase, MapPin, Hash } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 export default function WorkerDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const { workers, fetchWorkers } = useWorkersStore();
-  const { issues, fetchIssues, unassignWorker } = useIssuesStore();
+  const { issues, fetchIssues } = useIssuesStore();
   const [worker, setWorker] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [availabilityFilter, setAvailabilityFilter] = useState('all');
-  const { toast } = useToast();
 
   useEffect(() => {
     const loadWorker = async () => {
@@ -65,61 +60,88 @@ export default function WorkerDetails() {
     );
   }
 
-  // Find assigned issue for this worker
-  const assignedIssue = issues.find(
+  // Always use the database value for assignedIssueIds
+  const assignedIssueIds = Array.isArray(worker.assignedIssueIds) ? worker.assignedIssueIds : [];
+
+  // Compute assigned and resolved issues from the issues array
+  const assignedIssues = issues.filter(
     (issue) =>
       (typeof issue.assignedTo === "object"
         ? issue.assignedTo.id
-        : issue.assignedTo) === worker.id
+        : issue.assignedTo) === worker.id &&
+      !["resolved", "completed"].includes((issue.status || "").toLowerCase())
   );
 
-  // --- Section: Assigned Issue ---
-  const assignedSection = assignedIssue ? (
-    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-      <div className="font-semibold text-blue-800 mb-1 flex items-center gap-2">
-        <FileText className="h-4 w-4" />
-        Assigned to Issue:
-        <span className="ml-2">{assignedIssue.title || assignedIssue.id}</span>
-        <Badge variant="secondary" className="ml-2">{assignedIssue.status}</Badge>
-      </div>
-      <div className="text-sm text-gray-700">
-        This worker is currently assigned to the above issue.
-      </div>
-      <Button
-        className="mt-3"
-        variant="outline"
-        onClick={async () => {
-          try {
-            await unassignWorker(worker.id || worker.workerId);
-            // Refresh data after unassigning
-            await fetchWorkers();
-            await fetchIssues();
-            toast({
-              title: "Worker Unassigned",
-              description: "The worker has been unassigned from the issue.",
-            });
-          } catch (error) {
-            toast({
-              title: "Error",
-              description: error.message || "Failed to unassign worker.",
-              variant: "destructive",
-            });
-          }
-        }}
-      >
-        Unassign from Issue
-      </Button>
-      <Button
-        className="mt-3 ml-3"
-        variant="outline"
-        onClick={() => navigate(`/issues/${assignedIssue.id}`)}
-      >
-        View Issue Details
-      </Button>
-    </div>
+  const resolvedIssues = issues.filter(
+    (issue) =>
+      (typeof issue.assignedTo === "object"
+        ? issue.assignedTo.id
+        : issue.assignedTo) === worker.id &&
+      ["resolved", "completed"].includes((issue.status || "").toLowerCase())
+  );
+
+  const assignedCount = assignedIssues.length;
+  const isOccupied = assignedCount >= 10;
+  const isAvailable = assignedCount < 10;
+
+  // --- Section: Assigned Issues ---
+  const assignedSection = assignedIssues.length > 0 ? (
+    <ul className="space-y-4">
+      {assignedIssues.map((issue) => (
+        <li key={issue.id} className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="font-semibold text-blue-800 mb-1 flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Assigned to Issue:
+            <span className="ml-2">{issue.title || issue.id}</span>
+            <Badge variant="secondary" className="ml-2">{issue.status}</Badge>
+          </div>
+          <div className="text-sm text-gray-700">
+            This worker is currently assigned to the above issue.
+          </div>
+          <Button
+            className="mt-3 ml-3"
+            variant="outline"
+            onClick={() => navigate(`/issues/${issue.id}`)}
+          >
+            View Issue Details
+          </Button>
+        </li>
+      ))}
+    </ul>
   ) : (
     <div className="text-green-700 font-semibold">
       This worker is not currently assigned to any issue.
+    </div>
+  );
+
+  // --- Section: Resolved Issues ---
+  const resolvedSection = (
+    <div>
+      {resolvedIssues.length === 0 ? (
+        <div className="text-gray-500">No resolved issues yet.</div>
+      ) : (
+        <ul className="space-y-4">
+          {resolvedIssues.map((issue) => (
+            <li key={issue.id} className="p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="font-semibold text-green-800 mb-1 flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                {issue.title || issue.id}
+                <Badge variant="secondary" className="ml-2">{issue.status}</Badge>
+              </div>
+              <div className="text-sm text-gray-700">
+                This issue was resolved by this worker.
+              </div>
+              <Button
+                className="mt-3 ml-3"
+                variant="outline"
+                onClick={() => navigate(`/issues/${issue.id}`)}
+              >
+                View Issue Details
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 
@@ -137,12 +159,12 @@ export default function WorkerDetails() {
       </div>
       <span
         className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
-          worker.assignedIssueId
-            ? "bg-yellow-100 text-yellow-700 border border-yellow-300"
+          isOccupied
+            ? "bg-red-100 text-red-700 border border-red-300"
             : "bg-green-100 text-green-700 border border-green-300"
         }`}
       >
-        {worker.assignedIssueId ? "Assigned" : "Available"}
+        {isOccupied ? "Occupied" : "Available"}
       </span>
     </div>
   );
@@ -173,33 +195,11 @@ export default function WorkerDetails() {
     </div>
   );
 
-  // Filter workers based on availability
-  const matchesAvailability =
-    availabilityFilter === 'all' ||
-    (availabilityFilter === 'assigned' && !!worker.assignedIssueId) ||
-    (availabilityFilter === 'available' && !worker.assignedIssueId);
-
   return (
     <DashboardLayout>
       <div className="p-4 sm:p-8 md:p-12 max-w-4xl mx-auto space-y-8 bg-background rounded-xl shadow-none">
         {/* Header */}
         {headerSection}
-
-        {/* Filter Section - New Addition
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex-1 min-w-[200px]">
-            <Select value={availabilityFilter} onValueChange={setAvailabilityFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select availability" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="assigned">Assigned</SelectItem>
-                <SelectItem value="available">Available</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div> */}
 
         {/* Details Section */}
         <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
@@ -212,15 +212,26 @@ export default function WorkerDetails() {
           <CardContent className="p-6">{detailsSection}</CardContent>
         </Card>
 
-        {/* Assigned Issue Section */}
+        {/* Assigned Issues Section */}
         <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
           <CardHeader>
             <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
               <FileText className="h-6 w-6 text-blue-700" />
-              Assigned Issue
+              Assigned Issues
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">{assignedSection}</CardContent>
+        </Card>
+
+        {/* Resolved Issues Section */}
+        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
+          <CardHeader>
+            <CardTitle className="text-lg font-bold text-green-700 flex items-center gap-2">
+              <FileText className="h-6 w-6 text-green-700" />
+              Resolved Issues
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">{resolvedSection}</CardContent>
         </Card>
       </div>
     </DashboardLayout>

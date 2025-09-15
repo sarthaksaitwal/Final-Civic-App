@@ -65,10 +65,39 @@ export const useIssuesStore = create((set, getState) => ({
     try {
       const issueRef = ref(realtimeDb, `complaints/${id}`);
       await update(issueRef, { status });
-      set(state => ({
-        issues: state.issues.map(issue =>
+
+      // Get the updated issue to find the assigned worker
+      const issueSnapshot = await get(issueRef);
+      const issue = issueSnapshot.exists() ? issueSnapshot.val() : null;
+
+      // If the issue is resolved/completed, update the worker's resolvedIssuesId
+      if (
+        issue &&
+        issue.assignedTo &&
+        ["resolved", "completed"].includes(status.toLowerCase())
+      ) {
+        const workerRef = ref(realtimeDb, `workers/${issue.assignedTo}`);
+        const workerSnapshot = await get(workerRef);
+        const workerData = workerSnapshot.exists() ? workerSnapshot.val() : {};
+
+        // Prepare resolvedIssuesId array
+        let resolvedIssuesId = Array.isArray(workerData.resolvedIssuesId)
+          ? [...workerData.resolvedIssuesId]
+          : [];
+        if (!resolvedIssuesId.includes(id)) {
+          resolvedIssuesId.push(id);
+        }
+
+        await update(workerRef, {
+          resolvedIssuesId,
+        });
+      }
+
+      // Update local state
+      set((state) => ({
+        issues: state.issues.map((issue) =>
           issue.id === id ? { ...issue, status } : issue
-        )
+        ),
       }));
     } catch (error) {
       set({ error: error.message });
@@ -85,91 +114,91 @@ export const useIssuesStore = create((set, getState) => ({
   // Assign worker to issue
   assignWorker: async (issueId, worker) => {
     try {
-      // Fetch the latest worker data from the database
       const workerKey = worker.workerId || worker.id;
-      const workerRef = ref(realtimeDb, `workers/${workerKey}`);
-      const workerSnapshot = await get(workerRef);
-      const workerData = workerSnapshot.exists() ? workerSnapshot.val() : {};
-
-      // Prevent assignment if worker is already assigned
-      if (workerData.assignedIssueId && workerData.assignedIssueId !== "") {
-        throw new Error(
-          `Worker is already assigned to issue ${workerData.assignedIssueId}. Unassign first.`
-        );
-      }
-
-      // Fetch the latest issue data from the database
       const issueRef = ref(realtimeDb, `complaints/${issueId}`);
+
+      // Fetch current issue data
       const issueSnapshot = await get(issueRef);
       const issueData = issueSnapshot.exists() ? issueSnapshot.val() : {};
 
-      // Prevent assignment if issue already has a worker assigned
-      if (issueData.assignedTo && issueData.assignedTo !== "" && issueData.assignedTo !== workerKey) {
-        throw new Error(
-          `This issue is already assigned to another worker (${issueData.assignedTo}). Unassign first.`
-        );
+      // Prevent assigning the same worker to the same issue again
+      const currentAssignee =
+        typeof issueData.assignedTo === "object"
+          ? issueData.assignedTo.id
+          : issueData.assignedTo;
+      if (currentAssignee && currentAssignee === workerKey) {
+        throw new Error("This worker is already assigned to this issue.");
       }
 
-      const assignedTo = workerKey;
-      const assignedDate = new Date().toISOString();
+      // Count active assigned issues for this worker
+      const allIssuesSnapshot = await get(ref(realtimeDb, "complaints"));
+      let assignedCount = 0;
+      if (allIssuesSnapshot.exists()) {
+        const allIssues = allIssuesSnapshot.val();
+        assignedCount = Object.values(allIssues).filter(
+          (issue) =>
+            (typeof issue.assignedTo === "object"
+              ? issue.assignedTo.id
+              : issue.assignedTo) === workerKey &&
+            !["resolved", "completed"].includes((issue.status || "").toLowerCase())
+        ).length;
+      }
+      if (assignedCount >= 10) {
+        throw new Error("This worker is occupied and cannot be assigned more issues until some are resolved.");
+      }
 
-      // Update the issue
-      await update(issueRef, { assignedTo, status: 'Assigned', assignedDate });
-
-      // Update the worker: set assignedIssueId
-      await update(workerRef, { assignedIssueId: issueId });
-
-      set(state => ({
-        issues: state.issues.map(issue =>
-          issue.id === issueId ? { ...issue, assignedTo, status: 'Assigned', assignedDate } : issue
-        )
-      }));
-    } catch (error) {
-      set({ error: error.message });
-      throw error; // So UI can show toast
-    }
-  },
-
-  // Unassign worker from issue
-  unassignWorker: async (workerId) => {
-    try {
-      // 1. Find the issue currently assigned to this worker
-      const issuesSnapshot = await get(ref(realtimeDb, 'complaints'));
-      if (!issuesSnapshot.exists()) return;
-
-      const issuesData = issuesSnapshot.val();
-      let assignedIssueId = null;
-      let assignedIssueKey = null;
-
-      for (const [issueKey, issue] of Object.entries(issuesData)) {
-        if (
-          (typeof issue.assignedTo === "object"
-            ? issue.assignedTo.id
-            : issue.assignedTo) === workerId
-        ) {
-          assignedIssueId = issue.id || issueKey;
-          assignedIssueKey = issueKey;
-          break;
+      // Remove this issue from the previous worker's assignedIssueIds (if any)
+      if (currentAssignee && currentAssignee !== workerKey) {
+        const prevWorkerRef = ref(realtimeDb, `workers/${currentAssignee}`);
+        const prevWorkerSnapshot = await get(prevWorkerRef);
+        if (prevWorkerSnapshot.exists()) {
+          const prevWorkerData = prevWorkerSnapshot.val();
+          let prevAssignedIssueIds = Array.isArray(prevWorkerData.assignedIssueIds)
+            ? [...prevWorkerData.assignedIssueIds]
+            : [];
+          prevAssignedIssueIds = prevAssignedIssueIds.filter(id => id !== issueId);
+          await update(prevWorkerRef, { assignedIssueIds: prevAssignedIssueIds });
         }
       }
 
-      // 2. Update the worker: set assignedIssueId to ""
-      const workerRef = ref(realtimeDb, `workers/${workerId}`);
-      await update(workerRef, { assignedIssueId: "" });
-
-      // 3. Update the complaint: set assignedTo to "" and add previouslyAssignedWorker
-      if (assignedIssueKey) {
-        const complaintRef = ref(realtimeDb, `complaints/${assignedIssueKey}`);
-        await update(complaintRef, {
-          assignedTo: "",
-          previouslyAssignedWorker: workerId,
-        });
+      // Add this issue to the new worker's assignedIssueIds
+      const newWorkerRef = ref(realtimeDb, `workers/${workerKey}`);
+      const newWorkerSnapshot = await get(newWorkerRef);
+      let newAssignedIssueIds = [];
+      if (newWorkerSnapshot.exists()) {
+        const newWorkerData = newWorkerSnapshot.val();
+        newAssignedIssueIds = Array.isArray(newWorkerData.assignedIssueIds)
+          ? [...newWorkerData.assignedIssueIds]
+          : [];
+        if (!newAssignedIssueIds.includes(issueId)) {
+          newAssignedIssueIds.push(issueId);
+        }
+      } else {
+        newAssignedIssueIds = [issueId];
       }
+      await update(newWorkerRef, { assignedIssueIds: newAssignedIssueIds });
+
+      // Update the issue: assign to new worker and set assignedDate
+      await update(issueRef, {
+        assignedTo: workerKey,
+        assignedDate: new Date().toISOString(),
+        status: 'Assigned'
+      });
+
+      // Update local state if needed
+      set(state => ({
+        issues: state.issues.map(issue =>
+          issue.id === issueId
+            ? { ...issue, assignedTo: workerKey, assignedDate: new Date().toISOString(), status: 'Assigned' }
+            : issue
+        )
+      }));
     } catch (error) {
       set({ error: error.message });
       throw error;
     }
   },
+
 
   // When creating a new worker
   createWorker: async (workerId, workerData) => {
@@ -182,7 +211,46 @@ export const useIssuesStore = create((set, getState) => ({
     } catch (error) {
       set({ error: error.message });
     }
-  }
+  },
+
+  // Fetch workers with real-time listener
+  fetchWorkers: () => {
+    return new Promise((resolve, reject) => {
+      const workersRef = ref(realtimeDb, 'workers');
+      // Remove any previous listener
+      if (getState()._unsubscribeWorkers) {
+        getState()._unsubscribeWorkers();
+      }
+
+      onValue(
+        workersRef,
+        (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            // Convert object to array
+            const workersArray = Object.keys(data).map((key) => ({
+              id: key,
+              ...data[key],
+            }));
+            set({ workers: workersArray, error: null });
+            resolve(workersArray);
+          } else {
+            set({ workers: [], error: null });
+            resolve([]);
+          }
+        },
+        (error) => {
+          set({ error: error.message });
+          reject(error);
+        }
+      );
+
+      // Store unsubscribe function in state for cleanup
+      set({
+        _unsubscribeWorkers: () => off(workersRef, 'value')
+      });
+    });
+  },
 }));
 
 // Run this once in your admin panel or Node script

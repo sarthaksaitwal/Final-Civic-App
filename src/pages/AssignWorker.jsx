@@ -8,7 +8,7 @@ import { useWorkersStore } from '@/store/workers';
 import { useIssuesStore } from '@/store/issues';
 import { useToast } from '@/components/ui/use-toast';
 import { useEffect, useState } from 'react';
-import { Loader2, User, Filter, Phone, MapPin, Briefcase, Hash, ShieldCheck, UserCheck, CheckCircle } from 'lucide-react';
+import { Loader2, User, Filter, Phone, MapPin, Briefcase } from 'lucide-react';
 
 
 export default function AssignWorker() {
@@ -17,118 +17,85 @@ export default function AssignWorker() {
   const navigate = useNavigate();
   const location = useLocation();
   const { workers, fetchWorkers } = useWorkersStore();
-  const { assignWorker, issues } = useIssuesStore(); // <-- add issues here
+  const { assignWorker, issues, fetchIssues } = useIssuesStore();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [availabilityFilter, setAvailabilityFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
-  // Set default department filter from navigation state, fallback to 'all'
-  const [departmentFilter, setDepartmentFilter] = useState(
-    location.state?.department
-      ? workers.find(w => normalize(w.department) === normalize(location.state.department))
-        ? normalize(location.state.department)
-        : 'all'
-      : 'all'
-  );
+  const [departmentFilter, setDepartmentFilter] = useState('all');
 
-  // Get issueId from location state or query params
+  // Get issueId and department from navigation state or query params
   const issueId = location.state?.issueId || null;
+  const navDepartment = location.state?.department || null;
+
+  // Find the current issue and its department
+  const currentIssue = issues.find(issue => issue.id === issueId);
+  const currentIssueDepartment = navDepartment || currentIssue?.department || null;
 
   useEffect(() => {
-    fetchWorkers().finally(() => setIsLoading(false));
+    const fetchData = async () => {
+      setIsLoading(true);
+      await fetchWorkers();
+      await fetchIssues();
+      setIsLoading(false);
+    };
+    fetchData();
     // eslint-disable-next-line
   }, []);
 
-  useEffect(() => {
-    // If department is provided in navigation state and exists in departments, set it as default
-    if (location.state?.department) {
-      const normalizedDept = normalize(location.state.department);
-      if (departments.some(dept => normalize(dept) === normalizedDept)) {
-        setDepartmentFilter(normalizedDept);
-      } else {
-        setDepartmentFilter('all');
-      }
+  // For department/location dropdowns
+  const departments = Array.from(new Set(workers.map((w) => w.department).filter(Boolean)));
+  const locations = Array.from(new Set(workers.map((w) => w.location).filter(Boolean)));
+
+  // Filtering logic
+  let filteredWorkers = workers;
+
+  // If assigning/reassigning for a specific issue, always filter by that issue's department
+  if (issueId && currentIssueDepartment) {
+    filteredWorkers = filteredWorkers.filter(
+      (worker) =>
+        normalize(worker.department) === normalize(currentIssueDepartment)
+    );
+  } else {
+    // Only apply department filter from dropdown if not assigning a specific issue
+    if (departmentFilter !== "all") {
+      filteredWorkers = filteredWorkers.filter(
+        (worker) =>
+          normalize(worker.department) === normalize(departmentFilter)
+      );
     }
-    // eslint-disable-next-line
-  }, [location.state?.department, workers]);
-
-  // Get unique locations and departments for filter
-  const locations = [...new Set(workers.map(worker => worker.location))];
-  let departments = [...new Set(workers.map(worker => worker.department).filter(Boolean))];
-
-  // Remove "StreetLight" from the department filter options if present
-  departments = departments.filter(dept => dept !== "StreetLight");
-
-  // Filter workers based on selected filters
-  const filteredWorkers = workers.filter(worker => {
-    const matchesAvailability =
-      availabilityFilter === 'all' ||
-      (availabilityFilter === 'assigned' && !!worker.assignedIssueId) ||
-      (availabilityFilter === 'available' && !worker.assignedIssueId);
-    const matchesLocation = locationFilter === 'all' || worker.location === locationFilter;
-    const normalize = str => (str || '').toLowerCase().replace(/\s+/g, '');
-    const matchesDepartment =
-      departmentFilter === 'all' ||
-      (normalize(worker.department) === normalize(departmentFilter));
-    return matchesAvailability && matchesLocation && matchesDepartment;
-  });
-
-  if (isLoading) {
-    return (
-      <DashboardLayout>
-        <div className="p-6 flex justify-center items-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        </div>
-      </DashboardLayout>
+  }
+  if (availabilityFilter !== "all") {
+    filteredWorkers = filteredWorkers.filter((worker) => {
+      const assignedIssues = issues.filter(
+        (issue) =>
+          (typeof issue.assignedTo === "object"
+            ? issue.assignedTo.id
+            : issue.assignedTo) === worker.id &&
+          !["resolved", "completed"].includes((issue.status || "").toLowerCase())
+      );
+      const assignedCount = assignedIssues.length;
+      if (availabilityFilter === "available") return assignedCount < 10;
+      if (availabilityFilter === "occupied") return assignedCount >= 10;
+      return true;
+    });
+  }
+  if (locationFilter !== "all") {
+    filteredWorkers = filteredWorkers.filter(
+      (worker) => normalize(worker.location) === normalize(locationFilter)
     );
   }
 
+  // Handler for viewing worker details
   const handleWorkerClick = (worker) => {
-    navigate(`/workers/${worker.id}`, { state: { issueId } });
+    navigate(`/workers/${worker.id}`);
   };
 
-  const currentIssue = issues.find(issue => issue.id === issueId);
-  const isResolved = (currentIssue?.status || "").toLowerCase() === "resolved" || (currentIssue?.status || "").toLowerCase() === "completed";
-
-  // const actionsSection = !isResolved && (
-  //   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4 mt-8">
-  //     {lastActiveIndex >= assignedStepIndex ? (
-  //       <Button
-  //         variant="primary"
-  //         className="flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-base bg-blue-600 text-white shadow-lg hover:bg-blue-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-all duration-200"
-  //         onClick={() => {
-  //           const normalize = (str) => (str || "").toLowerCase().replace(/\s+/g, "");
-  //           navigate("/assign-worker", {
-  //             state: {
-  //               issueId: issue.id,
-  //               department: normalize(issue.category),
-  //             },
-  //           });
-  //         }}
-  //       >
-  //         <UserCheck className="h-5 w-5" />
-  //         Reassign to Worker
-  //       </Button>
-  //     ) : (
-  //       <Button
-  //         variant="primary"
-  //         className="flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-base bg-blue-600 text-white shadow-lg hover:bg-blue-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-all duration-200"
-  //         onClick={() => {
-  //           const normalize = (str) => (str || "").toLowerCase().replace(/\s+/g, "");
-  //           navigate("/assign-worker", {
-  //             state: {
-  //               issueId: issue.id,
-  //               department: normalize(issue.category),
-  //             },
-  //           });
-  //         }}
-  //       >
-  //         <CheckCircle className="h-5 w-5" />
-  //         Assign to Worker
-  //       </Button>
-  //     )}
-  //   </div>
-  // );
+  // Find the current issue and its assignee
+  const currentAssigneeId =
+    typeof currentIssue?.assignedTo === "object"
+      ? currentIssue.assignedTo.id
+      : currentIssue?.assignedTo;
 
   return (
     <DashboardLayout>
@@ -153,8 +120,8 @@ export default function AssignWorker() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="assigned">Assigned</SelectItem>
                     <SelectItem value="available">Available</SelectItem>
+                    <SelectItem value="occupied">Occupied</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -200,111 +167,145 @@ export default function AssignWorker() {
 
         {/* Workers List */}
         <Card className="shadow-lg border border-gray-200">
-          <CardHeader>
-            {/* <CardTitle className="flex items-center gap-2 text-blue-800">
-              <ShieldCheck className="h-5 w-5" />
-              Available Workers
-            </CardTitle> */}
-          </CardHeader>
+          <CardHeader />
           <CardContent>
             <div className="space-y-4">
-              {filteredWorkers.length === 0 ? (
+              {isLoading ? (
+                <div className="text-center py-8">Loading...</div>
+              ) : filteredWorkers.length === 0 ? (
                 <div className="text-muted-foreground text-center">No workers found.</div>
               ) : (
-                filteredWorkers.map((worker) => (
-                  <div
-                    key={worker.id}
-                    className="flex justify-between items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => handleWorkerClick(worker)}
-                  >
-                    {/* Left: Worker details */}
-                    <div className="flex flex-col gap-1 flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <User className="h-5 w-5 text-blue-600" />
-                        <span className="font-bold text-lg text-gray-900 truncate">
-                          {worker.name || "Unnamed"}
-                        </span>
-                        {/* Availability Badge */}
-                        <span
-                          className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                            worker.assignedIssueId
-                              ? "bg-yellow-100 text-yellow-700 border border-yellow-300"
-                              : "bg-green-100 text-green-700 border border-green-300"
-                          }`}
-                        >
-                          {worker.assignedIssueId ? "Assigned" : "Available"}
-                        </span>
-                      </div>
-                      {/* Assigned Issue ID */}
-                      {worker.assignedIssueId && (
-                        <div className="text-xs text-blue-700 font-semibold mt-1">
-                          Assigned to Issue: <span className="font-mono">{worker.assignedIssueId}</span>
+                filteredWorkers.map((worker) => {
+                  // Find all assigned issues for this worker
+                  const assignedIssues = issues.filter(
+                    (issue) =>
+                      (typeof issue.assignedTo === "object"
+                        ? issue.assignedTo.id
+                        : issue.assignedTo) === worker.id &&
+                      !["resolved", "completed"].includes((issue.status || "").toLowerCase())
+                  );
+                  const assignedCount = assignedIssues.length;
+                  const isOccupied = assignedCount >= 10;
+                  const isAvailable = assignedCount < 10;
+
+                  // Only show assign/reassign button if:
+                  // - Issue is unassigned
+                  // - OR issue is assigned to a different worker
+                  // - AND worker is not occupied
+                  const canAssign =
+                    issueId &&
+                    (!currentAssigneeId || (currentAssigneeId && currentAssigneeId !== worker.id)) &&
+                    !isOccupied;
+
+                  // Prevent assigning the same worker to the same issue
+                  const alreadyAssignedToThisIssue =
+                    currentAssigneeId && currentAssigneeId === worker.id;
+
+                  return (
+                    <div
+                      key={worker.id}
+                      className="flex flex-row items-center justify-between border rounded-xl p-4 bg-white shadow"
+                    >
+                      {/* Left: Worker Info */}
+                      <div>
+                        <div className="flex items-center gap-2 text-lg font-bold text-blue-900">
+                          <span>{worker.name}</span>
+                          {/* Availability Badge */}
+                          <span
+                            className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                              isOccupied
+                                ? "bg-red-100 text-red-700 border border-red-300"
+                                : "bg-green-100 text-green-700 border border-green-300"
+                            }`}
+                          >
+                            {isOccupied ? "Occupied" : "Available"}
+                          </span>
                         </div>
-                      )}
-                      {/* Department and Phone horizontally aligned */}
-                      <div className="flex flex-row gap-4">
-                        <div className="flex items-center gap-2 text-gray-700 text-base font-semibold">
-                          <Briefcase className="h-4 w-4" />
-                          <span>{worker.department || "N/A"}</span>
+                        {/* Assigned Issue IDs */}
+                        {assignedIssues.length > 0 && (
+                          <div className="text-xs text-blue-700 font-semibold mt-1">
+                            Assigned to Issues:{" "}
+                            {assignedIssues.map((issue, idx) => (
+                              <span key={issue.id}>
+                                <a
+                                  href={`/issues/${issue.id}`}
+                                  className="underline text-blue-700"
+                                  style={{ marginRight: 4 }}
+                                >
+                                  {issue.id}
+                                </a>
+                                {idx < assignedIssues.length - 1 && ", "}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {/* Department and Phone horizontally aligned */}
+                        <div className="flex flex-row gap-4">
+                          <div className="flex items-center gap-2 text-gray-700 text-base font-semibold">
+                            <Briefcase className="h-4 w-4" />
+                            <span>{worker.department || "N/A"}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-gray-700 text-base font-semibold">
+                            <Phone className="h-4 w-4" />
+                            <span>{worker.phone || "N/A"}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-700 text-base font-semibold">
-                          <Phone className="h-4 w-4" />
-                          <span>{worker.phone || "N/A"}</span>
+                        {/* Location below */}
+                        <div className="flex items-center gap-2 text-gray-600 text-sm">
+                          <MapPin className="h-4 w-4" />
+                          <span>{worker.location || "N/A"}</span>
                         </div>
                       </div>
-                      {/* Location below */}
-                      <div className="flex items-center gap-2 text-gray-600 text-sm">
-                        <MapPin className="h-4 w-4" />
-                        <span>{worker.location || "N/A"}</span>
-                      </div>
-                      {/* <div className="flex items-center gap-2 text-gray-600 text-sm">
-                        <Hash className="h-4 w-4" />
-                        <span>{worker.pincode || "N/A"}</span>
-                      </div> */}
-                    </div>
-                    {/* Right: Actions */}
-                    <div className="ml-4 flex flex-row items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="w-full sm:w-auto"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleWorkerClick(worker);
-                        }}
-                      >
-                        View Details
-                      </Button>
-                      {issueId && (
+                      {/* Right: Actions */}
+                      <div className="ml-4 flex flex-row items-center gap-2">
                         <Button
                           size="sm"
-                          variant="primary"
-                          className="w-full sm:w-auto bg-primary text-primary-foreground font-semibold shadow hover:bg-primary/90 rounded-xl transition-all duration-200"
-                          disabled={!!worker.assignedIssueId || !!issues.find(issue => issue.id === issueId)?.assignedTo}
-                          onClick={async (e) => {
+                          variant="outline"
+                          className="w-full sm:w-auto"
+                          onClick={(e) => {
                             e.stopPropagation();
-                            try {
-                              await assignWorker(issueId, worker);
-                              toast({
-                                title: "Worker Assigned",
-                                description: `${worker.name} has been assigned to the issue.`,
-                              });
-                              navigate(`/issues/${issueId}`);
-                            } catch (error) {
-                              toast({
-                                title: "Error",
-                                description: error.message || "Failed to assign worker to the issue.",
-                                variant: "destructive",
-                              });
-                            }
+                            handleWorkerClick(worker);
                           }}
                         >
-                          Assign to Issue
+                          View Details
                         </Button>
-                      )}
+                        {issueId && canAssign && !alreadyAssignedToThisIssue && (
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            className="w-full sm:w-auto bg-primary text-primary-foreground font-semibold shadow hover:bg-primary/90 rounded-xl transition-all duration-200"
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                await assignWorker(issueId, worker);
+                                toast({
+                                  title: currentAssigneeId
+                                    ? "Worker Reassigned"
+                                    : "Worker Assigned",
+                                  description: `${worker.name} has been ${currentAssigneeId ? "reassigned" : "assigned"} to the issue.`,
+                                });
+                                navigate(`/issues/${issueId}`);
+                              } catch (error) {
+                                toast({
+                                  title: "Error",
+                                  description: error.message || "Failed to assign worker to the issue.",
+                                  variant: "destructive",
+                                });
+                              }
+                            }}
+                          >
+                            {currentAssigneeId ? "Reassign to Worker" : "Assign to Issue"}
+                          </Button>
+                        )}
+                        {isOccupied && (
+                          <span className="ml-2 text-xs text-red-600 font-semibold">
+                            Cannot assign more issues until some are resolved.
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
             {filteredWorkers.length === 0 && (
@@ -314,7 +315,6 @@ export default function AssignWorker() {
             )}
           </CardContent>
         </Card>
-        {/* {actionsSection} */}
       </div>
     </DashboardLayout>
   );
