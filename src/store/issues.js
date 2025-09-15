@@ -133,12 +133,38 @@ export const useIssuesStore = create((set, getState) => ({
   // Unassign worker from issue
   unassignWorker: async (workerId) => {
     try {
-      // Remove assignedIssueId from worker
+      // 1. Find the issue currently assigned to this worker
+      const issuesSnapshot = await get(ref(realtimeDb, 'complaints'));
+      if (!issuesSnapshot.exists()) return;
+
+      const issuesData = issuesSnapshot.val();
+      let assignedIssueId = null;
+      let assignedIssueKey = null;
+
+      for (const [issueKey, issue] of Object.entries(issuesData)) {
+        if (
+          (typeof issue.assignedTo === "object"
+            ? issue.assignedTo.id
+            : issue.assignedTo) === workerId
+        ) {
+          assignedIssueId = issue.id || issueKey;
+          assignedIssueKey = issueKey;
+          break;
+        }
+      }
+
+      // 2. Update the worker: set assignedIssueId to ""
       const workerRef = ref(realtimeDb, `workers/${workerId}`);
       await update(workerRef, { assignedIssueId: "" });
 
-      // Optionally, also update the issue to remove assignedTo if needed
-      // (You may want to find the issueId first if you want to clear it)
+      // 3. Update the complaint: set assignedTo to "" and add previouslyAssignedWorker
+      if (assignedIssueKey) {
+        const complaintRef = ref(realtimeDb, `complaints/${assignedIssueKey}`);
+        await update(complaintRef, {
+          assignedTo: "",
+          previouslyAssignedWorker: workerId,
+        });
+      }
     } catch (error) {
       set({ error: error.message });
       throw error;

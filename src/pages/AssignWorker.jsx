@@ -8,7 +8,7 @@ import { useWorkersStore } from '@/store/workers';
 import { useIssuesStore } from '@/store/issues';
 import { useToast } from '@/components/ui/use-toast';
 import { useEffect, useState } from 'react';
-import { Loader2, User, Filter, Phone, MapPin, Briefcase, Hash, ShieldCheck } from 'lucide-react';
+import { Loader2, User, Filter, Phone, MapPin, Briefcase, Hash, ShieldCheck, UserCheck, CheckCircle } from 'lucide-react';
 
 
 export default function AssignWorker() {
@@ -86,6 +86,49 @@ export default function AssignWorker() {
   const handleWorkerClick = (worker) => {
     navigate(`/workers/${worker.id}`, { state: { issueId } });
   };
+
+  const currentIssue = issues.find(issue => issue.id === issueId);
+  const isResolved = (currentIssue?.status || "").toLowerCase() === "resolved" || (currentIssue?.status || "").toLowerCase() === "completed";
+
+  // const actionsSection = !isResolved && (
+  //   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4 mt-8">
+  //     {lastActiveIndex >= assignedStepIndex ? (
+  //       <Button
+  //         variant="primary"
+  //         className="flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-base bg-blue-600 text-white shadow-lg hover:bg-blue-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-all duration-200"
+  //         onClick={() => {
+  //           const normalize = (str) => (str || "").toLowerCase().replace(/\s+/g, "");
+  //           navigate("/assign-worker", {
+  //             state: {
+  //               issueId: issue.id,
+  //               department: normalize(issue.category),
+  //             },
+  //           });
+  //         }}
+  //       >
+  //         <UserCheck className="h-5 w-5" />
+  //         Reassign to Worker
+  //       </Button>
+  //     ) : (
+  //       <Button
+  //         variant="primary"
+  //         className="flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-base bg-blue-600 text-white shadow-lg hover:bg-blue-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-all duration-200"
+  //         onClick={() => {
+  //           const normalize = (str) => (str || "").toLowerCase().replace(/\s+/g, "");
+  //           navigate("/assign-worker", {
+  //             state: {
+  //               issueId: issue.id,
+  //               department: normalize(issue.category),
+  //             },
+  //           });
+  //         }}
+  //       >
+  //         <CheckCircle className="h-5 w-5" />
+  //         Assign to Worker
+  //       </Button>
+  //     )}
+  //   </div>
+  // );
 
   return (
     <DashboardLayout>
@@ -271,6 +314,7 @@ export default function AssignWorker() {
             )}
           </CardContent>
         </Card>
+        {/* {actionsSection} */}
       </div>
     </DashboardLayout>
   );

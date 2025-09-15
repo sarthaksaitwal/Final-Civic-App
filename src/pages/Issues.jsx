@@ -62,7 +62,9 @@ export default function Issues() {
     }
 
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(issue => issue.status === statusFilter);
+      filtered = filtered.filter(
+        issue => (issue.status || '').toLowerCase() === statusFilter.toLowerCase()
+      );
     }
 
     if (categoryFilter !== 'all') {
@@ -177,12 +179,12 @@ export default function Issues() {
                   <SelectValue placeholder="All Statuses" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="new">New</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  {/* <SelectItem value="reverted">Reverted</SelectItem> */}
-                  <SelectItem value="manual">Review & Approve</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Assigned">Assigned</SelectItem>
+                  <SelectItem value="In Progress">In Progress</SelectItem>
+                  <SelectItem value="Resolved">Resolved</SelectItem>
+                  <SelectItem value="Review & Approve">Review & Approve</SelectItem>
                 </SelectContent>
               </Select>
 

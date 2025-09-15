@@ -91,7 +91,9 @@ export default function WorkerDetails() {
         onClick={async () => {
           try {
             await unassignWorker(worker.id || worker.workerId);
-            // Optionally, refresh worker/issue data here
+            // Refresh data after unassigning
+            await fetchWorkers();
+            await fetchIssues();
             toast({
               title: "Worker Unassigned",
               description: "The worker has been unassigned from the issue.",

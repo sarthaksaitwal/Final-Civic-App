@@ -20,35 +20,36 @@ import {
   Waves, // If this fails, use Settings or another fallback
   MapPin,
   Calendar,
-  TrendingUp
+  TrendingUp,
+  UserCheck
 } from 'lucide-react';
 
 const statusConfig = {
-  new: {
-    title: 'New Issues',
-    icon: FileX,
-    color: 'bg-primary',
-    textColor: 'text-primary-foreground'
-  },
-  pending: {
-    title: 'Pending Issues',
+  Pending: {
+    title: 'Pending',
     icon: RotateCcw,
-    color: 'bg-warning',
-    textColor: 'text-warning-foreground'
+    color: 'bg-yellow-100',
+    textColor: 'text-yellow-700'
   },
-  completed: {
-    title: 'Completed Issues',
+  Assigned: {
+    title: 'Assigned',
+    icon: UserCheck,
+    color: 'bg-purple-100',
+    textColor: 'text-purple-700'
+  },
+  "In Progress": {
+    title: 'In Progress',
+    icon: Wrench,
+    color: 'bg-blue-100',
+    textColor: 'text-blue-700'
+  },
+  Resolved: {
+    title: 'Resolved',
     icon: CheckCircle,
-    color: 'bg-success',
-    textColor: 'text-success-foreground'
+    color: 'bg-green-100',
+    textColor: 'text-green-700'
   },
-  // reverted: {
-  //   title: 'Reverted Issues',
-  //   icon: RotateCcw,
-  //   color: 'bg-destructive',
-  //   textColor: 'text-destructive-foreground'
-  // },
-  manual: {
+  "Review & Approve": {
     title: 'Review & Approve',
     icon: Settings,
     color: 'bg-accent',
@@ -95,10 +96,12 @@ const getIssueIcon = (type) => {
 };
 
 export default function Dashboard() {
-
-  const { issues, getIssuesByStatus, fetchIssues, loading } = useIssuesStore();
+  const { issues, fetchIssues, loading } = useIssuesStore();
   const navigate = useNavigate();
   const [markerSize, setMarkerSize] = useState({ width: 20, height: 26 });
+
+  const getIssuesByStatus = (status) =>
+    issues.filter(issue => (issue.status || '').toLowerCase() === status.toLowerCase());
 
   // Fetch issues on mount
   useEffect(() => {
@@ -128,9 +131,15 @@ export default function Dashboard() {
     navigate('/issues', { state: { filterStatus: status } });
   };
 
-  // Show all issues, no location filter
+  // Sort issues by dateReported descending (newest first)
+  const sortedIssues = [...issues]
+    .filter(issue => issue.dateReported instanceof Date)
+    .sort((a, b) => b.dateReported - a.dateReported);
+
+  // Get the latest 5 or 6 issues
+  const recentIssues = sortedIssues.slice(0, 6);
+
   const allIssues = issues;
-  const recentIssues = allIssues.slice(0, 5);
   const totalIssues = allIssues.length;
   const completedIssues = getIssuesByStatus('completed').length;
   const completionRate = totalIssues > 0 ? Math.round((completedIssues / totalIssues) * 100) : 0;
@@ -204,42 +213,40 @@ export default function Dashboard() {
           </div>
           {/* Status Cards */}
           <div className="space-y-3">
-            {Object.keys(statusConfig)
-              .filter(status => status !== "reverted")
-              .map((status) => {
-                const config = statusConfig[status];
-                const count = getIssuesByStatus(status).length;
-                const IconComponent = config.icon;
+            {Object.keys(statusConfig).map((status) => {
+              const config = statusConfig[status];
+              const count = issues.filter(issue => (issue.status || '').toLowerCase() === status.toLowerCase()).length;
+              const IconComponent = config.icon;
 
-                return (
-                  <Card
-                    key={status}
-                    className="cursor-pointer shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1 border border-gray-200"
-                    onClick={() => handleCategoryClick(status)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className={`p-2 rounded-lg ${config.color}`}>
-                            <IconComponent className={`h-4 w-4 ${config.textColor}`} />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-800">
-                              {config.title}
-                            </p>
-                            <p className="text-xs text-gray-600">
-                              Click to view all
-                            </p>
-                          </div>
+              return (
+                <Card
+                  key={status}
+                  className="cursor-pointer shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1 border border-gray-200"
+                  onClick={() => handleCategoryClick(status)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className={`p-2 rounded-lg ${config.color}`}>
+                          <IconComponent className={`h-4 w-4 ${config.textColor}`} />
                         </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-gray-900">{count}</p>
+                        <div>
+                          <p className="text-sm font-medium text-gray-800">
+                            {config.title}
+                          </p>
+                          <p className="text-xs text-gray-600">
+                            Click to view all
+                          </p>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-gray-900">{count}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
 
@@ -258,42 +265,44 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentIssues.map((issue) => {
-                  // Use category or fallback to type
-                  const category = issue.category || getIssueTypeFromToken(issue.id) || "Unknown";
-                  const Icon = CATEGORY_ICON[category] || FileX;
-                  return (
+                {recentIssues.length === 0 ? (
+                  <div className="text-muted-foreground text-center">No recent issues.</div>
+                ) : (
+                  recentIssues.map((issue) => (
                     <div
                       key={issue.id}
                       className="flex justify-between items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                       onClick={() => navigate(`/issues/${issue.id}`)}
                     >
-                      {/* Left: Issue details */}
-                      <div className="flex flex-col gap-1 flex-1">
+                      <div className="flex flex-col gap-1 flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <Icon className="h-5 w-5 text-blue-600" />
-                          <span className="font-medium text-gray-900">{issue.title || category || "Untitled Issue"}</span>
+                          <span className="font-bold text-base text-gray-900 truncate">
+                            {issue.title || issue.name || getIssueTypeFromToken(issue.id) || "Untitled Issue"}
+                          </span>
+                          <Badge variant="outline" className="ml-2">
+                            {issue.status}
+                          </Badge>
                         </div>
                         <div className="flex items-center gap-2 text-gray-600 text-sm">
                           <MapPin className="h-4 w-4" />
-                          <span>{issue.location}</span>
+                          <span>{issue.location || "N/A"}</span>
                         </div>
                         <div className="flex items-center gap-2 text-gray-600 text-sm">
                           <Calendar className="h-4 w-4" />
                           <span>
                             {issue.dateReported instanceof Date
-                              ? issue.dateReported.toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit", year: "2-digit" })
+                              ? issue.dateReported.toLocaleDateString("en-IN", {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "2-digit",
+                                })
                               : "N/A"}
                           </span>
                         </div>
                       </div>
-                      {/* Right: Status badge */}
-                      <div className="ml-4 flex flex-col items-end">
-                        <Badge variant="secondary" className="bg-gray-200 text-gray-800 mb-2">{issue.status}</Badge>
-                      </div>
                     </div>
-                  );
-                })}
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
@@ -302,3 +311,4 @@ export default function Dashboard() {
     </DashboardLayout>
   );
 }
+

@@ -645,9 +645,11 @@ export default function IssueDetails() {
     ...timelineSteps.map((step, idx) => (step.active ? idx : -1))
   );
 
-  const actionsSection = (
+  const isResolved = (issue.status || "").toLowerCase() === "resolved" || (issue.status || "").toLowerCase() === "completed";
+
+  const actionsSection = !isResolved && (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4 mt-8">
-      {lastActiveStepIndex >= assignedStepIndex ? (
+      {lastActiveIndex >= assignedStepIndex ? (
         <Button
           variant="primary"
           className="flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-base bg-blue-600 text-white shadow-lg hover:bg-blue-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-all duration-200"
