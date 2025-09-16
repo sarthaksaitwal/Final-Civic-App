@@ -204,13 +204,16 @@ export default function AssignWorker() {
                   return (
                     <div
                       key={worker.id}
-                      className="flex flex-row items-center justify-between border rounded-xl p-4 bg-white shadow"
+                      className="flex flex-col sm:flex-row items-center justify-between border rounded-xl p-4 bg-white shadow cursor-pointer hover:bg-blue-50 transition-all duration-200"
+                      onClick={() => navigate(`/workers/${worker.id}`)}
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`View details for ${worker.name}`}
                     >
                       {/* Left: Worker Info */}
-                      <div>
+                      <div className="w-full sm:w-auto">
                         <div className="flex items-center gap-2 text-lg font-bold text-blue-900">
                           <span>{worker.name}</span>
-                          {/* Availability Badge */}
                           <span
                             className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
                               isOccupied
@@ -221,7 +224,6 @@ export default function AssignWorker() {
                             {isOccupied ? "Occupied" : "Available"}
                           </span>
                         </div>
-                        {/* Assigned Issue IDs */}
                         {assignedIssues.length > 0 && (
                           <div className="text-xs text-blue-700 font-semibold mt-1">
                             Assigned to Issues:{" "}
@@ -231,6 +233,10 @@ export default function AssignWorker() {
                                   href={`/issues/${issue.id}`}
                                   className="underline text-blue-700"
                                   style={{ marginRight: 4 }}
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    navigate(`/issues/${issue.id}`);
+                                  }}
                                 >
                                   {issue.id}
                                 </a>
@@ -239,8 +245,7 @@ export default function AssignWorker() {
                             ))}
                           </div>
                         )}
-                        {/* Department and Phone horizontally aligned */}
-                        <div className="flex flex-row gap-4">
+                        <div className="flex flex-row gap-4 flex-wrap mt-2">
                           <div className="flex items-center gap-2 text-gray-700 text-base font-semibold">
                             <Briefcase className="h-4 w-4" />
                             <span>{worker.department || "N/A"}</span>
@@ -249,20 +254,19 @@ export default function AssignWorker() {
                             <Phone className="h-4 w-4" />
                             <span>{worker.phone || "N/A"}</span>
                           </div>
-                        </div>
-                        {/* Location below */}
-                        <div className="flex items-center gap-2 text-gray-600 text-sm">
-                          <MapPin className="h-4 w-4" />
-                          <span>{worker.location || "N/A"}</span>
+                          <div className="flex items-center gap-2 text-gray-600 text-sm">
+                            <MapPin className="h-4 w-4" />
+                            <span>{worker.location || "N/A"}</span>
+                          </div>
                         </div>
                       </div>
                       {/* Right: Actions */}
-                      <div className="ml-4 flex flex-row items-center gap-2">
+                      <div className="mt-4 sm:mt-0 flex flex-row items-center gap-2">
                         <Button
                           size="sm"
                           variant="outline"
                           className="w-full sm:w-auto"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             handleWorkerClick(worker);
                           }}

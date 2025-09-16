@@ -144,6 +144,7 @@ export default function Issues() {
   return (
     <DashboardLayout>
       <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-center">
           <div>
@@ -152,6 +153,7 @@ export default function Issues() {
         </div>
 
         {/* Filters */}
+        <Card className="shadow-card bg-gray-100 backdrop-blur-md">
         <Card className="shadow-card bg-gray-100 backdrop-blur-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -316,5 +318,5 @@ export default function Issues() {
         </Card>
       </div>
     </DashboardLayout>
-  );
+  );
 }
