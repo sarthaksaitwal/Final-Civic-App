@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIssuesStore } from '@/store/issues';
 import 'leaflet/dist/leaflet.css';
 import {
@@ -17,7 +16,6 @@ import {
   Clock,
   AlertTriangle,
   List,
-  Map,
   Tag,
   Trash2,
   Droplet,
@@ -144,7 +142,6 @@ export default function Issues() {
   return (
     <DashboardLayout>
       <div className="p-4 space-y-4">
-      <div className="p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-center">
           <div>
@@ -153,7 +150,6 @@ export default function Issues() {
         </div>
 
         {/* Filters */}
-        <Card className="shadow-card bg-gray-100 backdrop-blur-md">
         <Card className="shadow-card bg-gray-100 backdrop-blur-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
