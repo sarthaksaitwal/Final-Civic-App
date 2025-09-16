@@ -143,7 +143,7 @@ export default function Issues() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6">
+      <div className="p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-center">
           <div>
@@ -152,7 +152,7 @@ export default function Issues() {
         </div>
 
         {/* Filters */}
-        <Card className="shadow-card">
+        <Card className="shadow-card bg-gray-100 backdrop-blur-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-primary" />
@@ -219,7 +219,7 @@ export default function Issues() {
         {/* Issues List */}
         <div className="grid gap-4 mt-6">
           {filteredIssues.length === 0 ? (
-            <Card className="shadow-card">
+            <Card className="shadow-card bg-gray-100 backdrop-blur-md">
               <CardContent className="text-center py-8">
                 <div className="text-muted-foreground">
                   <AlertTriangle className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -232,18 +232,18 @@ export default function Issues() {
             sortedIssues.map((issue) => (
               <Card
                 key={issue.id}
-                className="shadow-card hover:shadow-hover transition-all duration-200 cursor-pointer"
+                className="shadow-card hover:shadow-md hover:scale-101 hover:bg-gray-200 transition-all duration-200 cursor-pointer rounded-3xl border border-gray-300 bg-gray-100 backdrop-blur-md"
                 onClick={() => navigate(`/issues/${issue.id}`)}
               >
-                <CardContent className="p-6">
+                <CardContent className="p-3">
                   <div className="flex items-start justify-between">
-                    <div className="flex-1 space-y-3">
+                    <div className="flex-1 space-y-2">
                       <div className="flex items-start justify-between">
                         <div>
-                          <h3 className="text-lg font-semibold text-foreground">
+                          <h3 className="text-lg font-semibold text-gray-900">
                             {issue.title || getIssueTypeFromToken(issue.id) || 'Untitled Issue'}
                           </h3>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-gray-700">
                             #{issue.id}
                           </p>
                         </div>
@@ -251,12 +251,7 @@ export default function Issues() {
                           {issue.status}
                         </Badge>
                       </div>
-
-                      {/* <p className="text-muted-foreground">
-                        {issue.description || 'No description provided'}
-                      </p> */}
-
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-4 text-sm text-gray-700">
                         <div className="flex items-center gap-1">
                           <MapPin className="h-4 w-4" />
                           {issue.location || 'N/A'}
@@ -274,33 +269,14 @@ export default function Issues() {
                           </div>
                         )}
                       </div>
-
                       <div className="flex items-center gap-2">
-                        {/* {issue.category && (
-                          <Badge variant="outline">{issue.category}</Badge>
-                        )} */}
                         {issue.priority && (
                           <Badge variant={getPriorityBadgeVariant(issue.priority)}>
                             {issue.priority} priority
                           </Badge>
                         )}
-                        {/* {issue.assignedTo && (
-                          <Badge variant="secondary">
-                            Assigned to: {typeof issue.assignedTo === "object" ? issue.assignedTo.name : issue.assignedTo}
-                          </Badge>
-                        )} */}
                       </div>
                     </div>
-
-                    {/* {issue.photos && issue.photos.length > 0 && (
-                      <div className="ml-4">
-                        <img
-                          src={issue.photos[0]}
-                          alt={issue.title}
-                          className="w-20 h-20 object-cover rounded-lg border border-border"
-                        />
-                      </div>
-                    )} */}
                     {issue.audio && issue.audio.length > 0 && (
                       <div className="mt-2">
                         {issue.audio.map((audioUrl, index) => (
@@ -319,5 +295,5 @@ export default function Issues() {
         </div>
       </div>
     </DashboardLayout>
-  );
+  );
 }
