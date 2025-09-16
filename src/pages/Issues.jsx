@@ -26,6 +26,38 @@ import {
   Settings
 } from 'lucide-react';
 
+const getBadgeClass = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'assigned':
+      return 'bg-blue-500 text-white';
+    case 'resolved':
+      return 'bg-green-500 text-white';
+    case 'in progress':
+      return 'bg-orange-500 text-white';
+    case 'review & approve':
+      return 'bg-gray-500 text-white';
+    default:
+      return '';
+  }
+};
+
+const getCategoryIcon = (type) => {
+  switch (type) {
+    case 'Garbage':
+      return { icon: Trash2, color: 'text-green-500' };
+    case 'Drainage & Sewage':
+      return { icon: RotateCcw, color: 'text-amber-700' }; // brown
+    case 'Road Damage':
+      return { icon: AlertTriangle, color: 'text-orange-500' };
+    case 'StreetLight':
+      return { icon: Lightbulb, color: 'text-yellow-500' };
+    case 'Water':
+      return { icon: Droplet, color: 'text-blue-500' };
+    default:
+      return { icon: Settings, color: 'text-gray-500' };
+  }
+};
+
 export default function Issues() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -144,7 +176,6 @@ export default function Issues() {
   return (
     <DashboardLayout>
       <div className="p-4 space-y-4">
-      <div className="p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-center">
           <div>
@@ -153,8 +184,7 @@ export default function Issues() {
         </div>
 
         {/* Filters */}
-        <Card className="shadow-card bg-gray-100 backdrop-blur-md">
-        <Card className="shadow-card bg-gray-100 backdrop-blur-md">
+        <Card className="shadow-card bg-gray-100 backdrop-blur-md rounded-3xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-primary" />
@@ -241,30 +271,19 @@ export default function Issues() {
                 sortedIssues.map((issue) => (
                   <div
                     key={issue.id}
-                    className="flex justify-between items-start p-6 rounded-2xl cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:scale-105 hover:bg-white/20 bg-white/10 backdrop-blur-md text-black border border-white/20"
+                    className="flex justify-between items-start p-6 rounded-2xl cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:bg-gray-200 bg-gray-100 backdrop-blur-md text-black border border-white/20"
                     onClick={() => navigate(`/issues/${issue.id}`)}
                   >
                     <div className="flex flex-col gap-2 flex-1 min-w-0">
                       <div className="flex items-center gap-3">
+                        {(() => {
+                          const { icon: Icon, color } = getCategoryIcon(getIssueTypeFromToken(issue.id));
+                          return <Icon className={`h-5 w-5 ${color}`} />;
+                        })()}
                         <span className="font-extrabold text-lg truncate">
                           {issue.title || getIssueTypeFromToken(issue.id) || 'Untitled Issue'}
                         </span>
-                        <Badge
-                          variant="outline"
-                          className={`ml-2 ${
-                            (issue.status || '').toLowerCase() === 'pending'
-                              ? 'bg-amber-100 text-amber-800 border-amber-300'
-                              : (issue.status || '').toLowerCase() === 'assigned'
-                              ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
-                              : (issue.status || '').toLowerCase() === 'in progress'
-                              ? 'bg-orange-100 text-orange-800 border-orange-300'
-                              : (issue.status || '').toLowerCase() === 'resolved'
-                              ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                              : (issue.status || '').toLowerCase() === 'review & approve'
-                              ? 'bg-purple-100 text-purple-800 border-purple-300'
-                              : 'bg-gray-100 text-gray-800 border-gray-300'
-                          }`}
-                        >
+                        <Badge className={`ml-2 text-xs ${getBadgeClass(issue.status)}`}>
                           {issue.status}
                         </Badge>
                         {issue.priority && (

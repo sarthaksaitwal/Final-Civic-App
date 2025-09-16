@@ -103,7 +103,7 @@ export default function AssignWorker() {
         <h1 className="text-3xl font-bold text-foreground">Assign Worker</h1>
 
         {/* Filters */}
-        <Card className="shadow-card">
+        <Card className="shadow-card bg-gray-100 backdrop-blur-md rounded-3xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-5 w-5" />
@@ -166,7 +166,7 @@ export default function AssignWorker() {
         </Card>
 
         {/* Workers List */}
-        <Card className="shadow-lg border border-gray-200">
+        <Card className="shadow-card border border-gray-300 rounded-3xl bg-gray-100 backdrop-blur-md hover:shadow-2xl transition-shadow duration-300">
           <CardHeader />
           <CardContent>
             <div className="space-y-4">
@@ -204,7 +204,7 @@ export default function AssignWorker() {
                   return (
                     <div
                       key={worker.id}
-                      className="flex flex-col sm:flex-row items-center justify-between border rounded-xl p-4 bg-white shadow cursor-pointer hover:bg-blue-50 transition-all duration-200"
+                      className="flex flex-col sm:flex-row items-center justify-between rounded-2xl p-6 shadow-md hover:shadow-xl hover:bg-gray-200 bg-gray-100 backdrop-blur-md text-black border border-white/20 cursor-pointer transition-all duration-300"
                       onClick={() => navigate(`/workers/${worker.id}`)}
                       tabIndex={0}
                       role="button"
@@ -214,15 +214,7 @@ export default function AssignWorker() {
                       <div className="w-full sm:w-auto">
                         <div className="flex items-center gap-2 text-lg font-bold text-blue-900">
                           <span>{worker.name}</span>
-                          <span
-                            className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                              isOccupied
-                                ? "bg-[rgb(236,236,187)] text-black border border-yellow-300"
-                                : "bg-[rgb(202,232,189)] text-black border border-green-300"
-                            }`}
-                          >
-                            {isOccupied ? "Occupied" : "Available"}
-                          </span>
+                          <Badge className={isAvailable ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}>{isAvailable ? 'Available' : 'Unavailable'}</Badge>
                         </div>
                         {assignedIssues.length > 0 && (
                           <div className="text-xs text-blue-700 font-semibold mt-1">

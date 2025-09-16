@@ -70,7 +70,7 @@ export function Sidebar({ className, collapsed, setCollapsed }) {
                   onClick={() => navigate('/issues', { state: { filterStatus: 'manual' } })}
                   className={cn(
                     "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 w-full",
-                    "text-gray-700 hover:bg-gray-200 hover:scale-105 hover:shadow-lg",
+                    "text-gray-700 hover:bg-gray-200 hover:shadow-lg",
                     collapsed ? "justify-center" : "justify-start"
                   )}
                   title={collapsed ? item.name : undefined}
@@ -86,7 +86,7 @@ export function Sidebar({ className, collapsed, setCollapsed }) {
                       "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200",
                       isActive
                         ? "bg-gray-300 text-gray-900 shadow-lg"
-                        : "text-gray-700 hover:bg-gray-200 hover:scale-105 hover:shadow-lg",
+                        : "text-gray-700 hover:bg-gray-200 hover:shadow-lg",
                       collapsed ? "justify-center" : "justify-start"
                     )
                   }

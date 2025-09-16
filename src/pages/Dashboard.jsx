@@ -24,6 +24,38 @@ import {
   UserCheck
 } from 'lucide-react';
 
+const getBadgeClass = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'assigned':
+      return 'bg-blue-500 text-white';
+    case 'resolved':
+      return 'bg-green-500 text-white';
+    case 'in progress':
+      return 'bg-orange-500 text-white';
+    case 'review & approve':
+      return 'bg-gray-500 text-white';
+    default:
+      return '';
+  }
+};
+
+const getCategoryIcon = (type) => {
+  switch (type) {
+    case 'Garbage':
+      return { icon: Trash2, color: 'text-green-500' };
+    case 'Drainage & Sewage':
+      return { icon: RotateCcw, color: 'text-amber-700' }; // brown
+    case 'Road Damage':
+      return { icon: AlertTriangle, color: 'text-orange-500' };
+    case 'StreetLight':
+      return { icon: Lightbulb, color: 'text-yellow-500' };
+    case 'Water':
+      return { icon: Droplet, color: 'text-blue-500' };
+    default:
+      return { icon: FileX, color: 'text-gray-500' };
+  }
+};
+
 const statusConfig = {
   Pending: {
     title: 'Pending',
@@ -202,7 +234,7 @@ export default function Dashboard() {
                             <strong className="block text-sm font-semibold">{issue.title}</strong>
                             <span className="block text-xs text-indigo-700">{issue.location}</span>
                             <span className="block text-xs mt-1">
-                              Status: <Badge variant="outline" className="text-xs">{issue.status}</Badge>
+                              Status: <Badge className={`text-xs ${getBadgeClass(issue.status)}`}>{issue.status}</Badge>
                             </span>
                           </div>
                         </Popup>
@@ -223,7 +255,7 @@ export default function Dashboard() {
               return (
                 <Card
                   key={status}
-                  className={`cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-white/20 rounded-3xl bg-white/10 backdrop-blur-md hover:bg-white/15`}
+                  className={`cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20 rounded-3xl bg-white/10 backdrop-blur-md hover:bg-white/15`}
                   onClick={() => handleCategoryClick(status)}
                 >
                   <CardContent className="p-6">
@@ -273,15 +305,19 @@ export default function Dashboard() {
                   recentIssues.map((issue) => (
                     <div
                       key={issue.id}
-                      className="flex justify-between items-start p-6 rounded-2xl cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:scale-105 hover:bg-gray-200 bg-gray-100 backdrop-blur-md text-black"
+                      className="flex justify-between items-start p-6 rounded-2xl cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:bg-gray-200 bg-gray-100 backdrop-blur-md text-black"
                       onClick={() => navigate(`/issues/${issue.id}`)}
                     >
                       <div className="flex flex-col gap-2 flex-1 min-w-0">
                         <div className="flex items-center gap-3">
+                          {(() => {
+                            const { icon: Icon, color } = getCategoryIcon(getIssueTypeFromToken(issue.id));
+                            return <Icon className={`h-5 w-5 ${color}`} />;
+                          })()}
                           <span className="font-extrabold text-lg truncate">
                             {issue.title || issue.name || getIssueTypeFromToken(issue.id) || "Untitled Issue"}
                           </span>
-                          <Badge variant="outline" className="ml-2">
+                          <Badge className={`ml-2 text-xs ${getBadgeClass(issue.status)}`}>
                             {issue.status}
                           </Badge>
                         </div>
