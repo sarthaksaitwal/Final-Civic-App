@@ -214,8 +214,8 @@ export default function AssignWorker() {
                           <span
                             className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
                               isOccupied
-                                ? "bg-red-100 text-red-700 border border-red-300"
-                                : "bg-green-100 text-green-700 border border-green-300"
+                                ? "bg-[rgb(236,236,187)] text-black border border-yellow-300"
+                                : "bg-[rgb(202,232,189)] text-black border border-green-300"
                             }`}
                           >
                             {isOccupied ? "Occupied" : "Available"}

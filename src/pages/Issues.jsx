@@ -143,7 +143,7 @@ export default function Issues() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6">
+      <div className="p-4 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-center">
           <div>
@@ -152,7 +152,7 @@ export default function Issues() {
         </div>
 
         {/* Filters */}
-        <Card className="shadow-card">
+        <Card className="shadow-card bg-gray-100 backdrop-blur-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-primary" />
@@ -217,94 +217,91 @@ export default function Issues() {
         </Card>
 
         {/* Issues List */}
-        <div className="grid gap-4 mt-6">
-          {filteredIssues.length === 0 ? (
-            <Card className="shadow-card">
-              <CardContent className="text-center py-8">
-                <div className="text-muted-foreground">
+        <Card className="shadow-card border border-gray-300 rounded-3xl bg-gray-100 backdrop-blur-md hover:shadow-2xl transition-shadow duration-300">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-indigo-700 text-lg font-semibold">
+              <List className="h-6 w-6" />
+              Issues
+            </CardTitle>
+            <CardDescription>
+              All reported civic issues requiring attention
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {filteredIssues.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
                   <AlertTriangle className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p className="text-lg font-medium">No issues found</p>
                   <p>Try adjusting your filters or search terms.</p>
                 </div>
-              </CardContent>
-            </Card>
-          ) : (
-            sortedIssues.map((issue) => (
-              <Card
-                key={issue.id}
-                className="shadow-card hover:shadow-hover transition-all duration-200 cursor-pointer"
-                onClick={() => navigate(`/issues/${issue.id}`)}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 space-y-3">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="text-lg font-semibold text-foreground">
-                            {issue.title || getIssueTypeFromToken(issue.id) || 'Untitled Issue'}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            #{issue.id}
-                          </p>
-                        </div>
-                        <Badge variant={getStatusBadgeVariant(issue.status)}>
+              ) : (
+                sortedIssues.map((issue) => (
+                  <div
+                    key={issue.id}
+                    className="flex justify-between items-start p-6 rounded-2xl cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:scale-105 hover:bg-white/20 bg-white/10 backdrop-blur-md text-black border border-white/20"
+                    onClick={() => navigate(`/issues/${issue.id}`)}
+                  >
+                    <div className="flex flex-col gap-2 flex-1 min-w-0">
+                      <div className="flex items-center gap-3">
+                        <span className="font-extrabold text-lg truncate">
+                          {issue.title || getIssueTypeFromToken(issue.id) || 'Untitled Issue'}
+                        </span>
+                        <Badge
+                          variant="outline"
+                          className={`ml-2 ${
+                            (issue.status || '').toLowerCase() === 'pending'
+                              ? 'bg-amber-100 text-amber-800 border-amber-300'
+                              : (issue.status || '').toLowerCase() === 'assigned'
+                              ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                              : (issue.status || '').toLowerCase() === 'in progress'
+                              ? 'bg-orange-100 text-orange-800 border-orange-300'
+                              : (issue.status || '').toLowerCase() === 'resolved'
+                              ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                              : (issue.status || '').toLowerCase() === 'review & approve'
+                              ? 'bg-purple-100 text-purple-800 border-purple-300'
+                              : 'bg-gray-100 text-gray-800 border-gray-300'
+                          }`}
+                        >
                           {issue.status}
                         </Badge>
-                      </div>
-
-                      {/* <p className="text-muted-foreground">
-                        {issue.description || 'No description provided'}
-                      </p> */}
-
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
-                          {issue.location || 'N/A'}
-                        </div>
-                        {issue.dateReported && (
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            Reported: {issue.dateReported.toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit", year: "2-digit" })}
-                          </div>
-                        )}
-                        {issue.deadline && (
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            {formatDeadline(issue.deadline)}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        {/* {issue.category && (
-                          <Badge variant="outline">{issue.category}</Badge>
-                        )} */}
                         {issue.priority && (
-                          <Badge variant={getPriorityBadgeVariant(issue.priority)}>
-                            {issue.priority} priority
+                          <Badge variant={getPriorityBadgeVariant(issue.priority)} className="ml-2">
+                            {issue.priority}
                           </Badge>
                         )}
-                        {/* {issue.assignedTo && (
-                          <Badge variant="secondary">
-                            Assigned to: {typeof issue.assignedTo === "object" ? issue.assignedTo.name : issue.assignedTo}
-                          </Badge>
-                        )} */}
+                      </div>
+                      <div className="flex items-center gap-3 text-gray-700 text-sm">
+                        <MapPin className="h-5 w-5" />
+                        <span>{issue.location || "N/A"}</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-gray-700 text-sm">
+                        <Calendar className="h-5 w-5" />
+                        <span>
+                          {issue.dateReported instanceof Date
+                            ? issue.dateReported.toLocaleDateString("en-IN", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "2-digit",
+                              })
+                            : "N/A"}
+                        </span>
+                      </div>
+                      {issue.deadline && (
+                        <div className="flex items-center gap-3 text-gray-700 text-sm">
+                          <Clock className="h-5 w-5" />
+                          <span>{formatDeadline(issue.deadline)}</span>
+                        </div>
+                      )}
+                      <div className="text-sm text-gray-600">
+                        #{issue.id}
                       </div>
                     </div>
 
-                    {/* {issue.photos && issue.photos.length > 0 && (
-                      <div className="ml-4">
-                        <img
-                          src={issue.photos[0]}
-                          alt={issue.title}
-                          className="w-20 h-20 object-cover rounded-lg border border-border"
-                        />
-                      </div>
-                    )} */}
                     {issue.audio && issue.audio.length > 0 && (
                       <div className="mt-2">
                         {issue.audio.map((audioUrl, index) => (
-                          <audio key={index} controls className="w-full">
+                          <audio key={index} controls className="w-full max-w-xs">
                             <source src={audioUrl} type="audio/mpeg" />
                             Your browser does not support the audio element.
                           </audio>
@@ -312,11 +309,11 @@ export default function Issues() {
                       </div>
                     )}
                   </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );

@@ -33,21 +33,17 @@ export default function Navbar() {
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 bg-background px-4 py-4 flex items-center justify-between border-b border-border"
-      style={{ height: '5rem' }}
+      className="fixed top-0 left-0 right-0 z-50 bg-sidebar backdrop-blur-md px-6 py-4 flex items-center justify-between border-b border-gray-200 shadow-md"
+      style={{ height: '5.5rem' }}
     >
       {/* Left: App Name */}
-      <span className="text-lg font-semibold text-foreground">CivicTracker</span>
+      <span className="text-xl font-extrabold text-gray-900 tracking-wide">CivicTracker</span>
       {/* Center: Page Title */}
       <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <span className="text-3xl font-extrabold text-gray-800">{getPageTitle()}</span>
+        <span className="text-4xl font-extrabold text-gray-900">{getPageTitle()}</span>
       </div>
       {/* Right: Date/Time */}
-      <span className="flex items-center gap-2 bg-muted px-3 py-1 rounded-full shadow text-base font-semibold text-muted-foreground border border-border">
-        {/* <svg className="w-5 h-5 text-primary-foreground" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
-        </svg> */}
+      <span className="flex items-center gap-3 bg-gray-100 px-4 py-2 rounded-full shadow-md text-lg font-semibold text-gray-700 border border-gray-300 select-none">
         {dateTime.toLocaleString(undefined, {
           month: 'short',
           day: '2-digit',

@@ -28,32 +28,32 @@ const statusConfig = {
   Pending: {
     title: 'Pending',
     icon: RotateCcw,
-    color: 'bg-yellow-100',
-    textColor: 'text-yellow-700'
+    color: 'bg-gray-100 backdrop-blur-md',
+    textColor: 'text-black'
   },
   Assigned: {
     title: 'Assigned',
     icon: UserCheck,
-    color: 'bg-purple-100',
-    textColor: 'text-purple-700'
+    color: 'bg-gray-100 backdrop-blur-md',
+    textColor: 'text-black'
   },
   "In Progress": {
     title: 'In Progress',
     icon: Wrench,
-    color: 'bg-blue-100',
-    textColor: 'text-blue-700'
+    color: 'bg-gray-100 backdrop-blur-md',
+    textColor: 'text-black'
   },
   Resolved: {
     title: 'Resolved',
     icon: CheckCircle,
-    color: 'bg-green-100',
-    textColor: 'text-green-700'
+    color: 'bg-gray-100 backdrop-blur-md',
+    textColor: 'text-black'
   },
   "Review & Approve": {
     title: 'Review & Approve',
     icon: Settings,
-    color: 'bg-accent',
-    textColor: 'text-accent-foreground'
+    color: 'bg-gray-100 backdrop-blur-md',
+    textColor: 'text-black'
   }
 };
 
@@ -157,30 +157,32 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-8 md:p-12 space-y-8 bg-background min-h-screen">
+      <div className="p-2 sm:p-4 md:p-6 space-y-4 relative">
+        {/* Glassmorphism background overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-sm rounded-3xl -z-10"></div>
         {/* Header */}
         <div className="flex flex-col items-start items-center justify-center gap-4 mb-4">
-          <h3 className="text-2xl sm:text-3xl font-bold text-gray-800">Overview of Civic Issues and System Status</h3>
+          <h3 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">Overview of Civic Issues and System Status</h3>
         </div>
 
         {/* Top Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Map */}
           <div className="lg:col-span-2">
-            <Card className="h-[400px] shadow-card border border-gray-200 rounded-2xl">
+            <Card className="h-full shadow-lg border border-white/20 rounded-3xl bg-white/10 backdrop-blur-md hover:shadow-2xl hover:bg-white/15 transition-all duration-300">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-blue-800 text-lg sm:text-xl">
-                  <MapPin className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-indigo-700 text-lg sm:text-xl font-semibold">
+                  <MapPin className="h-6 w-6" />
                   Issue Locations Map
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-0 border-t border-gray-200">
-                <div className="h-[320px] w-full overflow-hidden rounded-b-2xl relative">
+              <CardContent className="p-0 border-t border-gray-300 rounded-b-3xl overflow-hidden" style={{ height: '500px' }}>
+                <div className="h-full w-full overflow-hidden rounded-b-3xl relative">
                   <MapContainer
                     center={[22.5937, 78.9629]} // Center of India
                     zoom={5} // Suitable zoom for India
                     scrollWheelZoom={true}
-                    className="h-full w-full rounded-b-2xl"
+                    className="h-full w-full rounded-b-3xl"
                     style={{ position: "relative", zIndex: 1 }}
                   >
                     <TileLayer
@@ -198,7 +200,7 @@ export default function Dashboard() {
                         <Popup>
                           <div className="p-2">
                             <strong className="block text-sm font-semibold">{issue.title}</strong>
-                            <span className="block text-xs text-gray-600">{issue.location}</span>
+                            <span className="block text-xs text-indigo-700">{issue.location}</span>
                             <span className="block text-xs mt-1">
                               Status: <Badge variant="outline" className="text-xs">{issue.status}</Badge>
                             </span>
@@ -212,7 +214,7 @@ export default function Dashboard() {
             </Card>
           </div>
           {/* Status Cards */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             {Object.keys(statusConfig).map((status) => {
               const config = statusConfig[status];
               const count = issues.filter(issue => (issue.status || '').toLowerCase() === status.toLowerCase()).length;
@@ -221,26 +223,26 @@ export default function Dashboard() {
               return (
                 <Card
                   key={status}
-                  className="cursor-pointer shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1 border border-gray-200"
+                  className={`cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-white/20 rounded-3xl bg-white/10 backdrop-blur-md hover:bg-white/15`}
                   onClick={() => handleCategoryClick(status)}
                 >
-                  <CardContent className="p-4">
+                  <CardContent className="p-6">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className={`p-2 rounded-lg ${config.color}`}>
-                          <IconComponent className={`h-4 w-4 ${config.textColor}`} />
+                      <div className="flex items-center space-x-4">
+                        <div className={`p-3 rounded-xl bg-white bg-opacity-80`}>
+                          <IconComponent className={`h-6 w-6 ${config.textColor}`} />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-800">
+                          <p className="text-lg font-semibold text-gray-900">
                             {config.title}
                           </p>
-                          <p className="text-xs text-gray-600">
+                          <p className="text-sm text-gray-700">
                             Click to view all
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-gray-900">{count}</p>
+                        <p className="text-3xl font-extrabold text-gray-900">{count}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -253,10 +255,10 @@ export default function Dashboard() {
         {/* Bottom Section - Recent Issues */}
         <div className="w-full">
           {/* Recent Issues List */}
-          <Card className="shadow-lg border border-gray-200">
+          <Card className="shadow-lg border border-white/20 rounded-3xl bg-white/10 backdrop-blur-md hover:shadow-2xl hover:bg-white/15 transition-all duration-300">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-800">
-                <Calendar className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-indigo-700 text-lg font-semibold">
+                <Calendar className="h-6 w-6" />
                 Recent Issues
               </CardTitle>
               <CardDescription>
@@ -266,29 +268,29 @@ export default function Dashboard() {
             <CardContent>
               <div className="space-y-4">
                 {recentIssues.length === 0 ? (
-                  <div className="text-muted-foreground text-center">No recent issues.</div>
+                  <div className="text-indigo-400 text-center">No recent issues.</div>
                 ) : (
                   recentIssues.map((issue) => (
                     <div
                       key={issue.id}
-                      className="flex justify-between items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                      className="flex justify-between items-start p-6 rounded-2xl cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:scale-105 hover:bg-gray-200 bg-gray-100 backdrop-blur-md text-black"
                       onClick={() => navigate(`/issues/${issue.id}`)}
                     >
-                      <div className="flex flex-col gap-1 flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-base text-gray-900 truncate">
+                      <div className="flex flex-col gap-2 flex-1 min-w-0">
+                        <div className="flex items-center gap-3">
+                          <span className="font-extrabold text-lg truncate">
                             {issue.title || issue.name || getIssueTypeFromToken(issue.id) || "Untitled Issue"}
                           </span>
                           <Badge variant="outline" className="ml-2">
                             {issue.status}
                           </Badge>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-600 text-sm">
-                          <MapPin className="h-4 w-4" />
+                        <div className="flex items-center gap-3 text-gray-700 text-sm">
+                          <MapPin className="h-5 w-5" />
                           <span>{issue.location || "N/A"}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-600 text-sm">
-                          <Calendar className="h-4 w-4" />
+                        <div className="flex items-center gap-3 text-gray-700 text-sm">
+                          <Calendar className="h-5 w-5" />
                           <span>
                             {issue.dateReported instanceof Date
                               ? issue.dateReported.toLocaleDateString("en-IN", {

@@ -28,7 +28,7 @@ export function DashboardLayout({ children }) {
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Navbar />
       <div
-        className={`transition-all duration-300 pt-20 px-4 bg-background min-h-screen ${collapsed ? 'ml-16' : 'ml-64'}`}
+        className={`transition-all duration-300 pt-20 px-4 bg-sidebar min-h-screen ${collapsed ? 'ml-16' : 'ml-64'}`}
       >
         <main>{children}</main>
       </div>

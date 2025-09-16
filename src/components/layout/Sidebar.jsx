@@ -42,7 +42,7 @@ export function Sidebar({ className, collapsed, setCollapsed }) {
         height: 'calc(100vh - 5rem)', // Fill below the navbar
         boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.10)",
         borderRadius: "1rem",
-        background: "hsl(var(--background) / 0.95)",
+        background: "hsl(var(--sidebar))",
         backdropFilter: "blur(8px)",
         border: "1px solid hsl(var(--border))",
         display: 'flex',
@@ -69,8 +69,8 @@ export function Sidebar({ className, collapsed, setCollapsed }) {
                 <button
                   onClick={() => navigate('/issues', { state: { filterStatus: 'manual' } })}
                   className={cn(
-                    "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors w-full",
-                    "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                    "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 w-full",
+                    "text-gray-700 hover:bg-gray-200 hover:scale-105 hover:shadow-lg",
                     collapsed ? "justify-center" : "justify-start"
                   )}
                   title={collapsed ? item.name : undefined}
@@ -83,10 +83,10 @@ export function Sidebar({ className, collapsed, setCollapsed }) {
                   to={item.href}
                   className={({ isActive }) =>
                     cn(
-                      "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                      "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200",
                       isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                        ? "bg-gray-300 text-gray-900 shadow-lg"
+                        : "text-gray-700 hover:bg-gray-200 hover:scale-105 hover:shadow-lg",
                       collapsed ? "justify-center" : "justify-start"
                     )
                   }

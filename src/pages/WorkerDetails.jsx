@@ -88,12 +88,19 @@ export default function WorkerDetails() {
   const assignedSection = assignedIssues.length > 0 ? (
     <ul className="space-y-4">
       {assignedIssues.map((issue) => (
-        <li key={issue.id} className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <li key={issue.id} className="p-4 bg-white border border-gray-300 rounded-lg">
           <div className="font-semibold text-blue-800 mb-1 flex items-center gap-2">
             <FileText className="h-4 w-4" />
             Assigned to Issue:
             <span className="ml-2">{issue.title || issue.id}</span>
-            <Badge variant="secondary" className="ml-2">{issue.status}</Badge>
+            <Badge variant="secondary" className={`ml-2 ${
+              issue.status === 'Pending' ? 'bg-[rgb(236,236,187)] text-black' :
+              issue.status === 'Assigned' ? 'bg-[rgb(213,180,180)] text-black' :
+              issue.status === 'In Progress' ? 'bg-[rgb(193,216,195)] text-black' :
+              issue.status === 'Resolved' ? 'bg-[rgb(202,232,189)] text-black' :
+              issue.status === 'Review & Approve' ? 'bg-[rgb(241,166,97)] text-black' :
+              'bg-gray-200 text-gray-900'
+            }`}>{issue.status}</Badge>
           </div>
           <div className="text-sm text-gray-700">
             This worker is currently assigned to the above issue.
@@ -122,12 +129,19 @@ export default function WorkerDetails() {
       ) : (
         <ul className="space-y-4">
           {resolvedIssues.map((issue) => (
-            <li key={issue.id} className="p-4 bg-green-50 border border-green-200 rounded-lg">
-              <div className="font-semibold text-green-800 mb-1 flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                {issue.title || issue.id}
-                <Badge variant="secondary" className="ml-2">{issue.status}</Badge>
-              </div>
+            <li key={issue.id} className="p-4 bg-white border border-gray-300 rounded-lg">
+          <div className="font-semibold text-green-800 mb-1 flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            {issue.title || issue.id}
+            <Badge variant="secondary" className={`ml-2 ${
+              issue.status === 'Pending' ? 'bg-[rgb(236,236,187)] text-black' :
+              issue.status === 'Assigned' ? 'bg-[rgb(213,180,180)] text-black' :
+              issue.status === 'In Progress' ? 'bg-[rgb(193,216,195)] text-black' :
+              issue.status === 'Resolved' ? 'bg-[rgb(202,232,189)] text-black' :
+              issue.status === 'Review & Approve' ? 'bg-[rgb(241,166,97)] text-black' :
+              'bg-gray-200 text-gray-900'
+            }`}>{issue.status}</Badge>
+          </div>
               <div className="text-sm text-gray-700">
                 This issue was resolved by this worker.
               </div>
@@ -160,8 +174,8 @@ export default function WorkerDetails() {
       <span
         className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
           isOccupied
-            ? "bg-red-100 text-red-700 border border-red-300"
-            : "bg-green-100 text-green-700 border border-green-300"
+            ? "bg-[rgb(236,236,187)] text-black border border-yellow-300"
+            : "bg-[rgb(202,232,189)] text-black border border-green-300"
         }`}
       >
         {isOccupied ? "Occupied" : "Available"}
@@ -197,7 +211,7 @@ export default function WorkerDetails() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-8 md:p-12 max-w-4xl mx-auto space-y-8 bg-background rounded-xl shadow-none">
+      <div className="p-4 sm:p-8 md:p-12 max-w-4xl mx-auto space-y-8">
         {/* Header */}
         {headerSection}
 
