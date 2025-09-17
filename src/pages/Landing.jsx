@@ -1,142 +1,166 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { MapPin, Users, BarChart3, Shield } from 'lucide-react';
+import landingBg from '@/images/landingpagebg3.jpg';
 
 export default function Landing() {
   const navigate = useNavigate();
+
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) element.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const features = [
     {
       icon: MapPin,
       title: 'Real-time Issue Tracking',
-      description: 'Interactive maps showing live issue locations across the city'
+      subtext: 'Stay Ahead with Live Updates',
+      description: 'Track and visualize civic issues across the city in real-time.',
+      highlights: [
+        '📍 Interactive citywide maps',
+        '⚡ Instant alerts when issues arise',
+        '🗂️ Filter by category & location'
+      ]
     },
     {
       icon: Users,
       title: 'Citizen Engagement',
-      description: 'Easy reporting system for citizens to submit civic issues'
+      subtext: 'Empowering Every Citizen’s Voice',
+      description: 'Make it simple for residents to report problems and stay informed.',
+      highlights: [
+        '📝 Quick 2-step issue reporting',
+        '📸 Upload photos for better clarity',
+        '📢 Receive instant status notifications'
+      ]
     },
     {
       icon: BarChart3,
       title: 'Analytics Dashboard',
-      description: 'Comprehensive reports and analytics for informed decision making'
+      subtext: 'Smarter Decisions with Data',
+      description: 'Access powerful insights and performance metrics for better governance.',
+      highlights: [
+        '📊 Generate in-depth reports',
+        '📈 Track resolution progress',
+        '🔍 Identify recurring civic challenges'
+      ]
     },
     {
       icon: Shield,
       title: 'Secure Administration',
-      description: 'Role-based access control for municipal staff and administrators'
+      subtext: 'Robust Control, Seamless Access',
+      description: 'Ensure safe and role-based system management for city staff.',
+      highlights: [
+        '🛡️ Role-based access permissions',
+        '🔑 Secure staff authentication',
+        '🔒 Centralized control panel'
+      ]
     }
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="min-h-screen bg-fixed bg-cover bg-center"
+      style={{ backgroundImage: `url(${landingBg})` }}
+    >
       {/* Header */}
-      <header className="container mx-auto px-4 py-6">
-        <nav className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <MapPin className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">CivicTracker</span>
-          </div>
-          <Button variant="outline" onClick={() => navigate('/login')}>
-            Sign In
-          </Button>
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md shadow-md">
+        <nav className="container mx-auto flex items-center justify-between px-6 py-4">
+          <div className="text-2xl font-extrabold text-black cursor-default select-none">CivicTrack</div>
+          <ul className="flex space-x-8 text-black font-semibold">
+            <li
+              className="cursor-pointer hover:text-primary hover:underline transition-colors duration-200"
+              onClick={() => scrollToSection('hero')}
+            >
+              About Us
+            </li>
+            <li
+              className="cursor-pointer hover:text-primary hover:underline transition-colors duration-200"
+              onClick={() => scrollToSection('features')}
+            >
+              Features
+            </li>
+            <li
+              className="cursor-pointer hover:text-primary hover:underline transition-colors duration-200"
+              onClick={() => scrollToSection('vision')}
+            >
+              Our Vision
+            </li>
+          </ul>
         </nav>
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="text-center max-w-4xl mx-auto">
-          <Badge variant="secondary" className="mb-6">
-            Municipal Issue Management System
-          </Badge>
-          <h1 className="text-5xl font-bold text-foreground mb-6 leading-tight">
-            Streamline Civic Issue
-            <span className="gradient-primary bg-clip-text text-transparent block">
-              Resolution & Tracking
-            </span>
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Efficiently manage and track civic issues from report to resolution. 
-            Real-time dashboards, interactive maps, and comprehensive analytics 
-            for modern municipal administration.
+      <section id="hero" className="relative min-h-screen flex items-center justify-center">
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="relative z-10 text-center text-white px-4">
+          <h1 className="text-7xl font-extrabold mb-4">CivicTrack</h1>
+          <p className="text-3xl mb-8 leading-relaxed tracking-wide">Track. Manage. Resolve.</p>
+          <Button
+            size="lg"
+            className="bg-primary text-white px-10 py-4 font-bold hover:bg-primary-dark mb-8"
+            onClick={() => navigate('/login')}
+          >
+            Admin Login
+          </Button>
+          <p className="text-lg max-w-2xl mx-auto leading-relaxed tracking-wide">
+            CivicTrack empowers Jharkhand's citizens and authorities to report, monitor, and resolve civic issues effortlessly. From potholes to public services, get real-time updates, actionable insights, and improve governance efficiency—all in one platform.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              onClick={() => navigate('/login')}
-              className="text-lg px-8 py-6"
-            >
-              Access Dashboard
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="text-lg px-8 py-6"
-            >
-              Learn More
-            </Button>
-          </div>
         </div>
       </section>
 
       {/* Features Grid */}
-      <section className="container mx-auto px-4 py-20">
+      <section id="features" className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-foreground mb-4">
+          <h2 className="text-3xl font-extrabold text-black mb-4">
             Powerful Tools for Municipal Management
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-black max-w-2xl mx-auto leading-relaxed tracking-wide">
             Everything you need to efficiently manage civic issues and improve citizen services
           </p>
         </div>
-        
+
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => (
-            <Card key={index} className="shadow-card hover:shadow-hover transition-all duration-300">
+            <Card
+              key={index}
+              className="shadow-card hover:shadow-lg transition-transform duration-300 transform hover:scale-105 rounded-lg bg-white/30 backdrop-blur-md"
+            >
               <CardHeader className="text-center">
                 <div className="w-12 h-12 mx-auto bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                   <feature.icon className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle className="text-lg">{feature.title}</CardTitle>
+                <CardTitle className="text-xl font-bold text-black">{feature.title}</CardTitle>
+                <p className="text-sm text-black mb-2 leading-relaxed tracking-wide">{feature.subtext}</p>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-center">
-                  {feature.description}
-                </CardDescription>
+                <CardDescription className="text-center mb-4 text-base leading-relaxed tracking-wide text-black">{feature.description}</CardDescription>
+                <ul className="list-disc list-inside text-left text-sm space-y-1 leading-relaxed text-black">
+                  {feature.highlights.map((highlight, i) => (
+                    <li key={i}>{highlight}</li>
+                  ))}
+                </ul>
               </CardContent>
             </Card>
           ))}
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="bg-muted/50 py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold text-primary mb-2">2,847</div>
-              <div className="text-muted-foreground">Issues Resolved</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-success mb-2">94%</div>
-              <div className="text-muted-foreground">Resolution Rate</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-accent mb-2">48hrs</div>
-              <div className="text-muted-foreground">Avg Response Time</div>
-            </div>
-          </div>
+      {/* Our Vision Section */}
+      <section id="vision" className="bg-muted/30 py-20 border-t border-border">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-extrabold text-black mb-6">Our Vision</h2>
+          <p className="text-lg text-black max-w-4xl mx-auto leading-relaxed tracking-wide">
+            We are committed to building smarter, more connected cities by streamlining government operations and empowering citizens. Our platform grows with urban needs, enabling faster response times, data-driven insights, and transparent governance. Looking ahead, we will integrate AI-powered analytics and smart city infrastructure to create sustainable, future-ready municipalities.
+          </p>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="bg-card border-t border-border py-8">
-        <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>&copy; 2024 CivicTracker. Municipal Issue Management System.</p>
+        <div className="container mx-auto px-4 text-center text-black">
+          <p>&copy; 2024 CivicTrack. Municipal Issue Management System.</p>
         </div>
       </footer>
     </div>
