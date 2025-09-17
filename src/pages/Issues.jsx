@@ -21,7 +21,9 @@ import {
   Droplet,
   Lightbulb,
   RotateCcw,
-  Settings
+  Settings,
+  Waves,
+  Construction
 } from 'lucide-react';
 
 const getBadgeClass = (status) => {
@@ -44,9 +46,9 @@ const getCategoryIcon = (type) => {
     case 'Garbage':
       return { icon: Trash2, color: 'text-green-500' };
     case 'Drainage & Sewage':
-      return { icon: RotateCcw, color: 'text-amber-700' }; // brown
+      return { icon: Waves, color: 'text-amber-700' }; // changed to Waves icon
     case 'Road Damage':
-      return { icon: AlertTriangle, color: 'text-orange-500' };
+      return { icon: Construction, color: 'text-orange-500' }; // changed to Construction icon
     case 'StreetLight':
       return { icon: Lightbulb, color: 'text-yellow-500' };
     case 'Water':
@@ -173,7 +175,7 @@ export default function Issues() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 bg-sidebar">
         {/* Header */}
         <div className="flex items-center justify-center">
           <div>
@@ -182,7 +184,7 @@ export default function Issues() {
         </div>
 
         {/* Filters */}
-        <Card className="shadow-card bg-gray-100 backdrop-blur-md rounded-3xl">
+        <Card className="shadow-card bg-[#f6f6f6] backdrop-blur-md rounded-3xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-primary" />
@@ -247,7 +249,7 @@ export default function Issues() {
         </Card>
 
         {/* Issues List */}
-        <Card className="shadow-card border border-gray-300 rounded-3xl bg-gray-100 backdrop-blur-md hover:shadow-2xl transition-shadow duration-300">
+        <Card className="shadow-card border border-gray-300 rounded-3xl bg-[#f6f6f6] backdrop-blur-md hover:shadow-2xl transition-shadow duration-300">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-indigo-700 text-lg font-semibold">
               <List className="h-6 w-6" />
@@ -269,7 +271,7 @@ export default function Issues() {
                 sortedIssues.map((issue) => (
                   <div
                     key={issue.id}
-                    className="flex justify-between items-start p-6 rounded-2xl cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:bg-gray-200 bg-gray-100 backdrop-blur-md text-black border border-white/20"
+                    className="flex justify-between items-start p-6 rounded-2xl cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:bg-gray-200 bg-[#f6f6f6] backdrop-blur-md text-black border border-white/20"
                     onClick={() => navigate(`/issues/${issue.id}`)}
                   >
                     <div className="flex flex-col gap-2 flex-1 min-w-0">

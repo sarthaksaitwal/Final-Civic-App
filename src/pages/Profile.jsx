@@ -56,7 +56,7 @@ export default function Profile() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-8 bg-gray-50 min-h-screen">
+      <div className="p-6 space-y-8 bg-sidebar min-h-screen">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
           <h3 className="text-3xl font-bold text-gray-900 tracking-tight">Profile & Account Settings</h3>
@@ -68,7 +68,7 @@ export default function Profile() {
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Profile Card */}
-          <Card className="rounded-2xl shadow-lg hover:shadow-xl transition-all border-0 bg-white">
+          <Card className="rounded-2xl shadow-lg hover:shadow-xl transition-all border-0 bg-[#f6f6f6]">
             <CardHeader className="flex flex-col items-center pt-8 pb-4">
               <Avatar className="h-28 w-28 mb-4 shadow-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
@@ -114,7 +114,7 @@ export default function Profile() {
           </Card>
 
           {/* Performance Metrics */}
-          <Card className="rounded-2xl shadow-lg border-0 bg-white">
+          <Card className="rounded-2xl shadow-lg border-0 bg-[#f6f6f6]">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-gray-900">Performance Metrics</CardTitle>
               <CardDescription className="text-base text-gray-500">Your recent activity summary</CardDescription>
@@ -141,7 +141,7 @@ export default function Profile() {
           </Card>
 
           {/* Access Permissions */}
-          <Card className="rounded-2xl shadow-lg border-0 bg-white">
+          <Card className="rounded-2xl shadow-lg border-0 bg-[#f6f6f6]">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-gray-900">Access Permissions</CardTitle>
               <CardDescription className="text-base text-gray-500">Your current system permissions</CardDescription>
@@ -170,7 +170,7 @@ export default function Profile() {
         </div>
 
         {/* Recent Activity Timeline */}
-        <Card className="rounded-2xl shadow-lg border-0 bg-white mt-8">
+        <Card className="rounded-2xl shadow-lg border-0 bg-[#f6f6f6] mt-8">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-gray-900">Recent Activity</CardTitle>
             <CardDescription className="text-base text-gray-500">Your latest actions and system interactions</CardDescription>

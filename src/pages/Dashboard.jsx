@@ -21,7 +21,9 @@ import {
   MapPin,
   Calendar,
   TrendingUp,
-  UserCheck
+  UserCheck,
+  Construction,
+  ScanSearch
 } from 'lucide-react';
 
 const getBadgeClass = (status) => {
@@ -44,9 +46,9 @@ const getCategoryIcon = (type) => {
     case 'Garbage':
       return { icon: Trash2, color: 'text-green-500' };
     case 'Drainage & Sewage':
-      return { icon: RotateCcw, color: 'text-amber-700' }; // brown
+      return { icon: Waves, color: 'text-amber-700' }; // changed to Waves icon
     case 'Road Damage':
-      return { icon: AlertTriangle, color: 'text-orange-500' };
+      return { icon: Construction, color: 'text-orange-500' }; // changed to Construction icon
     case 'StreetLight':
       return { icon: Lightbulb, color: 'text-yellow-500' };
     case 'Water':
@@ -61,31 +63,31 @@ const statusConfig = {
     title: 'Pending',
     icon: RotateCcw,
     color: 'bg-gray-100 backdrop-blur-md',
-    textColor: 'text-black'
+    textColor: 'text-gray-500'
   },
   Assigned: {
     title: 'Assigned',
     icon: UserCheck,
     color: 'bg-gray-100 backdrop-blur-md',
-    textColor: 'text-black'
+    textColor: 'text-blue-500'
   },
   "In Progress": {
     title: 'In Progress',
     icon: Wrench,
     color: 'bg-gray-100 backdrop-blur-md',
-    textColor: 'text-black'
+    textColor: 'text-orange-500'
   },
   Resolved: {
     title: 'Resolved',
     icon: CheckCircle,
     color: 'bg-gray-100 backdrop-blur-md',
-    textColor: 'text-black'
+    textColor: 'text-green-500'
   },
   "Review & Approve": {
     title: 'Review & Approve',
-    icon: Settings,
+    icon: ScanSearch,
     color: 'bg-gray-100 backdrop-blur-md',
-    textColor: 'text-black'
+    textColor: 'text-indigo-500'
   }
 };
 
@@ -104,8 +106,6 @@ const CATEGORY_ICON = {
   "Water": Droplet,
   "Garbage": Trash2,
   "StreetLight": Lightbulb,
-  "Review & Approve": Wrench,
-  "Unknown": FileX
 };
 
 const ISSUE_TYPE_ICON = {
@@ -189,9 +189,10 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="p-2 sm:p-4 md:p-6 space-y-4 relative">
-        {/* Glassmorphism background overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-sm rounded-3xl -z-10"></div>
+      <div className="p-6 space-y-8 bg-sidebar min-h-screen">
+-        {/* Glassmorphism background overlay */}
+-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-sm rounded-3xl -z-10"></div>
+      
         {/* Header */}
         <div className="flex flex-col items-start items-center justify-center gap-4 mb-4">
           <h3 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">Overview of Civic Issues and System Status</h3>
@@ -201,7 +202,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Map */}
           <div className="lg:col-span-2">
-            <Card className="h-full shadow-lg border border-white/20 rounded-3xl bg-white/10 backdrop-blur-md hover:shadow-2xl hover:bg-white/15 transition-all duration-300">
+            <Card className="h-full shadow-lg border border-white/20 rounded-3xl bg-[#f6f6f6] backdrop-blur-md hover:shadow-2xl hover:bg-white/15 transition-all duration-300">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-indigo-700 text-lg sm:text-xl font-semibold">
                   <MapPin className="h-6 w-6" />
@@ -255,7 +256,7 @@ export default function Dashboard() {
               return (
                 <Card
                   key={status}
-                  className={`cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20 rounded-3xl bg-white/10 backdrop-blur-md hover:bg-white/15`}
+                  className={`cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-white/30 rounded-3xl bg-[#f6f6f6]`}
                   onClick={() => handleCategoryClick(status)}
                 >
                   <CardContent className="p-6">
@@ -287,7 +288,7 @@ export default function Dashboard() {
         {/* Bottom Section - Recent Issues */}
         <div className="w-full">
           {/* Recent Issues List */}
-          <Card className="shadow-lg border border-white/20 rounded-3xl bg-white/10 backdrop-blur-md hover:shadow-2xl hover:bg-white/15 transition-all duration-300">
+          <Card className="shadow-lg border border-white/20 rounded-3xl bg-[#f6f6f6] backdrop-blur-md hover:shadow-2xl hover:bg-white/15 transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-indigo-700 text-lg font-semibold">
                 <Calendar className="h-6 w-6" />

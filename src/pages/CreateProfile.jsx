@@ -110,7 +110,7 @@ export default function CreateProfile() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-2xl mx-auto mt-8 p-4 sm:p-8 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-border">
+      <div className="max-w-2xl mx-auto mt-8 p-4 sm:p-8 bg-[#f6f6f6] rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-0">
         <h2 className="text-3xl font-bold mb-2 text-center text-primary">Create Worker Profile</h2>
         <p className="text-center text-muted-foreground mb-6">Fill out the form below to add a new worker. Each section is labeled for clarity.</p>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -119,11 +119,11 @@ export default function CreateProfile() {
             <div className="flex flex-col gap-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">Name</label>
-                <Input id="name" name="name" value={form.name} onChange={handleChange} required className="w-full" />
+                <Input id="name" name="name" value={form.name} onChange={handleChange} required className="w-full bg-[#f6f6f6]" />
               </div>
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-1">Phone No</label>
-                <Input id="phone" name="phone" value={form.phone} onChange={handleChange} required type="tel" className="w-full" />
+                <Input id="phone" name="phone" value={form.phone} onChange={handleChange} required type="tel" className="w-full bg-[#f6f6f6]" />
               </div>
             </div>
           </div>
@@ -137,7 +137,7 @@ export default function CreateProfile() {
                   value={form.department}
                   onChange={(e) => setForm({ ...form, department: e.target.value })}
                   required
-                  className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-primary bg-white dark:bg-zinc-900"
+                  className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-primary bg-[#f6f6f6]"
                 >
                   <option value="">Select Department</option>
                   <option value="garbage">Garbage</option>
@@ -150,7 +150,7 @@ export default function CreateProfile() {
               </div>
               <div>
                 <label htmlFor="pincode" className="block text-sm font-medium text-foreground mb-1">Pincode</label>
-                <Input id="pincode" name="pincode" value={form.pincode} onChange={handleChange} required className="w-full" />
+                <Input id="pincode" name="pincode" value={form.pincode} onChange={handleChange} required className="w-full bg-[#f6f6f6]" />
               </div>
             </div>
           </div>

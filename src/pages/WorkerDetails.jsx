@@ -116,7 +116,7 @@ export default function WorkerDetails() {
       ))}
     </ul>
   ) : (
-    <div className="text-green-700 font-semibold">
+    <div className="text-blue-700 font-semibold">
       This worker is not currently assigned to any issue.
     </div>
   );
@@ -129,7 +129,7 @@ export default function WorkerDetails() {
       ) : (
         <ul className="space-y-4">
           {resolvedIssues.map((issue) => (
-            <li key={issue.id} className="p-4 bg-white border border-gray-300 rounded-lg">
+            <li key={issue.id} className="p-4 bg-gray-50 rounded-lg">
           <div className="font-semibold text-green-800 mb-1 flex items-center gap-2">
             <FileText className="h-4 w-4" />
             {issue.title || issue.id}
@@ -211,12 +211,12 @@ export default function WorkerDetails() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-8 md:p-12 max-w-4xl mx-auto space-y-8">
+      <div className="p-4 sm:p-8 md:p-12 max-w-4xl mx-auto space-y-8 bg-gray-50">
         {/* Header */}
         {headerSection}
 
         {/* Details Section */}
-        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
+        <Card className="rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 bg-[#f6f6f6]">
           <CardHeader>
             <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
               <User className="h-6 w-6 text-blue-700" />
@@ -227,7 +227,7 @@ export default function WorkerDetails() {
         </Card>
 
         {/* Assigned Issues Section */}
-        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
+        <Card className="rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 bg-[#f6f6f6]">
           <CardHeader>
             <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
               <FileText className="h-6 w-6 text-blue-700" />
@@ -238,7 +238,7 @@ export default function WorkerDetails() {
         </Card>
 
         {/* Resolved Issues Section */}
-        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
+        <Card className="rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 bg-[#f6f6f6]">
           <CardHeader>
             <CardTitle className="text-lg font-bold text-green-700 flex items-center gap-2">
               <FileText className="h-6 w-6 text-green-700" />

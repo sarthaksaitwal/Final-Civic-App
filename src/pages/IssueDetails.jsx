@@ -401,7 +401,7 @@ export default function IssueDetails() {
     (Array.isArray(issue.completionPhotos) && issue.completionPhotos.length > 0 ||
       !!issue.completionNotes ||
       !!issue.completionVoiceNote) ? (
-      <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
+      <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-[#f6f6f6]">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
             <UserCheck className="h-6 w-6 text-blue-700" />
@@ -806,12 +806,12 @@ export default function IssueDetails() {
   // --- Render ---
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-8 md:p-12 max-w-5xl mx-auto space-y-8 bg-background rounded-xl shadow-none">
+      <div className="p-4 sm:p-8 md:p-12 max-w-5xl mx-auto space-y-8 bg-sidebar rounded-xl shadow-none">
         {/* Header */}
         {headerSection}
 
         {/* Details FIRST */}
-        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
+        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-[#f6f6f6]">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
               <Folder className="h-6 w-6 text-blue-700" />
@@ -823,7 +823,7 @@ export default function IssueDetails() {
 
         {/* Citizen Submissions (Description, Voice Note, Photos) */}
         {(issue.description || (issue.photos && issue.photos.length > 0) || issue.voiceNote) && (
-          <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
+          <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-[#f6f6f6]">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
                 <ImageIcon className="h-6 w-6 text-blue-700" />
@@ -840,7 +840,7 @@ export default function IssueDetails() {
         {workerCompletionSection}
 
         {/* Timeline */}
-        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-white">
+        <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-[#f6f6f6]">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
               <Wrench className="h-6 w-6 text-blue-700" />

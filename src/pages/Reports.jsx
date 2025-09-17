@@ -219,7 +219,7 @@ export default function Reports() {
 
   return (
     <DashboardLayout>
-      <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-sidebar text-gray-900'}`}>
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-0">
           <div>
@@ -241,7 +241,7 @@ export default function Reports() {
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6 pt-4">
           {metricsData.map((metric, index) => (
-            <Card key={index} className={`rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+            <Card key={index} className={`rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-[#f6f6f6]'}`}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
@@ -294,7 +294,7 @@ export default function Reports() {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 pt-0">
           {/* Issue Category Distribution */}
-          <Card className={`rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 lg:col-span-1 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+          <Card className={`rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 lg:col-span-1 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-[#f6f6f6]'}`}>
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-xl font-semibold">
                 <Activity className="h-5 w-5 text-blue-500" />
@@ -362,7 +362,7 @@ export default function Reports() {
           </Card>
 
           {/* Worker Occupancy */}
-          <Card className={`rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 lg:col-span-1 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+          <Card className={`rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 lg:col-span-1 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-[#f6f6f6]'}`}>
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-xl font-semibold">
                 <Users className="h-5 w-5 text-green-500" />
@@ -422,7 +422,7 @@ export default function Reports() {
           </Card>
 
           {/* Heat Map */}
-          <Card className={`rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 lg:col-span-1 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'}`}>
+          <Card className={`rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 lg:col-span-1 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-[#f6f6f6]'}`}>
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-xl font-semibold">
                 <MapPin className="h-5 w-5 text-red-500" />

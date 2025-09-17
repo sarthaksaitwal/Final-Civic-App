@@ -99,11 +99,11 @@ export default function AssignWorker() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6 bg-sidebar">
         <h1 className="text-3xl font-bold text-foreground">Assign Worker</h1>
 
         {/* Filters */}
-        <Card className="shadow-card bg-gray-100 backdrop-blur-md rounded-3xl">
+        <Card className="rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 bg-[#f6f6f6]">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-5 w-5" />
@@ -166,7 +166,7 @@ export default function AssignWorker() {
         </Card>
 
         {/* Workers List */}
-        <Card className="shadow-card border border-gray-300 rounded-3xl bg-gray-100 backdrop-blur-md hover:shadow-2xl transition-shadow duration-300">
+        <Card className="shadow-card border border-gray-300 rounded-3xl bg-[#f6f6f6] hover:shadow-2xl transition-shadow duration-300">
           <CardHeader />
           <CardContent>
             <div className="space-y-4">
@@ -204,7 +204,7 @@ export default function AssignWorker() {
                   return (
                     <div
                       key={worker.id}
-                      className="flex flex-col sm:flex-row items-center justify-between rounded-2xl p-6 shadow-md hover:shadow-xl hover:bg-gray-200 bg-gray-100 backdrop-blur-md text-black border border-white/20 cursor-pointer transition-all duration-300"
+                      className="flex flex-col sm:flex-row items-center justify-between rounded-2xl p-6 shadow-md hover:shadow-xl hover:bg-gray-200 bg-[#f6f6f6] text-black border border-white/20 cursor-pointer transition-all duration-300"
                       onClick={() => navigate(`/workers/${worker.id}`)}
                       tabIndex={0}
                       role="button"
@@ -212,18 +212,18 @@ export default function AssignWorker() {
                     >
                       {/* Left: Worker Info */}
                       <div className="w-full sm:w-auto">
-                        <div className="flex items-center gap-2 text-lg font-bold text-blue-900">
+                        <div className="flex items-center gap-2 text-lg font-bold text-black">
                           <span>{worker.name}</span>
-                          <Badge className={isAvailable ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}>{isAvailable ? 'Available' : 'Unavailable'}</Badge>
+                          <Badge className={isAvailable ? 'bg-green-300 text-white hover:bg-green-300' : 'bg-red-500 text-white hover:bg-red-500'}>{isAvailable ? 'Available' : 'Unavailable'}</Badge>
                         </div>
                         {assignedIssues.length > 0 && (
-                          <div className="text-xs text-blue-700 font-semibold mt-1">
+                          <div className="text-xs text-gray-700 font-semibold mt-1">
                             Assigned to Issues:{" "}
                             {assignedIssues.map((issue, idx) => (
                               <span key={issue.id}>
                                 <a
                                   href={`/issues/${issue.id}`}
-                                  className="underline text-blue-700"
+                                  className="underline text-gray-700"
                                   style={{ marginRight: 4 }}
                                   onClick={e => {
                                     e.stopPropagation();
