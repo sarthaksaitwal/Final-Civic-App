@@ -142,9 +142,9 @@ export default function WorkerDetails() {
               'bg-gray-200 text-gray-900'
             }`}>{issue.status}</Badge>
           </div>
-              <div className="text-sm text-gray-700">
+              {/* <div className="text-sm text-gray-700">
                 This issue was resolved by this worker.
-              </div>
+              </div> */}
               <Button
                 className="mt-3 ml-3"
                 variant="outline"

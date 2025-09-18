@@ -271,7 +271,7 @@ export default function Issues() {
                 sortedIssues.map((issue) => (
                   <div
                     key={issue.id}
-                    className="flex justify-between items-start p-6 rounded-2xl cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:bg-gray-200 bg-[#f6f6f6] backdrop-blur-md text-black border border-white/20"
+                    className="relative flex justify-between items-start p-6 rounded-2xl cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:bg-gray-200 bg-[#f6f6f6] backdrop-blur-md text-black border border-white/20"
                     onClick={() => navigate(`/issues/${issue.id}`)}
                   >
                     <div className="flex flex-col gap-2 flex-1 min-w-0">
@@ -283,14 +283,14 @@ export default function Issues() {
                         <span className="font-extrabold text-lg truncate">
                           {issue.title || getIssueTypeFromToken(issue.id) || 'Untitled Issue'}
                         </span>
-                        <Badge className={`ml-2 text-xs ${getBadgeClass(issue.status)}`}>
-                          {issue.status}
-                        </Badge>
                         {issue.priority && (
                           <Badge variant={getPriorityBadgeVariant(issue.priority)} className="ml-2">
                             {issue.priority}
                           </Badge>
                         )}
+                        <Badge className={`ml-auto mr-2 text-xs ${getBadgeClass(issue.status)}`}>
+                          {issue.status}
+                        </Badge>
                       </div>
                       <div className="flex items-center gap-3 text-gray-700 text-sm">
                         <MapPin className="h-5 w-5" />

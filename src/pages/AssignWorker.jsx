@@ -212,9 +212,11 @@ export default function AssignWorker() {
                     >
                       {/* Left: Worker Info */}
                       <div className="w-full sm:w-auto">
-                        <div className="flex items-center gap-2 text-lg font-bold text-black">
+                        <div className="relative flex items-center gap-2 text-lg font-bold text-black">
                           <span>{worker.name}</span>
-                          <Badge className={isAvailable ? 'bg-green-300 text-white hover:bg-green-300' : 'bg-red-500 text-white hover:bg-red-500'}>{isAvailable ? 'Available' : 'Unavailable'}</Badge>
+                          <Badge className={`ml-2 text-xs ${isAvailable ? 'bg-green-300 text-white hover:bg-green-300' : 'bg-red-500 text-white hover:bg-red-500'}`}>
+                            {isAvailable ? 'Available' : 'Unavailable'}
+                          </Badge>
                         </div>
                         {assignedIssues.length > 0 && (
                           <div className="text-xs text-gray-700 font-semibold mt-1">

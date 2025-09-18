@@ -65,7 +65,7 @@ export default function Login() {
         </div>
 
         {/* Login Form */}
-        <Card className="shadow-card">
+        <Card className="shadow-card bg-[#f6f6f6]">
           <CardHeader>
             <CardTitle>Sign In</CardTitle>
             <CardDescription>

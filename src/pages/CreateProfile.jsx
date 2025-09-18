@@ -175,7 +175,7 @@ export default function CreateProfile() {
             </div>
           )}
           {error && <div className="text-red-600 text-sm">{error}</div>}
-          <Button type="submit" disabled={loading} className="w-full md:w-1/2 mx-auto">
+          <Button type="submit" disabled={loading} className="mx-auto block">
             {loading ? "Creating..." : "Create Worker"}
           </Button>
         </form>

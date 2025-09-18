@@ -306,7 +306,7 @@ export default function Dashboard() {
                   recentIssues.map((issue) => (
                     <div
                       key={issue.id}
-                      className="flex justify-between items-start p-6 rounded-2xl cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:bg-gray-200 bg-gray-100 backdrop-blur-md text-black"
+                      className="relative flex justify-between items-start p-6 rounded-2xl cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:bg-gray-200 bg-gray-100 backdrop-blur-md text-black"
                       onClick={() => navigate(`/issues/${issue.id}`)}
                     >
                       <div className="flex flex-col gap-2 flex-1 min-w-0">
@@ -318,7 +318,7 @@ export default function Dashboard() {
                           <span className="font-extrabold text-lg truncate">
                             {issue.title || issue.name || getIssueTypeFromToken(issue.id) || "Untitled Issue"}
                           </span>
-                          <Badge className={`ml-2 text-xs ${getBadgeClass(issue.status)}`}>
+                          <Badge className={`ml-auto mr-2 text-xs ${getBadgeClass(issue.status)}`}>
                             {issue.status}
                           </Badge>
                         </div>
