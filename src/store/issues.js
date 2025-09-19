@@ -205,7 +205,7 @@ export const useIssuesStore = create((set, getState) => ({
     try {
       const newWorker = {
         ...workerData,
-        assignedIssueId: "", // Always add this field
+        // assignedIssueId: "", // Always add this field
       };
       await set(ref(realtimeDb, `workers/${workerId}`), newWorker);
     } catch (error) {

@@ -15,6 +15,14 @@ const CATEGORY_CODES = {
   drainage: 'DRN',
 };
 
+const DEPARTMENT_DISPLAY_MAP = {
+  garbage: "Garbage",
+  streetlight: "Streetlight",
+  roaddamage: "Road Damage",
+  water: "Water",
+  drainage: "Drainage & Sewage"
+};
+
 export default function CreateProfile() {
   const [form, setForm] = useState({
     name: '',
@@ -34,6 +42,10 @@ export default function CreateProfile() {
     if (name === 'phone') {
       // Only allow numbers and max 10 digits
       if (!/^[0-9]{0,10}$/.test(value)) return;
+    }
+    if (name === 'pincode') {
+      // Only allow numbers and max 6 digits
+      if (!/^[0-9]{0,6}$/.test(value)) return;
     }
     setForm({ ...form, [name]: value });
   };
@@ -87,7 +99,9 @@ export default function CreateProfile() {
       const workerData = {
         ...form,
         workerId: id,
-        department_pincode: `${form.department}_${form.pincode}`,
+        department_pincode: `${DEPARTMENT_DISPLAY_MAP[form.department] || form.department}_${form.pincode}`,
+        department: DEPARTMENT_DISPLAY_MAP[form.department] || form.department, // <-- Use display name
+        assignedIssueIds: [], 
       };
 
       await set(ref(realtimeDb, `workers/${id}`), workerData);
