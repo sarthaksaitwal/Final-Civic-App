@@ -65,10 +65,10 @@ export default function Landing() {
       style={{ backgroundImage: `url(${landingBg})` }}
     >
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md shadow-md">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md shadow-md">
         <nav className="container mx-auto flex items-center justify-between px-6 py-4">
-          <div className="text-2xl font-extrabold text-black cursor-default select-none">CivicTrack</div>
-          <ul className="flex space-x-8 text-black font-semibold">
+          <div className="text-2xl font-extrabold text-white cursor-default select-none">CivicTrack</div>
+          <ul className="flex space-x-8 text-white font-semibold">
             <li
               className="cursor-pointer hover:text-primary hover:underline transition-colors duration-200"
               onClick={() => scrollToSection('hero')}
@@ -88,6 +88,12 @@ export default function Landing() {
               Our Vision
             </li>
           </ul>
+          <Button
+            className="bg-white text-black hover:bg-gray-100 transition-colors duration-200"
+            onClick={() => navigate('/login')}
+          >
+            Sign In
+          </Button>
         </nav>
       </header>
 
@@ -111,55 +117,60 @@ export default function Landing() {
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="container mx-auto px-4 py-20">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-extrabold text-black mb-4">
-            Powerful Tools for Municipal Management
-          </h2>
-          <p className="text-lg text-black max-w-2xl mx-auto leading-relaxed tracking-wide">
-            Everything you need to efficiently manage civic issues and improve citizen services
-          </p>
-        </div>
+      <section id="features" className="relative container mx-auto px-4 py-20">
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-extrabold text-white mb-4">
+              Powerful Tools for Municipal Management
+            </h2>
+            <p className="text-lg text-white max-w-2xl mx-auto leading-relaxed tracking-wide">
+              Everything you need to efficiently manage civic issues and improve citizen services
+            </p>
+          </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((feature, index) => (
-            <Card
-              key={index}
-              className="shadow-card hover:shadow-lg transition-transform duration-300 transform hover:scale-105 rounded-lg bg-white/30 backdrop-blur-md"
-            >
-              <CardHeader className="text-center">
-                <div className="w-12 h-12 mx-auto bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                  <feature.icon className="h-6 w-6 text-primary" />
-                </div>
-                <CardTitle className="text-xl font-bold text-black">{feature.title}</CardTitle>
-                <p className="text-sm text-black mb-2 leading-relaxed tracking-wide">{feature.subtext}</p>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-center mb-4 text-base leading-relaxed tracking-wide text-black">{feature.description}</CardDescription>
-                <ul className="list-disc list-inside text-left text-sm space-y-1 leading-relaxed text-black">
-                  {feature.highlights.map((highlight, i) => (
-                    <li key={i}>{highlight}</li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          ))}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((feature, index) => (
+              <Card
+                key={index}
+                className="shadow-card hover:shadow-lg transition-transform duration-300 transform hover:scale-105 rounded-lg bg-black/50 backdrop-blur-md"
+              >
+                <CardHeader className="text-center">
+                  <div className="w-12 h-12 mx-auto bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                    <feature.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl font-bold text-white">{feature.title}</CardTitle>
+                  <p className="text-sm text-white mb-2 leading-relaxed tracking-wide">{feature.subtext}</p>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-center mb-4 text-base leading-relaxed tracking-wide text-white">{feature.description}</CardDescription>
+                  <ul className="list-disc list-inside text-left text-sm space-y-1 leading-relaxed text-white">
+                    {feature.highlights.map((highlight, i) => (
+                      <li key={i}>{highlight}</li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Our Vision Section */}
-      <section id="vision" className="bg-muted/30 py-20 border-t border-border">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-extrabold text-black mb-6">Our Vision</h2>
-          <p className="text-lg text-black max-w-4xl mx-auto leading-relaxed tracking-wide">
+      <section id="vision" className="relative bg-black/30 py-20 border-t border-border">
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="relative z-10 container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-extrabold text-white mb-6">Our Vision</h2>
+          <p className="text-lg text-white max-w-4xl mx-auto leading-relaxed tracking-wide">
             We are committed to building smarter, more connected cities by streamlining government operations and empowering citizens. Our platform grows with urban needs, enabling faster response times, data-driven insights, and transparent governance. Looking ahead, we will integrate AI-powered analytics and smart city infrastructure to create sustainable, future-ready municipalities.
           </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-card border-t border-border py-8">
-        <div className="container mx-auto px-4 text-center text-black">
+      <footer className="relative bg-black/30 border-t border-border py-8">
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="relative z-10 container mx-auto px-4 text-center text-white">
           <p>&copy; 2024 CivicTrack. Municipal Issue Management System.</p>
         </div>
       </footer>
