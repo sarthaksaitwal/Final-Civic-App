@@ -39,7 +39,7 @@ export default function WorkerCreated() {
             <div>
               <span className="font-semibold">Pincode:</span> {worker.pincode}
             </div>
-            <Button className="mt-4" onClick={() => navigate("/workers")}>
+            <Button className="mt-4" onClick={() => navigate("/assign-worker")}>
               Go to Workers List
             </Button>
           </CardContent>
