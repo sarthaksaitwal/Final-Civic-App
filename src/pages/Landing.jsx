@@ -60,10 +60,12 @@ export default function Landing() {
   ];
 
   return (
-    <div
-      className="min-h-screen bg-fixed bg-cover bg-center"
-      style={{ backgroundImage: `url(${landingBg})` }}
-    >
+    <div className="relative min-h-screen">
+      <div
+        className="bg-fixed bg-cover bg-center absolute inset-0 z-0"
+        style={{ backgroundImage: `url(${landingBg})` }}
+      />
+      <div className="absolute inset-0 bg-black/60 z-0" />
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md shadow-md">
         <nav className="container mx-auto flex items-center justify-between px-6 py-4">
@@ -88,35 +90,40 @@ export default function Landing() {
               Our Vision
             </li>
           </ul>
+          <button
+            className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/80 transition"
+            onClick={() => navigate('/login')}
+          >
+            Sign In
+          </button>
         </nav>
       </header>
 
       {/* Hero Section */}
-      <section id="hero" className="relative min-h-screen flex items-center justify-center">
-        <div className="absolute inset-0 bg-black opacity-50"></div>
+      <section id="hero" className="relative min-h-screen flex items-center justify-center z-10">
         <div className="relative z-10 text-center text-white px-4">
           <h1 className="text-7xl font-extrabold mb-4">CivicTrack</h1>
           <p className="text-3xl mb-8 leading-relaxed tracking-wide">Track. Manage. Resolve.</p>
           <Button
             size="lg"
-            className="bg-primary text-white px-10 py-4 font-bold hover:bg-primary-dark mb-8"
+            className="bg-primary text-white px-12 py-6 font-bold hover:bg-primary-dark mb-8"
             onClick={() => navigate('/login')}
           >
             Admin Login
           </Button>
-          <p className="text-lg max-w-2xl mx-auto leading-relaxed tracking-wide">
+          <p className="text-xl max-w-2xl mx-auto leading-relaxed tracking-wide">
             CivicTrack empowers Jharkhand's citizens and authorities to report, monitor, and resolve civic issues effortlessly. From potholes to public services, get real-time updates, actionable insights, and improve governance efficiency—all in one platform.
           </p>
         </div>
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="container mx-auto px-4 py-20">
+      <section id="features" className="container mx-auto px-4 py-20 relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-extrabold text-black mb-4">
+          <h2 className="text-3xl font-extrabold text-white mb-4">
             Powerful Tools for Municipal Management
           </h2>
-          <p className="text-lg text-black max-w-2xl mx-auto leading-relaxed tracking-wide">
+          <p className="text-lg text-white max-w-2xl mx-auto leading-relaxed tracking-wide">
             Everything you need to efficiently manage civic issues and improve citizen services
           </p>
         </div>
@@ -148,10 +155,10 @@ export default function Landing() {
       </section>
 
       {/* Our Vision Section */}
-      <section id="vision" className="bg-muted/30 py-20 border-t border-border">
+      <section id="vision" className="bg-muted/30 py-20 border-t border-border relative z-10">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-extrabold text-black mb-6">Our Vision</h2>
-          <p className="text-lg text-black max-w-4xl mx-auto leading-relaxed tracking-wide">
+          <h2 className="text-3xl font-extrabold text-white mb-6">Our Vision</h2>
+          <p className="text-lg text-white max-w-4xl mx-auto leading-relaxed tracking-wide">
             We are committed to building smarter, more connected cities by streamlining government operations and empowering citizens. Our platform grows with urban needs, enabling faster response times, data-driven insights, and transparent governance. Looking ahead, we will integrate AI-powered analytics and smart city infrastructure to create sustainable, future-ready municipalities.
           </p>
         </div>
