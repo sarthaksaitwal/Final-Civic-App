@@ -258,10 +258,12 @@ export default function IssueDetails() {
           <span className="font-medium">Reported:</span>
           <span>
             {issue.dateReported instanceof Date
-              ? issue.dateReported.toLocaleDateString("en-IN", {
+              ? issue.dateReported.toLocaleString("en-IN", {
                   day: "2-digit",
                   month: "2-digit",
                   year: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
                 })
               : "N/A"}
           </span>
@@ -719,7 +721,14 @@ export default function IssueDetails() {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               <Marker position={mapCoordinates}>
-                <Popup>{issue.title || "Issue Location"}</Popup>
+                <Popup>
+                  <div>
+                    <strong>{issue.title || "Issue Location"}</strong>
+                    <div className="text-xs text-gray-700 mt-1">
+                      {issue.location || "No location provided"}
+                    </div>
+                  </div>
+                </Popup>
               </Marker>
             </MapContainer>
           </div>

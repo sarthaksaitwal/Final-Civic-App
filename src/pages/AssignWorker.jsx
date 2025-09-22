@@ -11,6 +11,19 @@ import { useEffect, useState } from 'react';
 import { Loader2, User, Filter, Phone, MapPin, Briefcase } from 'lucide-react';
 
 
+const DEPARTMENT_DISPLAY_MAP = {
+  garbage: "Garbage",
+  streetlight: "Streetlight",
+  roaddamage: "Road Damage",
+  water: "Water",
+  drainage: "Drainage & Sewage"
+};
+
+function getDepartmentDisplay(dept) {
+  if (!dept) return "";
+  return DEPARTMENT_DISPLAY_MAP[dept.toLowerCase()] || dept;
+}
+
 export default function AssignWorker() {
   const normalize = str => (str || '').toLowerCase().replace(/\s+/g, '');
 
@@ -44,7 +57,10 @@ export default function AssignWorker() {
   }, []);
 
   // For department/location dropdowns
-  const departments = Array.from(new Set(workers.map((w) => w.department).filter(Boolean)));
+  const departmentsRaw = workers.map((w) => w.department).filter(Boolean);
+  const departments = Array.from(
+    new Set(departmentsRaw.map((dept) => getDepartmentDisplay(dept)))
+  );
   const locations = Array.from(new Set(workers.map((w) => w.location).filter(Boolean)));
 
   // Filtering logic
@@ -154,7 +170,7 @@ export default function AssignWorker() {
                   <SelectContent>
                     <SelectItem value="all">All</SelectItem>
                     {departments.map((dept) => (
-                      <SelectItem key={dept} value={normalize(dept)}>
+                      <SelectItem key={dept} value={dept}>
                         {dept}
                       </SelectItem>
                     ))}
