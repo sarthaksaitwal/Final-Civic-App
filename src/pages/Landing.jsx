@@ -72,237 +72,516 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <section id="hero" className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-green-900 px-4 pt-24">
-        <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-green-400 bg-clip-text text-transparent drop-shadow-lg animate-fade-in">
-            CivicTrack — Empowering Citizens. Streamlining Cities.
-          </h1>
-          <p className="text-lg md:text-2xl mb-8 text-slate-300 animate-fade-in">Civic issue reporting and management platform.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-semibold shadow-blue-500/30 transition-all duration-200">Get Started</Button>
-            <Button size="lg" variant="outline" className="border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white px-8 py-4 rounded-full font-semibold transition-all duration-200">Learn More</Button>
+      <section
+        id="hero"
+        className="min-h-screen flex flex-col justify-center items-center px-4 pt-32 md:pt-24 relative bg-slate-900"
+      >
+        <div className="max-w-6xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-12 md:gap-20 w-full py-10 md:py-20">
+          {/* Left Side */}
+          <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left space-y-6 md:space-y-8">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-2 leading-tight">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400">CivicTrack</span>
+              <br />
+              <span className="text-white">Empowering Citizens.<br />Streamlining Cities.</span>
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl text-slate-200 mb-4 max-w-lg">
+              Report, track, and resolve civic issues in real-time with a powerful mobile-first solution powered by AI and community engagement.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center md:justify-start">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold shadow-blue-500/30 transition-all duration-200 flex items-center gap-2">
+                <MapPin className="w-5 h-5" /> Get Started
+              </Button>
+              <Button size="lg" variant="outline" className="bg-slate-800 border-none text-white px-8 py-4 rounded-xl font-semibold shadow transition-all duration-200 flex items-center gap-2">
+                <Monitor className="w-5 h-5" /> Admin Login
+              </Button>
+            </div>
           </div>
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8 mt-12">
-            <div className="w-64 h-96 bg-slate-800 rounded-2xl border-2 border-dashed border-slate-600 flex flex-col items-center justify-center shadow-lg hover:shadow-blue-500/30 transition">
-              <Smartphone className="w-16 h-16 text-slate-500" />
-              <span className="mt-2 text-slate-500">Phone Mockup<br /><span className="text-xs text-slate-600">(Add your screenshot here)</span></span>
+          {/* Right Side */}
+          <div className="flex-1 flex flex-row gap-6 justify-center items-center w-full">
+            <div className="w-40 sm:w-56 h-48 sm:h-80 bg-[#e6f4ea] rounded-2xl flex items-center justify-center shadow-lg">
+              <Smartphone className="w-12 sm:w-16 h-12 sm:h-16 text-slate-500" />
             </div>
-            <div className="w-96 h-64 bg-slate-800 rounded-2xl border-2 border-dashed border-slate-600 flex flex-col items-center justify-center shadow-lg hover:shadow-green-500/30 transition">
-              <Monitor className="w-16 h-16 text-slate-500" />
-              <span className="mt-2 text-slate-500">Laptop Mockup<br /><span className="text-xs text-slate-600">(Add your screenshot here)</span></span>
+            <div className="w-36 sm:w-64 h-32 sm:h-48 bg-[#e6eefe] rounded-2xl flex items-center justify-center shadow-lg">
+              <Monitor className="w-12 sm:w-16 h-12 sm:h-16 text-slate-500" />
             </div>
+          </div>
+        </div>
+        {/* Removed the translucent gradient overlay */}
+      </section>
+
+      {/* Spacing */}
+      <div className="h-8 md:h-16" />
+
+      {/* Challenge Section */}
+      <section id="challenge" className="min-h-screen flex items-center bg-slate-800">
+        <div className="container mx-auto px-4 flex flex-col lg:flex-row gap-12 md:gap-20 items-center w-full py-10 md:py-20">
+          {/* Left Side: Title, Description, Stats */}
+          <div className="flex-1">
+            <h2 className="text-5xl font-extrabold mb-6" style={{ color: "#23A6F0" }}>The Challenge</h2>
+            <p className="text-xl text-slate-200 mb-8 max-w-xl">
+              Municipalities worldwide struggle with inefficient civic issue management. Citizens face frustration with slow response times, lack of transparency, and poor accountability.
+            </p>
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <span className="w-14 h-14 rounded-full bg-[#4B263A] flex items-center justify-center">
+                  <AlertTriangle className="w-7 h-7 text-[#F16D6F]" />
+                </span>
+                <span className="text-lg text-white font-semibold">Average resolution time: 30+ days</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="w-14 h-14 rounded-full bg-[#4B3F26] flex items-center justify-center">
+                  <Clock className="w-7 h-7 text-[#FFD600]" />
+                </span>
+                <span className="text-lg text-yellow-100 font-semibold">60% of issues go unreported</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="w-14 h-14 rounded-full bg-[#4B3926] flex items-center justify-center">
+                  <Star className="w-7 h-7 text-[#FFB86F]" />
+                </span>
+                <span className="text-lg text-orange-100 font-semibold">Low citizen satisfaction rates</span>
+              </div>
+            </div>
+          </div>
+          {/* Right Side: Issue Cards */}
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="bg-[#353F4B] rounded-xl border-none p-6 flex flex-col justify-center min-h-[140px]">
+              <CardHeader className="flex flex-row items-center gap-3 p-0">
+                <span className="bg-transparent">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M7 20h10M6 20a1 1 0 0 1-1-1v-2.382a1 1 0 0 1 .553-.894l7-3.618a1 1 0 0 1 .894 0l7 3.618A1 1 0 0 1 22 16.618V19a1 1 0 0 1-1 1H6zm7-8V4a1 1 0 0 0-2 0v8" stroke="#F16D6F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </span>
+                <CardTitle className="text-white text-xl font-bold">Road Damage</CardTitle>
+              </CardHeader>
+              <CardContent className="pl-12 pt-2 text-slate-300 text-base">Potholes and road issues causing traffic delays</CardContent>
+            </Card>
+            <Card className="bg-[#353F4B] rounded-xl border-none p-6 flex flex-col justify-center min-h-[140px]">
+              <CardHeader className="flex flex-row items-center gap-3 p-0">
+                <span className="bg-transparent">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="10" rx="2" fill="#3FE0B0"/><rect x="7" y="11" width="10" height="2" rx="1" fill="#fff"/></svg>
+                </span>
+                <CardTitle className="text-white text-xl font-bold">Waste Management</CardTitle>
+              </CardHeader>
+              <CardContent className="pl-12 pt-2 text-slate-300 text-base">Overflowing bins and waste collection issues</CardContent>
+            </Card>
+            <Card className="bg-[#353F4B] rounded-xl border-none p-6 flex flex-col justify-center min-h-[140px]">
+              <CardHeader className="flex flex-row items-center gap-3 p-0">
+                <span className="bg-transparent">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M12 2v6M12 14v8M7 7l5 5 5-5" stroke="#FFD600" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="12" r="10" stroke="#FFD600" strokeWidth="2"/></svg>
+                </span>
+                <CardTitle className="text-white text-xl font-bold">Street Lighting</CardTitle>
+              </CardHeader>
+              <CardContent className="pl-12 pt-2 text-slate-300 text-base">Broken streetlights affecting safety</CardContent>
+            </Card>
+            <Card className="bg-[#353F4B] rounded-xl border-none p-6 flex flex-col justify-center min-h-[140px]">
+              <CardHeader className="flex flex-row items-center gap-3 p-0">
+                <span className="bg-transparent">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M4 12c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="#3FE0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M4 12c0 4.418 3.582 8 8 8s8-3.582 8-8" stroke="#3FE0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M8 12h8" stroke="#3FE0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </span>
+                <CardTitle className="text-white text-xl font-bold">Water Issues</CardTitle>
+              </CardHeader>
+              <CardContent className="pl-12 pt-2 text-slate-300 text-base">Pipe leaks and water quality problems</CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
-      {/* The Challenge Section */}
-      <section id="challenge" className="py-16 bg-slate-800">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">The Challenge</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="bg-slate-700 border-slate-600 hover:bg-slate-600 transition rounded-xl shadow-md hover:shadow-red-500/30">
-              <CardHeader>
-                <AlertTriangle className="w-12 h-12 text-red-400 mb-4" />
-                <CardTitle className="text-lg md:text-xl">Lack of streamlined reporting</CardTitle>
-              </CardHeader>
-            </Card>
-            <Card className="bg-slate-700 border-slate-600 hover:bg-slate-600 transition rounded-xl shadow-md hover:shadow-yellow-500/30">
-              <CardHeader>
-                <Clock className="w-12 h-12 text-yellow-400 mb-4" />
-                <CardTitle className="text-lg md:text-xl">Slow municipal response times</CardTitle>
-              </CardHeader>
-            </Card>
-            <Card className="bg-slate-700 border-slate-600 hover:bg-slate-600 transition rounded-xl shadow-md hover:shadow-blue-500/30">
-              <CardHeader>
-                <Eye className="w-12 h-12 text-blue-400 mb-4" />
-                <CardTitle className="text-lg md:text-xl">Limited transparency</CardTitle>
-              </CardHeader>
-            </Card>
-            <Card className="bg-slate-700 border-slate-600 hover:bg-slate-600 transition rounded-xl shadow-md hover:shadow-green-500/30">
-              <CardHeader>
-                <Target className="w-12 h-12 text-green-400 mb-4" />
-                <CardTitle className="text-lg md:text-xl">Difficulty tracking issues</CardTitle>
-              </CardHeader>
-            </Card>
-          </div>
-        </div>
-      </section>
+      {/* Spacing */}
+      <div className="h-8 md:h-16" />
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-16 bg-slate-900">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">How It Works</h2>
-          <div className="max-w-4xl mx-auto">
-            {/* Step 1 */}
-            <div className="flex flex-col md:flex-row items-center mb-8 group">
-              <div className="flex-1 text-center md:text-left">
-                <h3 className="text-xl md:text-2xl font-semibold mb-2 group-hover:text-blue-400 transition">1. Citizen Reports Issue</h3>
-                <p className="text-slate-300">Citizens easily report issues via mobile app or web platform.</p>
-              </div>
-              <div className="w-64 h-48 bg-slate-800 rounded-xl border-2 border-dashed border-slate-600 flex flex-col items-center justify-center mx-4 shadow hover:shadow-blue-500/30 transition">
-                <Smartphone className="w-16 h-16 text-slate-500" />
-                <span className="mt-2 text-xs text-slate-600">Image Placeholder</span>
+      <section id="how-it-works" className="min-h-screen flex items-center bg-slate-900">
+        <div className="container mx-auto px-4 w-full py-10 md:py-20">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-12 text-white">How It Works</h2>
+          <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-1 gap-y-14 gap-x-8 items-center">
+            {/* 1. Citizen Reports Issue */}
+            <div>
+              <h3 className="text-2xl font-extrabold text-white mb-3">1. Citizen Reports Issue</h3>
+              <p className="text-lg text-slate-300 mb-2">Citizens easily report issues via mobile app or web platform.</p>
+            </div>
+            <div>
+              <div className="w-56 h-40 bg-slate-800 rounded-xl border-2 border-dashed border-slate-500 flex flex-col items-center justify-center mx-auto mb-2">
+                <Smartphone className="w-12 h-12 text-slate-500 mb-2" />
+                <span className="text-base text-slate-500">Image Placeholder</span>
               </div>
             </div>
-            <ArrowRight className="w-8 h-8 text-blue-400 mx-auto my-4 animate-fade-in" />
-            {/* Step 2 */}
-            <div className="flex flex-col md:flex-row items-center mb-8 group">
-              <div className="w-64 h-48 bg-slate-800 rounded-xl border-2 border-dashed border-slate-600 flex flex-col items-center justify-center mx-4 order-2 md:order-1 shadow hover:shadow-purple-500/30 transition">
-                <BarChart3 className="w-16 h-16 text-slate-500" />
-                <span className="mt-2 text-xs text-slate-600">Image Placeholder</span>
-              </div>
-              <div className="flex-1 text-center md:text-right order-1 md:order-2">
-                <h3 className="text-xl md:text-2xl font-semibold mb-2 group-hover:text-purple-400 transition">2. Automated Routing</h3>
-                <p className="text-slate-300">AI categorizes and routes issues to appropriate departments.</p>
+            {/* Arrow */}
+            <div className="col-span-2 flex justify-center items-center">
+              <ArrowRight className="w-8 h-8 text-blue-400" />
+            </div>
+            {/* 2. Automated Routing */}
+            <div>
+              <div className="w-56 h-40 bg-slate-800 rounded-xl border-2 border-dashed border-slate-500 flex flex-col items-center justify-center mx-auto mb-2">
+                <BarChart3 className="w-12 h-12 text-slate-500 mb-2" />
+                <span className="text-base text-slate-500">Image Placeholder</span>
               </div>
             </div>
-            <ArrowRight className="w-8 h-8 text-purple-400 mx-auto my-4 animate-fade-in" />
-            {/* Step 3 */}
-            <div className="flex flex-col md:flex-row items-center mb-8 group">
-              <div className="flex-1 text-center md:text-left">
-                <h3 className="text-xl md:text-2xl font-semibold mb-2 group-hover:text-green-400 transition">3. Department Coordination</h3>
-                <p className="text-slate-300">Departments collaborate and assign field workers.</p>
-              </div>
-              <div className="w-64 h-48 bg-slate-800 rounded-xl border-2 border-dashed border-slate-600 flex flex-col items-center justify-center mx-4 shadow hover:shadow-green-500/30 transition">
-                <Monitor className="w-16 h-16 text-slate-500" />
-                <span className="mt-2 text-xs text-slate-600">Image Placeholder</span>
+            <div>
+              <h3 className="text-2xl font-extrabold text-white mb-3 text-right">2. Automated Routing</h3>
+              <p className="text-lg text-slate-300 mb-2 text-right">AI categorizes and routes issues to appropriate departments.</p>
+            </div>
+            {/* Arrow */}
+            <div className="col-span-2 flex justify-center items-center">
+              <ArrowRight className="w-8 h-8 text-purple-400" />
+            </div>
+            {/* 3. Department Coordination */}
+            <div>
+              <h3 className="text-2xl font-extrabold text-white mb-3">3. Department Coordination</h3>
+              <p className="text-lg text-slate-300 mb-2">Departments collaborate and assign field workers.</p>
+            </div>
+            <div>
+              <div className="w-56 h-40 bg-slate-800 rounded-xl border-2 border-dashed border-slate-500 flex flex-col items-center justify-center mx-auto mb-2">
+                <Monitor className="w-12 h-12 text-slate-500 mb-2" />
+                <span className="text-base text-slate-500">Image Placeholder</span>
               </div>
             </div>
-            <ArrowRight className="w-8 h-8 text-green-400 mx-auto my-4 animate-fade-in" />
-            {/* Step 4 */}
-            <div className="flex flex-col md:flex-row items-center mb-8 group">
-              <div className="w-64 h-48 bg-slate-800 rounded-xl border-2 border-dashed border-slate-600 flex flex-col items-center justify-center mx-4 order-2 md:order-1 shadow hover:shadow-blue-500/30 transition">
-                <CheckCircle className="w-16 h-16 text-slate-500" />
-                <span className="mt-2 text-xs text-slate-600">Image Placeholder</span>
-              </div>
-              <div className="flex-1 text-center md:text-right order-1 md:order-2">
-                <h3 className="text-xl md:text-2xl font-semibold mb-2 group-hover:text-blue-400 transition">4. Issue Resolution</h3>
-                <p className="text-slate-300">Field workers resolve issues on-site with real-time updates.</p>
+            {/* Arrow */}
+            <div className="col-span-2 flex justify-center items-center">
+              <ArrowRight className="w-8 h-8 text-green-400" />
+            </div>
+            {/* 4. Issue Resolution */}
+            <div>
+              <div className="w-56 h-40 bg-slate-800 rounded-xl border-2 border-dashed border-slate-500 flex flex-col items-center justify-center mx-auto mb-2">
+                <CheckCircle className="w-12 h-12 text-slate-500 mb-2" />
+                <span className="text-base text-slate-500">Image Placeholder</span>
               </div>
             </div>
-            <ArrowRight className="w-8 h-8 text-blue-400 mx-auto my-4 animate-fade-in" />
-            {/* Step 5 */}
-            <div className="flex flex-col md:flex-row items-center group">
-              <div className="flex-1 text-center md:text-left">
-                <h3 className="text-xl md:text-2xl font-semibold mb-2 group-hover:text-yellow-400 transition">5. Citizen Feedback</h3>
-                <p className="text-slate-300">Citizens receive notifications and can provide feedback.</p>
-              </div>
-              <div className="w-64 h-48 bg-slate-800 rounded-xl border-2 border-dashed border-slate-600 flex flex-col items-center justify-center mx-4 shadow hover:shadow-yellow-500/30 transition">
-                <Star className="w-16 h-16 text-slate-500" />
-                <span className="mt-2 text-xs text-slate-600">Image Placeholder</span>
+            <div>
+              <h3 className="text-2xl font-extrabold text-white mb-3 text-right">4. Issue Resolution</h3>
+              <p className="text-lg text-slate-300 mb-2 text-right">Field workers resolve issues on-site with real-time updates.</p>
+            </div>
+            {/* Arrow */}
+            <div className="col-span-2 flex justify-center items-center">
+              <ArrowRight className="w-8 h-8 text-blue-400" />
+            </div>
+            {/* 5. Citizen Feedback */}
+            <div>
+              <h3 className="text-2xl font-extrabold text-white mb-3">5. Citizen Feedback</h3>
+              <p className="text-lg text-slate-300 mb-2">Citizens receive notifications and can provide feedback.</p>
+            </div>
+            <div>
+              <div className="w-56 h-40 bg-slate-800 rounded-xl border-2 border-dashed border-slate-500 flex flex-col items-center justify-center mx-auto mb-2">
+                <Star className="w-12 h-12 text-slate-500 mb-2" />
+                <span className="text-base text-slate-500">Image Placeholder</span>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Spacing */}
+      <div className="h-8 md:h-16" />
 
       {/* Features Section */}
-      <section id="features" className="py-16 bg-slate-800">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">Powerful Features</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { icon: <MapPin className="w-12 h-12 text-blue-400 mx-auto mb-4" />, title: "Real-time tracking", desc: "Track issues as they happen with live updates and notifications." },
-              { icon: <BarChart3 className="w-12 h-12 text-purple-400 mx-auto mb-4" />, title: "AI-powered categorization", desc: "Automatically categorize and prioritize issues using AI algorithms." },
-              { icon: <TrendingUp className="w-12 h-12 text-green-400 mx-auto mb-4" />, title: "Data-driven analytics", desc: "Gain insights from comprehensive data analytics and reporting." },
-              { icon: <Users className="w-12 h-12 text-blue-400 mx-auto mb-4" />, title: "Multi-channel support", desc: "Support for reporting via mobile, web, and social media channels." },
-              { icon: <Shield className="w-12 h-12 text-purple-400 mx-auto mb-4" />, title: "Role-based access", desc: "Secure access control based on user roles and permissions." },
-              { icon: <AlertTriangle className="w-12 h-12 text-green-400 mx-auto mb-4" />, title: "Escalation system", desc: "Automated escalation of unresolved issues to higher authorities." },
-            ].map((f, i) => (
-              <Card key={i} className="bg-slate-700 border-slate-600 hover:bg-slate-600 transition-all duration-200 hover:scale-105 rounded-xl shadow-md hover:shadow-blue-500/30">
-                <CardHeader className="text-center">{f.icon}<CardTitle>{f.title}</CardTitle></CardHeader>
-                <CardContent><p className="text-slate-300">{f.desc}</p></CardContent>
-              </Card>
-            ))}
+      <section id="features" className="min-h-screen flex items-center bg-slate-800">
+        <div className="container mx-auto px-4 w-full py-10 md:py-20">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-2 text-blue-400">Powerful Features</h2>
+          <p className="text-center text-slate-300 mb-10 text-base sm:text-lg">
+            Everything you need to transform civic issue management in your city
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Real-Time Reporting */}
+            <Card className="bg-[#232B36] rounded-2xl border border-[#4A5568] p-6 flex flex-col min-h-[270px] shadow-md">
+              <CardHeader className="flex flex-row items-center gap-3 p-0 mb-2">
+                <span className="bg-[#2ED8A7] rounded-lg p-2 flex items-center justify-center">
+                  {/* Camera Icon */}
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="14" rx="3" fill="#2ED8A7"/><circle cx="12" cy="14" r="4" fill="#fff"/></svg>
+                </span>
+                <CardTitle className="text-white text-xl font-bold">Real-Time Reporting</CardTitle>
+              </CardHeader>
+              <CardContent className="text-slate-300 text-base mb-4">
+                Capture high-quality images, record voice notes, and automatically tag precise GPS locations with one-tap reporting.
+              </CardContent>
+              <ul className="text-green-300 text-sm space-y-1 pl-2">
+                <li>✔ HD Photo Capture</li>
+                <li>✔ Voice Note Recording</li>
+                <li>✔ Automatic GPS Tagging</li>
+              </ul>
+            </Card>
+            {/* AI-Powered Routing */}
+            <Card className="bg-[#232B36] rounded-2xl border border-[#4A5568] p-6 flex flex-col min-h-[270px] shadow-md">
+              <CardHeader className="flex flex-row items-center gap-3 p-0 mb-2">
+                <span className="bg-[#B96AFF] rounded-lg p-2 flex items-center justify-center">
+                  {/* AI Icon */}
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><ellipse cx="16" cy="8" rx="4" ry="4" fill="#B96AFF"/><ellipse cx="8" cy="16" rx="4" ry="4" fill="#fff"/></svg>
+                </span>
+                <CardTitle className="text-white text-xl font-bold">AI-Powered Routing</CardTitle>
+              </CardHeader>
+              <CardContent className="text-slate-300 text-base mb-4">
+                Machine learning algorithms automatically categorize issues and route them to the right department with 98.5% accuracy.
+              </CardContent>
+              <div className="flex flex-col gap-1 text-xs mt-2">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Processing Speed</span>
+                  <span className="text-purple-300">&lt; 3s</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Accuracy Rate</span>
+                  <span className="text-purple-300">98.5%</span>
+                </div>
+              </div>
+            </Card>
+            {/* Live Issue Tracking */}
+            <Card className="bg-[#232B36] rounded-2xl border border-[#4A5568] p-6 flex flex-col min-h-[270px] shadow-md">
+              <CardHeader className="flex flex-row items-center gap-3 p-0 mb-2">
+                <span className="bg-[#23E06B] rounded-lg p-2 flex items-center justify-center">
+                  {/* Tracking Icon */}
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M2 12h20" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="12" r="8" fill="#23E06B"/></svg>
+                </span>
+                <CardTitle className="text-white text-xl font-bold">Live Issue Tracking</CardTitle>
+              </CardHeader>
+              <CardContent className="text-slate-300 text-base mb-4">
+                Citizens and supervisors can track issue progress in real-time with detailed timeline and status updates.
+              </CardContent>
+              <div className="space-y-1 text-sm mt-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-yellow-400 inline-block" />
+                  <span className="text-slate-200">Reported</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-blue-400 inline-block" />
+                  <span className="text-slate-200">Assigned</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-green-400 inline-block" />
+                  <span className="text-slate-200">In Progress</span>
+                </div>
+              </div>
+            </Card>
+            {/* Advanced Analytics */}
+            <Card className="bg-[#232B36] rounded-2xl border border-[#4A5568] p-6 flex flex-col min-h-[270px] shadow-md">
+              <CardHeader className="flex flex-row items-center gap-3 p-0 mb-2">
+                <span className="bg-[#FFB86F] rounded-lg p-2 flex items-center justify-center">
+                  {/* Analytics Icon */}
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="4" y="12" width="4" height="8" fill="#FFB86F"/><rect x="10" y="8" width="4" height="12" fill="#fff"/><rect x="16" y="4" width="4" height="16" fill="#FFB86F"/></svg>
+                </span>
+                <CardTitle className="text-white text-xl font-bold">Advanced Analytics</CardTitle>
+              </CardHeader>
+              <CardContent className="text-slate-300 text-base mb-4">
+                Comprehensive dashboard with insights on issue trends, response times, department performance, and citizen satisfaction.
+              </CardContent>
+              <div className="flex gap-4 text-xs mt-2">
+                <div>
+                  <span className="bg-slate-700 text-yellow-300 px-2 py-1 rounded-full">4.2h</span>
+                  <span className="text-slate-400 ml-1">Avg Response</span>
+                </div>
+                <div>
+                  <span className="bg-slate-700 text-orange-300 px-2 py-1 rounded-full">89%</span>
+                  <span className="text-slate-400 ml-1">Resolution Rate</span>
+                </div>
+              </div>
+            </Card>
+            {/* Role-Based Access */}
+            <Card className="bg-[#232B36] rounded-2xl border border-[#4A5568] p-6 flex flex-col min-h-[270px] shadow-md">
+              <CardHeader className="flex flex-row items-center gap-3 p-0 mb-2">
+                <span className="bg-[#B96AFF] rounded-lg p-2 flex items-center justify-center">
+                  {/* Role Icon */}
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="8" cy="12" r="4" fill="#fff"/><circle cx="16" cy="12" r="4" fill="#B96AFF"/></svg>
+                </span>
+                <CardTitle className="text-white text-xl font-bold">Role-Based Access</CardTitle>
+              </CardHeader>
+              <CardContent className="text-slate-300 text-base mb-4">
+                Separate optimized interfaces for citizens, field workers, and supervisors with appropriate permissions and features.
+              </CardContent>
+              <ul className="text-blue-300 text-sm space-y-1 pl-2 mt-2">
+                <li>• Citizen Mobile App</li>
+                <li>• Field Worker App</li>
+                <li>• Supervisor Dashboard</li>
+              </ul>
+            </Card>
+            {/* Grievance System */}
+            <Card className="bg-[#232B36] rounded-2xl border border-[#4A5568] p-6 flex flex-col min-h-[270px] shadow-md">
+              <CardHeader className="flex flex-row items-center gap-3 p-0 mb-2">
+                <span className="bg-[#FF6F91] rounded-lg p-2 flex items-center justify-center">
+                  {/* Grievance Icon */}
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="6" y="6" width="12" height="12" rx="6" fill="#FF6F91"/><rect x="10" y="10" width="4" height="4" rx="2" fill="#fff"/></svg>
+                </span>
+                <CardTitle className="text-white text-xl font-bold">Grievance System</CardTitle>
+              </CardHeader>
+              <CardContent className="text-slate-300 text-base mb-4">
+                Citizens can raise complaints about resolution quality or delays, ensuring accountability and continuous improvement.
+              </CardContent>
+              <div className="flex gap-4 text-xs mt-2">
+                <span className="bg-red-700 text-red-200 px-2 py-1 rounded-full">Escalation Available</span>
+                <span className="bg-slate-700 text-slate-300 px-2 py-1 rounded-full">24/7 Support</span>
+              </div>
+            </Card>
           </div>
         </div>
       </section>
+
+      {/* Spacing */}
+      <div className="h-8 md:h-16" />
 
       {/* App Showcase Section */}
-      <section className="py-16 bg-slate-900">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">App Showcase</h2>
+      <section id="app-showcase" className="min-h-screen flex items-center bg-slate-900">
+        <div className="container mx-auto px-4 w-full py-10 md:py-20">
+          <h2 className="text-4xl font-extrabold text-center mb-2" style={{ color: "#23A6F0" }}>App Showcase</h2>
+          <p className="text-center text-slate-300 mb-10 text-base">
+            Experience the intuitive design across all platforms – mobile apps for citizens and workers, web dashboard for supervisors
+          </p>
+          {/* Citizen Mobile App */}
+          <h3 className="text-lg font-bold text-center mb-4 text-white">Citizen Mobile App</h3>
+          <div className="flex flex-wrap justify-center gap-6 mb-12">
+            <img src="/app1.jpg" alt="App Screenshot 1" className="w-32 h-56 object-cover rounded-xl shadow-lg bg-white" />
+            <img src="/app2.jpg" alt="App Screenshot 2" className="w-32 h-56 object-cover rounded-xl shadow-lg bg-white" />
+            <img src="/app3.jpg" alt="App Screenshot 3" className="w-32 h-56 object-cover rounded-xl shadow-lg bg-white" />
+            <img src="/app4.jpg" alt="App Screenshot 4" className="w-32 h-56 object-cover rounded-xl shadow-lg bg-white" />
+          </div>
+          {/* Supervisor Web Dashboard */}
+          <h3 className="text-lg font-bold text-center mb-4 text-white">Supervisor Web Dashboard</h3>
+          <div className="flex justify-center mb-12 relative">
+            <div className="w-full max-w-md rounded-2xl shadow-2xl border-4 border-slate-700 bg-white overflow-hidden flex items-center justify-center">
+              <img
+                src="/Dashboard.jpg"
+                alt="Dashboard Screenshot"
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </div>
+          {/* Field Worker Mobile App */}
+          <h3 className="text-lg font-bold text-center mb-4 text-white">Field Worker Mobile App</h3>
+          <div className="flex flex-wrap justify-center gap-6">
+            <img src="/Public/app1.jpg" alt="Field App Screenshot 1" className="w-32 h-56 object-cover rounded-xl shadow-lg bg-white" />
+            <img src="/app2.jpg" alt="Field App Screenshot 2" className="w-32 h-56 object-cover rounded-xl shadow-lg bg-white" />
+            <img src="/app3.jpg" alt="Field App Screenshot 3" className="w-32 h-56 object-cover rounded-xl shadow-lg bg-white" />
+          </div>
+        </div>
+      </section>
+
+      {/* Spacing */}
+      <div className="h-8 md:h-16" />
+
+      {/* Analytics Section */}
+      <section id="analytics" className="min-h-screen flex items-center bg-slate-800">
+        <div className="container mx-auto px-4 w-full py-10 md:py-20">
+          <h2 className="text-5xl font-extrabold text-center mb-2" style={{ color: "#23A6F0" }}>Real-Time Analytics</h2>
+          <p className="text-center text-slate-300 mb-10 text-lg">
+            Make data-driven decisions with comprehensive insights and performance metrics
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {/* City Performance Overview */}
+            <div className="bg-[#232B36] rounded-2xl border border-[#4A5568] p-8 shadow-md flex-1">
+              <h3 className="text-white text-xl font-bold mb-6">City Performance Overview</h3>
+              <div className="space-y-4">
+                <div className="bg-[#2A3550] rounded-lg px-6 py-4 flex items-center justify-between">
+                  <div>
+                    <div className="text-blue-400 text-2xl font-bold">1,247</div>
+                    <div className="text-slate-300 text-sm">Issues Reported This Month</div>
+                  </div>
+                  <div className="text-green-400 text-sm font-semibold">↑ 12%</div>
+                </div>
+                <div className="bg-[#23403A] rounded-lg px-6 py-4 flex items-center justify-between">
+                  <div>
+                    <div className="text-green-400 text-2xl font-bold">1,089</div>
+                    <div className="text-slate-300 text-sm">Issues Resolved</div>
+                  </div>
+                  <div className="text-green-400 text-sm font-semibold">↑ 18%</div>
+                </div>
+                <div className="bg-[#4B3926] rounded-lg px-6 py-4 flex items-center justify-between">
+                  <div>
+                    <div className="text-yellow-300 text-2xl font-bold">4.2 hrs</div>
+                    <div className="text-slate-300 text-sm">Average Response Time</div>
+                  </div>
+                  <div className="text-red-400 text-sm font-semibold">↓ 23%</div>
+                </div>
+              </div>
+            </div>
+            {/* Issue Categories */}
+            <div className="bg-[#232B36] rounded-2xl border border-[#4A5568] p-8 shadow-md flex-1">
+              <h3 className="text-white text-xl font-bold mb-6">Issue Categories</h3>
+              <div className="space-y-5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-blue-400" />
+                    <span className="text-white font-semibold">Road Infrastructure</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 h-2 rounded-full bg-blue-400/30">
+                      <div className="h-2 rounded-full bg-blue-400" style={{ width: '35%' }}></div>
+                    </div>
+                    <span className="text-blue-400 font-bold text-sm">35%</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Monitor className="w-5 h-5 text-green-400" />
+                    <span className="text-white font-semibold">Waste Management</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 h-2 rounded-full bg-green-400/30">
+                      <div className="h-2 rounded-full bg-green-400" style={{ width: '28%' }}></div>
+                    </div>
+                    <span className="text-green-400 font-bold text-sm">28%</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-5 h-5 text-yellow-400" />
+                    <span className="text-white font-semibold">Street Lighting</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 h-2 rounded-full bg-yellow-400/30">
+                      <div className="h-2 rounded-full bg-yellow-400" style={{ width: '22%' }}></div>
+                    </div>
+                    <span className="text-yellow-400 font-bold text-sm">22%</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Wrench className="w-5 h-5 text-cyan-300" />
+                    <span className="text-white font-semibold">Water & Drainage</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 h-2 rounded-full bg-cyan-300/30">
+                      <div className="h-2 rounded-full bg-cyan-300" style={{ width: '15%' }}></div>
+                    </div>
+                    <span className="text-cyan-300 font-bold text-sm">15%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Department Performance */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-64 h-96 bg-slate-800 rounded-2xl border-2 border-dashed border-slate-600 flex flex-col items-center justify-center mx-auto mb-4 shadow hover:shadow-blue-500/30 transition">
-                <Smartphone className="w-16 h-16 text-slate-500" />
-                <span className="mt-2 text-xs text-slate-600">Mobile App Placeholder</span>
-              </div>
-              <h3 className="text-xl md:text-2xl font-semibold mb-2">Mobile App</h3>
-              <p className="text-slate-300">Report issues on-the-go with our intuitive mobile interface.</p>
+            <div className="bg-[#232B36] rounded-2xl border border-[#4A5568] p-8 shadow-md flex flex-col items-center">
+              <span className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 via-green-400 to-purple-400 flex items-center justify-center mb-4">
+                {/* Public Works Icon */}
+                <Wrench className="w-8 h-8 text-white" />
+              </span>
+              <h4 className="text-white text-lg font-bold mb-2">Public Works</h4>
+              <div className="text-green-400 text-3xl font-bold mb-1">92%</div>
+              <div className="text-slate-400 text-sm mb-1">Resolution Rate</div>
+              <div className="text-blue-400 text-xs">3.8 hrs avg response</div>
             </div>
-            <div className="text-center">
-              <div className="w-80 h-64 bg-slate-800 rounded-2xl border-2 border-dashed border-slate-600 flex flex-col items-center justify-center mx-auto mb-4 shadow hover:shadow-purple-500/30 transition">
-                <Monitor className="w-16 h-16 text-slate-500" />
-                <span className="mt-2 text-xs text-slate-600">Web Dashboard Placeholder</span>
-              </div>
-              <h3 className="text-xl md:text-2xl font-semibold mb-2">Web Dashboard</h3>
-              <p className="text-slate-300">Comprehensive management tools for city administrators.</p>
+            <div className="bg-[#232B36] rounded-2xl border border-[#4A5568] p-8 shadow-md flex flex-col items-center">
+              <span className="w-14 h-14 rounded-full bg-gradient-to-br from-green-400 via-blue-400 to-purple-400 flex items-center justify-center mb-4">
+                {/* Sanitation Icon */}
+                <Monitor className="w-8 h-8 text-white" />
+              </span>
+              <h4 className="text-white text-lg font-bold mb-2">Sanitation</h4>
+              <div className="text-green-400 text-3xl font-bold mb-1">88%</div>
+              <div className="text-slate-400 text-sm mb-1">Resolution Rate</div>
+              <div className="text-blue-400 text-xs">5.2 hrs avg response</div>
             </div>
-            <div className="text-center">
-              <div className="w-64 h-96 bg-slate-800 rounded-2xl border-2 border-dashed border-slate-600 flex flex-col items-center justify-center mx-auto mb-4 shadow hover:shadow-green-500/30 transition">
-                <Wrench className="w-16 h-16 text-slate-500" />
-                <span className="mt-2 text-xs text-slate-600">Field Worker App Placeholder</span>
-              </div>
-              <h3 className="text-xl md:text-2xl font-semibold mb-2">Field Worker App</h3>
-              <p className="text-slate-300">Equipped tools for efficient on-site issue resolution.</p>
+            <div className="bg-[#232B36] rounded-2xl border border-[#4A5568] p-8 shadow-md flex flex-col items-center">
+              <span className="w-14 h-14 rounded-full bg-gradient-to-br from-yellow-400 via-orange-400 to-pink-400 flex items-center justify-center mb-4">
+                {/* Utilities Icon */}
+                <Star className="w-8 h-8 text-white" />
+              </span>
+              <h4 className="text-white text-lg font-bold mb-2">Utilities</h4>
+              <div className="text-green-400 text-3xl font-bold mb-1">95%</div>
+              <div className="text-slate-400 text-sm mb-1">Resolution Rate</div>
+              <div className="text-blue-400 text-xs">2.1 hrs avg response</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Real-time Analytics Section */}
-      <section ref={analyticsRef} className="py-16 bg-slate-800">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">Real-time Analytics</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="bg-slate-700 border-slate-600 rounded-xl text-center shadow-lg hover:shadow-blue-500/30 transition">
-              <CardContent className="pt-6">
-                <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                  <TrendingUp className="w-10 h-10 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2">{issuesResolved.toLocaleString()}</h3>
-                <p className="text-slate-300">Issues Resolved</p>
-                <div className="mt-4 w-full h-8 bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 text-xs animate-fade-in">[Graph Placeholder]</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-slate-700 border-slate-600 rounded-xl text-center shadow-lg hover:shadow-purple-500/30 transition">
-              <CardContent className="pt-6">
-                <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                  <Clock className="w-10 h-10 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2">{avgResponse}</h3>
-                <p className="text-slate-300">Avg Response Time</p>
-                <div className="mt-4 w-full h-8 bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 text-xs animate-fade-in">[Graph Placeholder]</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-slate-700 border-slate-600 rounded-xl text-center shadow-lg hover:shadow-green-500/30 transition">
-              <CardContent className="pt-6">
-                <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                  <Users className="w-10 h-10 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2">{activeCitizens.toLocaleString()}</h3>
-                <p className="text-slate-300">Active Citizens</p>
-                <div className="mt-4 w-full h-8 bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 text-xs animate-fade-in">[Graph Placeholder]</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-slate-700 border-slate-600 rounded-xl text-center shadow-lg hover:shadow-red-500/30 transition">
-              <CardContent className="pt-6">
-                <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                  <AlertTriangle className="w-10 h-10 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2">{satisfaction}%</h3>
-                <p className="text-slate-300">Satisfaction Rate</p>
-                <div className="mt-4 w-full h-8 bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 text-xs animate-fade-in">[Graph Placeholder]</div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+      {/* Spacing */}
+      <div className="h-8 md:h-16" />
 
       {/* Testimonials Section */}
-      <section className="py-16 bg-slate-900">
-        <div className="container mx-auto px-4">
+      <section className="min-h-screen flex items-center bg-slate-900">
+        <div className="container mx-auto px-4 w-full py-10 md:py-20">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">What Our Users Say</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
@@ -328,34 +607,73 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Spacing */}
+      <div className="h-8 md:h-16" />
+
       {/* Vision Section */}
-      <section id="vision" className="py-16 bg-slate-800">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-10">Our Vision</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <Users className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-              <h3 className="text-xl md:text-2xl font-semibold mb-2">Empower Citizens</h3>
-              <p className="text-slate-300">Give every resident a voice in shaping their city's future.</p>
+      <section id="vision" className="min-h-screen flex items-center bg-slate-800">
+        <div className="container mx-auto px-4 text-center w-full py-10 md:py-20">
+          <h2 className="text-5xl font-extrabold mb-6" style={{ color: "#23A6F0" }}>Our Vision</h2>
+          <p className="text-2xl text-white mb-10 max-w-3xl mx-auto">
+            Our mission is to create connected, responsive cities where every citizen's voice matters and every issue gets resolved quickly. Powered by AI, real-time analytics, and scalable infrastructure, CivicTrack drives transparency, accountability, and progress.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center">
+            {/* Citizen-Centric */}
+            <div className="bg-[#353F4B] rounded-xl border border-slate-400 p-8 flex flex-col items-center justify-center shadow-md">
+              <span className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 via-green-400 to-purple-400 flex items-center justify-center mb-4">
+                {/* Users Icon */}
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="12" fill="url(#grad1)" />
+                  <g>
+                    <circle cx="12" cy="10" r="3" fill="#fff"/>
+                    <path d="M6 18c0-2 4-3 6-3s6 1 6 3v1H6v-1z" fill="#fff"/>
+                  </g>
+                  <defs>
+                    <radialGradient id="grad1" cx="0.5" cy="0.5" r="0.5">
+                      <stop offset="0%" stopColor="#23A6F0"/>
+                      <stop offset="100%" stopColor="#2ED8A7"/>
+                    </radialGradient>
+                  </defs>
+                </svg>
+              </span>
+              <h3 className="text-xl font-bold text-white mb-2">Citizen-Centric</h3>
+              <p className="text-slate-300 text-base">Every feature designed with citizen experience in mind</p>
             </div>
-            <div>
-              <BarChart3 className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-              <h3 className="text-xl md:text-2xl font-semibold mb-2">Smarter Governance</h3>
-              <p className="text-slate-300">Leverage data and technology for efficient municipal operations.</p>
+            {/* Data-Driven */}
+            <div className="bg-[#353F4B] rounded-xl border border-slate-400 p-8 flex flex-col items-center justify-center shadow-md">
+              <span className="w-16 h-16 rounded-full bg-gradient-to-br from-green-400 via-blue-400 to-purple-400 flex items-center justify-center mb-4">
+                {/* Chart/Check Icon */}
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="12" fill="url(#grad2)" />
+                  <path d="M8 13l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+              <h3 className="text-xl font-bold text-white mb-2">Data-Driven</h3>
+              <p className="text-slate-300 text-base">Actionable insights for smarter city management</p>
             </div>
-            <div>
-              <Target className="w-16 h-16 text-green-400 mx-auto mb-4" />
-              <h3 className="text-xl md:text-2xl font-semibold mb-2">Stronger Communities</h3>
-              <p className="text-slate-300">Build connected, responsive, and sustainable urban environments.</p>
+            {/* Future-Ready */}
+            <div className="bg-[#353F4B] rounded-xl border border-slate-400 p-8 flex flex-col items-center justify-center shadow-md">
+              <span className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-400 via-pink-400 to-blue-400 flex items-center justify-center mb-4">
+                {/* Rocket Icon */}
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="12" fill="url(#grad3)" />
+                  <path d="M12 17v-4m0 0l2-2m-2 2l-2-2m2 2V7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+              <h3 className="text-xl font-bold text-white mb-2">Future-Ready</h3>
+              <p className="text-slate-300 text-base">Built for the cities of tomorrow, today</p>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Spacing */}
+      <div className="h-8 md:h-16" />
+
       {/* Footer */}
       <footer className="bg-slate-900 border-t border-slate-800 py-12">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
             <div>
               <h3 className="text-2xl font-bold mb-4">CivicTrack</h3>
               <p className="text-slate-400">Empowering citizens, streamlining cities.</p>
