@@ -65,7 +65,7 @@ export default function Landing() {
             <li className="cursor-pointer hover:text-blue-400 hover:underline transition" onClick={() => scrollToSection('challenge')}>Challenge</li>
             <li className="cursor-pointer hover:text-blue-400 hover:underline transition" onClick={() => scrollToSection('how-it-works')}>How It Works</li>
             <li className="cursor-pointer hover:text-blue-400 hover:underline transition" onClick={() => scrollToSection('features')}>Features</li>
-            <li className="cursor-pointer hover:text-blue-400 hover:underline transition" onClick={() => scrollToSection('contact')}>Contact</li>
+            {/* <li className="cursor-pointer hover:text-blue-400 hover:underline transition" onClick={() => scrollToSection('contact')}>Contact</li> */}
           </ul>
           <Button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-blue-500/30 transition" onClick={() => navigate('/login')}>Sign In</Button>
         </nav>
@@ -76,37 +76,25 @@ export default function Landing() {
         id="hero"
         className="min-h-screen flex flex-col justify-center items-center px-4 pt-32 md:pt-24 relative bg-slate-900"
       >
-        <div className="max-w-6xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-12 md:gap-20 w-full py-10 md:py-20">
-          {/* Left Side */}
-          <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left space-y-6 md:space-y-8">
+        <div className="max-w-6xl mx-auto flex flex-col items-center justify-center gap-12 md:gap-20 w-full py-10 md:py-20">
+          {/* Centered Hero Content */}
+          <div className="flex flex-col items-center text-center space-y-6 md:space-y-8 w-full">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-2 leading-tight">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400">CivicTrack</span>
               <br />
               <span className="text-white">Empowering Citizens.<br />Streamlining Cities.</span>
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-slate-200 mb-4 max-w-lg">
+            <p className="text-base sm:text-lg md:text-xl text-slate-200 mb-4 max-w-lg mx-auto">
               Report, track, and resolve civic issues in real-time with a powerful mobile-first solution powered by AI and community engagement.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center md:justify-start">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold shadow-blue-500/30 transition-all duration-200 flex items-center gap-2">
-                <MapPin className="w-5 h-5" /> Get Started
-              </Button>
-              <Button size="lg" variant="outline" className="bg-slate-800 border-none text-white px-8 py-4 rounded-xl font-semibold shadow transition-all duration-200 flex items-center gap-2">
-                <Monitor className="w-5 h-5" /> Admin Login
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center">
+              <Button size="lg" variant="outline" className="bg-blue-700 hover:bg-green-700 text-white px-12 py-8 rounded-2xl font-semibold shadow transition-all duration-200 flex items-center gap-2" onClick={() => navigate('/login ')}>
+                <Monitor className="w-10 h-18" /> Admin Login
               </Button>
             </div>
           </div>
-          {/* Right Side */}
-          <div className="flex-1 flex flex-row gap-6 justify-center items-center w-full">
-            <div className="w-40 sm:w-56 h-48 sm:h-80 bg-[#e6f4ea] rounded-2xl flex items-center justify-center shadow-lg">
-              <Smartphone className="w-12 sm:w-16 h-12 sm:h-16 text-slate-500" />
-            </div>
-            <div className="w-36 sm:w-64 h-32 sm:h-48 bg-[#e6eefe] rounded-2xl flex items-center justify-center shadow-lg">
-              <Monitor className="w-12 sm:w-16 h-12 sm:h-16 text-slate-500" />
-            </div>
-          </div>
+          {/* Removed right side image section */}
         </div>
-        {/* Removed the translucent gradient overlay */}
       </section>
 
       {/* Spacing */}
@@ -191,11 +179,11 @@ export default function Landing() {
       <section id="how-it-works" className="min-h-screen flex items-center bg-slate-900">
         <div className="container mx-auto px-4 w-full py-10 md:py-20">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-12 text-white">How It Works</h2>
-          <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-1 gap-y-14 gap-x-8 items-center">
+          <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-1 items-center">
             {/* 1. Citizen Reports Issue */}
             <div>
-<h3 className="text-2xl font-extrabold text-white mb-3">1. Issue is Reported by Citizen</h3>
-<p className="text-lg text-slate-300 mb-2">Citizens report civic issues like potholes or garbage using the mobile app.</p>
+              <h3 className="text-2xl font-extrabold text-white mb-3">1. Issue is Reported by Citizen</h3>
+              <p className="text-lg text-slate-300 mb-2">Citizens report civic issues like potholes or garbage using the mobile app.</p>
             </div>
             <div>
               <img src="/report_issue.png" alt="Citizen reporting an issue" className="w-[600px] h-[400px] object-cover mx-auto rounded-xl overflow-hidden" />
@@ -275,7 +263,7 @@ export default function Landing() {
               <CardContent className="text-slate-300 text-base mb-4">
                 Capture high-quality images, record voice notes, and automatically tag precise GPS locations with one-tap reporting.
               </CardContent>
-              <ul className="text-green-300 text-sm space-y-1 pl-2">
+              <ul className="text-gray-300 text-sm space-y-1 pl-2">
                 <li>✔ HD Photo Capture</li>
                 <li>✔ Voice Note Recording</li>
                 <li>✔ Automatic GPS Tagging</li>
@@ -366,7 +354,7 @@ export default function Landing() {
               <CardContent className="text-slate-300 text-base mb-4">
                 Separate optimized interfaces for citizens, field workers, and supervisors with appropriate permissions and features.
               </CardContent>
-              <ul className="text-blue-300 text-sm space-y-1 pl-2 mt-2">
+              <ul className="text-gray-300 text-sm space-y-1 pl-2 mt-2">
                 <li>• Citizen Mobile App</li>
                 <li>• Field Worker App</li>
                 <li>• Supervisor Dashboard</li>
@@ -385,7 +373,7 @@ export default function Landing() {
                 Citizens can raise complaints about resolution quality or delays, ensuring accountability and continuous improvement.
               </CardContent>
               <div className="flex gap-4 text-xs mt-2">
-                <span className="bg-red-700 text-red-200 px-2 py-1 rounded-full">Escalation Available</span>
+                <span className="bg-slate-700 text-slate-200 px-2 py-1 rounded-full">Escalation Available</span>
                 <span className="bg-slate-700 text-slate-300 px-2 py-1 rounded-full">24/7 Support</span>
               </div>
             </Card>
