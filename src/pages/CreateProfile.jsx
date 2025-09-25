@@ -20,7 +20,7 @@ const DEPARTMENT_DISPLAY_MAP = {
   streetlight: "Streetlight",
   roaddamage: "Road Damage",
   water: "Water",
-  drainage: "Drainage & Sewage"
+  drainage: "Drainage & Sewerage"
 };
 
 export default function CreateProfile() {
@@ -158,7 +158,7 @@ export default function CreateProfile() {
                   <option value="streetlight">Streetlight</option>
                   <option value="roaddamage">Road Damage</option>
                   <option value="water">Water</option>
-                  <option value="drainage">Drainage & Sewage</option>
+                  <option value="drainage">Drainage & Sewerage</option>
                 </select>
                 <p className="text-xs text-muted-foreground mt-1">Select the department the worker will be assigned to.</p>
               </div>
