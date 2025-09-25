@@ -194,14 +194,11 @@ export default function Landing() {
           <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-1 gap-y-14 gap-x-8 items-center">
             {/* 1. Citizen Reports Issue */}
             <div>
-              <h3 className="text-2xl font-extrabold text-white mb-3">1. Citizen Reports Issue</h3>
-              <p className="text-lg text-slate-300 mb-2">Citizens easily report issues via mobile app or web platform.</p>
+<h3 className="text-2xl font-extrabold text-white mb-3">1. Issue is Reported by Citizen</h3>
+<p className="text-lg text-slate-300 mb-2">Citizens report civic issues like potholes or garbage using the mobile app.</p>
             </div>
             <div>
-              <div className="w-56 h-40 bg-slate-800 rounded-xl border-2 border-dashed border-slate-500 flex flex-col items-center justify-center mx-auto mb-2">
-                <Smartphone className="w-12 h-12 text-slate-500 mb-2" />
-                <span className="text-base text-slate-500">Image Placeholder</span>
-              </div>
+              <img src="/report_issue.png" alt="Citizen reporting an issue" className="w-[600px] h-[400px] object-cover mx-auto rounded-xl overflow-hidden" />
             </div>
             {/* Arrow */}
             <div className="col-span-2 flex justify-center items-center">
@@ -209,14 +206,11 @@ export default function Landing() {
             </div>
             {/* 2. Automated Routing */}
             <div>
-              <div className="w-56 h-40 bg-slate-800 rounded-xl border-2 border-dashed border-slate-500 flex flex-col items-center justify-center mx-auto mb-2">
-                <BarChart3 className="w-12 h-12 text-slate-500 mb-2" />
-                <span className="text-base text-slate-500">Image Placeholder</span>
-              </div>
+              <img src="/assign_worker.png" alt="Issue assigned to worker" className="w-[600px] h-[400px] object-cover mx-auto rounded-xl overflow-hidden" />
             </div>
             <div>
-              <h3 className="text-2xl font-extrabold text-white mb-3 text-right">2. Automated Routing</h3>
-              <p className="text-lg text-slate-300 mb-2 text-right">AI categorizes and routes issues to appropriate departments.</p>
+<h3 className="text-2xl font-extrabold text-white mb-3 text-right">2. Issue Assigned to Worker</h3>
+<p className="text-lg text-slate-300 mb-2 text-right">System assigns the issue to the right municipal worker or department.</p>
             </div>
             {/* Arrow */}
             <div className="col-span-2 flex justify-center items-center">
@@ -224,14 +218,11 @@ export default function Landing() {
             </div>
             {/* 3. Department Coordination */}
             <div>
-              <h3 className="text-2xl font-extrabold text-white mb-3">3. Department Coordination</h3>
-              <p className="text-lg text-slate-300 mb-2">Departments collaborate and assign field workers.</p>
+<h3 className="text-2xl font-extrabold text-white mb-3">3. Complaint is Marked as "In Progress" by Worker</h3>
+<p className="text-lg text-slate-300 mb-2">Worker accepts the issue and updates the status.</p>
             </div>
             <div>
-              <div className="w-56 h-40 bg-slate-800 rounded-xl border-2 border-dashed border-slate-500 flex flex-col items-center justify-center mx-auto mb-2">
-                <Monitor className="w-12 h-12 text-slate-500 mb-2" />
-                <span className="text-base text-slate-500">Image Placeholder</span>
-              </div>
+              <img src="/inprogress.png" alt="Issue marked as in progress" className="w-[600px] h-[400px] object-cover mx-auto rounded-xl overflow-hidden" />
             </div>
             {/* Arrow */}
             <div className="col-span-2 flex justify-center items-center">
@@ -239,14 +230,11 @@ export default function Landing() {
             </div>
             {/* 4. Issue Resolution */}
             <div>
-              <div className="w-56 h-40 bg-slate-800 rounded-xl border-2 border-dashed border-slate-500 flex flex-col items-center justify-center mx-auto mb-2">
-                <CheckCircle className="w-12 h-12 text-slate-500 mb-2" />
-                <span className="text-base text-slate-500">Image Placeholder</span>
-              </div>
+              <img src="/upload_image.png" alt="Worker uploads image of completed task" className="w-[600px] h-[400px] object-cover mx-auto rounded-xl overflow-hidden" />
             </div>
             <div>
-              <h3 className="text-2xl font-extrabold text-white mb-3 text-right">4. Issue Resolution</h3>
-              <p className="text-lg text-slate-300 mb-2 text-right">Field workers resolve issues on-site with real-time updates.</p>
+<h3 className="text-2xl font-extrabold text-white mb-3 text-right">4. Worker Uploads Picture of Completed Task</h3>
+<p className="text-lg text-slate-300 mb-2 text-right">After resolving the issue, worker uploads a photo as proof.</p>
             </div>
             {/* Arrow */}
             <div className="col-span-2 flex justify-center items-center">
@@ -254,14 +242,11 @@ export default function Landing() {
             </div>
             {/* 5. Citizen Feedback */}
             <div>
-              <h3 className="text-2xl font-extrabold text-white mb-3">5. Citizen Feedback</h3>
-              <p className="text-lg text-slate-300 mb-2">Citizens receive notifications and can provide feedback.</p>
+<h3 className="text-2xl font-extrabold text-white mb-3">5. Issue Resolved</h3>
+<p className="text-lg text-slate-300 mb-2">System marks the issue as resolved and notifies the citizen.</p>
             </div>
             <div>
-              <div className="w-56 h-40 bg-slate-800 rounded-xl border-2 border-dashed border-slate-500 flex flex-col items-center justify-center mx-auto mb-2">
-                <Star className="w-12 h-12 text-slate-500 mb-2" />
-                <span className="text-base text-slate-500">Image Placeholder</span>
-              </div>
+              <img src="/resolved.png" alt="Issue resolved confirmation" className="w-[600px] h-[400px] object-cover mx-auto rounded-xl overflow-hidden" />
             </div>
           </div>
         </div>
@@ -421,7 +406,7 @@ export default function Landing() {
           {/* Citizen Mobile App */}
           <h3 className="text-lg font-bold text-center mb-4 text-white">Citizen Mobile App</h3>
           <div className="flex flex-wrap justify-center gap-6 mb-12">
-            {["/app1.png", "/app2.png", "/app3.png", "/app4.png"].map((src, idx) => (
+            {["/app1.png", "/app2.png", "/app3.png", "/app4.png", "/app5.png"].map((src, idx) => (
               <div
                 key={idx}
                 className="w-60 h-90 rounded-xl shadow-lg bg-white flex items-center justify-center overflow-hidden"
