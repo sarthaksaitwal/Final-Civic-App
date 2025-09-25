@@ -421,28 +421,45 @@ export default function Landing() {
           {/* Citizen Mobile App */}
           <h3 className="text-lg font-bold text-center mb-4 text-white">Citizen Mobile App</h3>
           <div className="flex flex-wrap justify-center gap-6 mb-12">
-            <img src="/app1.jpg" alt="App Screenshot 1" className="w-32 h-56 object-cover rounded-xl shadow-lg bg-white" />
-            <img src="/app2.jpg" alt="App Screenshot 2" className="w-32 h-56 object-cover rounded-xl shadow-lg bg-white" />
-            <img src="/app3.jpg" alt="App Screenshot 3" className="w-32 h-56 object-cover rounded-xl shadow-lg bg-white" />
-            <img src="/app4.jpg" alt="App Screenshot 4" className="w-32 h-56 object-cover rounded-xl shadow-lg bg-white" />
+            {["/app1.png", "/app2.png", "/app3.png", "/app4.png"].map((src, idx) => (
+              <div
+                key={idx}
+                className="w-60 h-90 rounded-xl shadow-lg bg-white flex items-center justify-center overflow-hidden"
+              >
+                <img
+                  src={src}
+                  alt={`App Screenshot ${idx + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
           </div>
           {/* Supervisor Web Dashboard */}
           <h3 className="text-lg font-bold text-center mb-4 text-white">Supervisor Web Dashboard</h3>
           <div className="flex justify-center mb-12 relative">
-            <div className="w-full max-w-md rounded-2xl shadow-2xl border-4 border-slate-700 bg-white overflow-hidden flex items-center justify-center">
+            <div className="w-full max-w-4xl rounded-2xl shadow-2xl border-4 border-slate-700 bg-white overflow-hidden flex items-center justify-center">
               <img
-                src="/Dashboard.jpg"
+                src="/webdashboard.png"
                 alt="Dashboard Screenshot"
-                className="w-full h-full object-contain"
+                className="w-full h-auto max-h-[600px] object-cover"
               />
             </div>
           </div>
           {/* Field Worker Mobile App */}
           <h3 className="text-lg font-bold text-center mb-4 text-white">Field Worker Mobile App</h3>
           <div className="flex flex-wrap justify-center gap-6">
-            <img src="/Public/app1.jpg" alt="Field App Screenshot 1" className="w-32 h-56 object-cover rounded-xl shadow-lg bg-white" />
-            <img src="/app2.jpg" alt="Field App Screenshot 2" className="w-32 h-56 object-cover rounded-xl shadow-lg bg-white" />
-            <img src="/app3.jpg" alt="Field App Screenshot 3" className="w-32 h-56 object-cover rounded-xl shadow-lg bg-white" />
+            {["/workerapp1.png", "/workerapp2.png", "/workerapp3.png"].map((src, idx) => (
+              <div
+                key={idx}
+                className="w-60 h-90 rounded-xl shadow-lg bg-white flex items-center justify-center overflow-hidden"
+              >
+                <img
+                  src={src}
+                  alt={`Field App Screenshot ${idx + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </section>
