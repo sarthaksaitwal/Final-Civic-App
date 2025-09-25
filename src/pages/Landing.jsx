@@ -421,7 +421,7 @@ export default function Landing() {
           {/* Citizen Mobile App */}
           <h3 className="text-lg font-bold text-center mb-4 text-white">Citizen Mobile App</h3>
           <div className="flex flex-wrap justify-center gap-6 mb-12">
-            {["/app1.png", "/app2.png", "/app3.png", "/app4.png"].map((src, idx) => (
+            {["/app1.png", "/app2.png", "/app3.png", "/app4.png", "/app5.png"].map((src, idx) => (
               <div
                 key={idx}
                 className="w-60 h-90 rounded-xl shadow-lg bg-white flex items-center justify-center overflow-hidden"
