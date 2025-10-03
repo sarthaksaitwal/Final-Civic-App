@@ -9,7 +9,7 @@ import WorkerCreated from "@/pages/WorkerCreated";
 import { useAuthStore } from '@/store/auth';
 
 const CATEGORY_CODES = {
-  garbage: 'GBG',
+  garbage: 'GBG', // Corrected from GAR to GBG
   streetlight: 'SLT',
   roaddamage: 'RDG',
   water: 'WTR',
@@ -70,6 +70,15 @@ export default function CreateProfile() {
     return `${code}-${pincode}-${num}`;
   };
 
+  // Add this helper function:
+  function getDepartmentKey(department) {
+    // If already a key, return as is
+    if (CATEGORY_CODES[department]) return department;
+    // Otherwise, find the key by display name
+    const found = Object.entries(DEPARTMENT_DISPLAY_MAP).find(([key, value]) => value === department);
+    return found ? found[0] : department;
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!/^[0-9]{10}$/.test(form.phone)) {
@@ -98,15 +107,16 @@ export default function CreateProfile() {
         return;
       }
 
-      const id = await generateWorkerId(form.department, form.pincode);
+      const id = await generateWorkerId(getDepartmentKey(form.department), form.pincode);
       setWorkerId(id);
 
       const workerData = {
         ...form,
         workerId: id,
         department_pincode: `${DEPARTMENT_DISPLAY_MAP[form.department] || form.department}_${form.pincode}`,
-        department: DEPARTMENT_DISPLAY_MAP[form.department] || form.department, // <-- Use display name
-        assignedIssueIds: [], 
+        department: DEPARTMENT_DISPLAY_MAP[form.department] || form.department,
+        assignedIssueIds: [],
+        status: "Available", // <-- Add this line
       };
 
       await set(ref(realtimeDb, `workers/${id}`), workerData);

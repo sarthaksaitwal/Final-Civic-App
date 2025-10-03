@@ -9,8 +9,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { MapPin, Eye, EyeOff } from 'lucide-react';
 import { realtimeDb } from "@/lib/firebase";
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '@/components/LanguageSwitcher'; // Import the switcher
 
 export default function Login() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -32,7 +35,7 @@ export default function Login() {
     if (!value) {
       setEmailError('');
     } else if (!validateEmail(value)) {
-      setEmailError('Please enter a valid email address.');
+      setEmailError(t('emailInvalidError'));
     } else {
       setEmailError('');
     }
@@ -76,8 +79,8 @@ export default function Login() {
         }
       } catch (err) {
         toast({
-          title: "Login error",
-          description: "Could not connect to database.",
+          title: t('toastLoginErrorTitle'),
+          description: t('toastLoginErrorDescription'),
           variant: "destructive"
         });
       }
@@ -90,16 +93,16 @@ export default function Login() {
         isLoading: false
       });
       toast({
-        title: "Login successful",
+        title: t('toastLoginSuccessTitle'),
         description: userData.role === "admin"
-          ? "Welcome, Admin!"
-          : `Welcome, Department Head (${userData.department})!`,
+          ? t('toastWelcomeAdmin')
+          : t('toastWelcomeDeptHead', { department: userData.department }),
       });
       navigate("/dashboard"); // <-- Redirect to Dashboard after login
     } else {
       toast({
-        title: "Invalid credentials",
-        description: "Email or password is incorrect.",
+        title: t('toastInvalidCredentialsTitle'),
+        description: t('toastInvalidCredentialsDescription'),
         variant: "destructive"
       });
     }
@@ -109,54 +112,51 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
-        {/* Logo */}
+        <div className="absolute top-4 right-4">
+          <LanguageSwitcher />
+        </div>
         <div className="text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
               <MapPin className="h-6 w-6 text-primary-foreground" />
             </div>
-            <span className="text-2xl font-bold text-foreground">CivicTracker</span>
+            <span className="text-2xl font-bold text-foreground">{t('appName')}</span>
           </div>
-          <p className="text-muted-foreground">Municipal Administration Portal</p>
+          <p className="text-muted-foreground">{t('appSubtitle')}</p>
         </div>
 
-        {/* Login Form */}
         <Card className="shadow-card bg-[#f6f6f6]">
           <CardHeader>
-            <CardTitle>Sign In</CardTitle>
-            <CardDescription>
-              Enter your credentials to access the dashboard
-            </CardDescription>
+            <CardTitle>{t('signIn')}</CardTitle>
+            <CardDescription>{t('signInDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('email')}</Label>
                 <Input
                   id="email"
                   type="text"
-                  placeholder="Enter your email"
+                  placeholder={t('enterYourEmail')}
                   value={email}
                   onChange={handleEmailChange}
                   required
                   autoFocus
                   onBlur={() => {
-                    if (email && !validateEmail(email)) setEmailError('Please enter a valid email address.');
+                    if (email && !validateEmail(email)) setEmailError(t('emailInvalidError'));
                     else setEmailError('');
                   }}
                 />
-                {emailError && (
-                  <span className="text-red-600 text-xs">{emailError}</span>
-                )}
+                {emailError && <span className="text-red-600 text-xs">{emailError}</span>}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('password')}</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder={t('enterYourPassword')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -171,11 +171,7 @@ export default function Login() {
                     onClick={() => setShowPassword(!showPassword)}
                     disabled={!!emailError}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>
@@ -185,23 +181,15 @@ export default function Login() {
                 className="w-full" 
                 disabled={isLoading || !!emailError}
               >
-                {isLoading ? "Signing in..." : "Sign In"}
+                {isLoading ? t('signingInButton') : t('signIn')}
               </Button>
             </form>
-
-            {/* Demo Credentials */}
-            {/* <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-              <p className="text-sm text-muted-foreground mb-2">Demo credentials:</p>
-              <p className="text-sm font-mono">Email: admin</p>
-              <p className="text-sm font-mono">Password: admin</p>
-            </div> */}
           </CardContent>
         </Card>
 
-        {/* Back to Home */}
         <div className="text-center">
           <Button variant="ghost" onClick={() => navigate('/')}>
-            ← Back to Home
+            {t('backToHome')}
           </Button>
         </div>
       </div>
