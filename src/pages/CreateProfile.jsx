@@ -56,16 +56,16 @@ export default function CreateProfile() {
   };
 
   // Generate worker ID by counting workers in Realtime Database
-  const generateWorkerId = async (department, pincode) => {
+  const generateWorkerId = async (departmentKey, pincode) => {
     const workersRef = ref(realtimeDb, 'workers');
     const q = query(
       workersRef,
       orderByChild('department_pincode'),
-      equalTo(`${department}_${pincode}`)
+      equalTo(`${departmentKey}_${pincode}`)
     );
     const snap = await get(q);
     const count = snap.exists() ? Object.keys(snap.val()).length : 0;
-    const code = CATEGORY_CODES[department] || (department ? department.substring(0,3).toUpperCase() : 'GEN');
+    const code = CATEGORY_CODES[departmentKey] || (departmentKey ? departmentKey.substring(0,3).toUpperCase() : 'GEN');
     const num = String(count + 1).padStart(3, '0');
     return `${code}-${pincode}-${num}`;
   };
@@ -107,33 +107,29 @@ export default function CreateProfile() {
         return;
       }
 
-      const id = await generateWorkerId(getDepartmentKey(form.department), form.pincode);
+      const departmentKey = getDepartmentKey(form.department);
+      const id = await generateWorkerId(departmentKey, form.pincode);
       setWorkerId(id);
 
       const workerData = {
         ...form,
         workerId: id,
-        department_pincode: `${DEPARTMENT_DISPLAY_MAP[form.department] || form.department}_${form.pincode}`,
-        department: DEPARTMENT_DISPLAY_MAP[form.department] || form.department,
+        department_pincode: `${departmentKey}_${form.pincode}`,
+        department: DEPARTMENT_DISPLAY_MAP[departmentKey], // Always store display name
+        departmentKey, // Optionally store the key for reference
         assignedIssueIds: [],
-        status: "Available", // <-- Add this line
+        status: "Available",
       };
 
       await set(ref(realtimeDb, `workers/${id}`), workerData);
 
       setLoading(false);
       setShowSuccess(true);
-
-      // Redirect to WorkerCreated page with worker info
       navigate("/worker-created", { state: { worker: workerData } });
     } catch (err) {
       setError('Failed to create worker.');
       setLoading(false);
-      if (err && err.message) {
-        console.error('Create worker error:', err.message);
-      } else {
-        console.error('Create worker error:', err);
-      }
+      console.error('Create worker error:', err.message || err);
     }
   };
 

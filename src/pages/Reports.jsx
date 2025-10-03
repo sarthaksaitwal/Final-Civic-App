@@ -39,7 +39,7 @@ const CHART_COLORS = {
 export default function Reports() {
   const { workers } = useWorkersStore();
   const { issues } = useIssuesStore();
-  const { user } = useAuthStore(); // Get logged-in user
+  const { user } = useAuthStore();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -57,8 +57,16 @@ export default function Reports() {
     ? issues.filter(issue => issue.category === user.department)
     : issues;
 
+  // Filter workers by department if user is department head
+  const departmentWorkers = user?.role === "admin"
+    ? workers
+    : workers.filter(
+        worker =>
+          worker.department === user.department && worker.status === "Available"
+      );
+
   // Worker occupancy stats with trends
-  const workerStats = workers.map(worker => {
+  const workerStats = departmentWorkers.map(worker => {
     const assignedIssues = departmentIssues.filter(
       issue =>
         (typeof issue.assignedTo === "object"
@@ -109,7 +117,7 @@ export default function Reports() {
   const resolvedIssues = departmentIssues.filter(i => (i.status || '').toLowerCase() === 'resolved').length;
   const resolutionRate = totalIssues ? Math.round((resolvedIssues / totalIssues) * 100) : 0;
   const avgResponseTime = '2.3 days';
-  const activeWorkers = workers.length;
+  const activeWorkersCount = departmentWorkers.length;
 
   const metricsData = [
     {
@@ -142,12 +150,12 @@ export default function Reports() {
     },
     {
       title: "Active Workers",
-      value: activeWorkers,
+      value: activeWorkersCount,
       icon: Users,
       color: "purple",
       trend: "+8%",
       trendUp: true,
-      sparkline: generateSparklineData(activeWorkers, 0.25)
+      sparkline: generateSparklineData(activeWorkersCount, 0.25)
     }
   ];
 
