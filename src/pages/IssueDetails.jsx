@@ -31,6 +31,7 @@ import {
   Wrench,
   BadgeCheck,
   Image as ImageIcon, // <-- Add this import for the image icon
+  Video as VideoIcon,
 } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { ref, onValue, off, update, get } from "firebase/database";
@@ -66,9 +67,31 @@ export default function IssueDetails() {
     const handleValue = (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
-        // Convert date fields to Date objects if present
         if (data.dateTime) data.dateReported = new Date(data.dateTime);
         if (data.deadline) data.deadline = new Date(data.deadline);
+
+        // Extract photos and videos by type, not by key
+        let photos = [];
+        let videos = [];
+        let photoTimestamps = [];
+        let videoTimestamps = [];
+        if (data.media) {
+          Object.values(data.media).forEach((item) => {
+            if (item.type === "photo" && item.url) {
+              photos.push(item.url);
+              photoTimestamps.push(item.timestamp || null);
+            }
+            if (item.type === "video" && item.url) {
+              videos.push(item.url);
+              videoTimestamps.push(item.timestamp || null);
+            }
+          });
+        }
+        data.photos = photos;
+        data.videos = videos;
+        data.photoTimestamps = photoTimestamps;
+        data.videoTimestamps = videoTimestamps;
+
         setRealtimeIssue({ ...data, id });
         setIsLoading(false);
       } else {
@@ -150,7 +173,7 @@ export default function IssueDetails() {
     </div>
   );
 
-  // --- Section: Media (Photos & Audio) ---
+  // --- Section: Media (Photos & Videos & Audio) ---
   const mediaSection = (
     <div className="flex flex-col md:flex-row gap-6">
       {/* Photos */}
@@ -201,6 +224,27 @@ export default function IssueDetails() {
           </div>
         </div>
       )}
+      {/* Videos */}
+      {issue.videos && issue.videos.length > 0 && (
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-2 font-bold text-blue-700">
+            <VideoIcon className="h-5 w-5 text-blue-600" />
+            Videos
+          </div>
+          <div className="flex gap-3 flex-wrap">
+            {issue.videos.map((videoUrl, index) => (
+              <div key={index} className="relative flex flex-col items-center">
+                <video
+                  src={videoUrl}
+                  controls
+                  className="w-44 h-44 object-cover rounded-lg border border-gray-200"
+                  title={`Video ${index + 1}`}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {/* Audio Evidence (multiple audio files, if any) */}
       {issue.audio && issue.audio.length > 0 && (
         <div className="flex-1">
@@ -218,7 +262,6 @@ export default function IssueDetails() {
           </div>
         </div>
       )}
-      {/* Voice Note REMOVED from this section */}
     </div>
   );
 

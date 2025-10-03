@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { get, ref } from "firebase/database";
 import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,9 +8,10 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { MapPin, Eye, EyeOff } from 'lucide-react';
+import { realtimeDb } from "@/lib/firebase";
 
 export default function Login() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,29 +23,64 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Only allow login if username and password are both 'admin'
-    if (username === 'admin' && password === 'admin') {
-      const mockUser = {
-        id: 'mock-user-id',
-        name: 'Admin User',
-        email: 'admin@civictracker.com',
-        role: 'Civic Administrator',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
+    let found = false;
+    let userData = null;
+
+    // Check for admin credentials first
+    if (email === "admin@gmail.com" && password === "admin") {
+      userData = {
+        email,
+        role: "admin",
+        name: "Admin User"
+        // no department field!
       };
+      found = true;
+    } else {
+      try {
+        // Fetch all department_heads
+        const headsRef = ref(realtimeDb, "department_heads");
+        const snap = await get(headsRef);
+
+        if (snap.exists()) {
+          const departments = snap.val();
+          for (const dept in departments) {
+            for (const headId in departments[dept]) {
+              const head = departments[dept][headId];
+              if (head.email === email && head.password === password) {
+                found = true;
+                userData = head;
+                break;
+              }
+            }
+            if (found) break;
+          }
+        }
+      } catch (err) {
+        toast({
+          title: "Login error",
+          description: "Could not connect to database.",
+          variant: "destructive"
+        });
+      }
+    }
+
+    if (found && userData) {
       useAuthStore.setState({
-        user: mockUser,
+        user: userData,
         isAuthenticated: true,
         isLoading: false
       });
       toast({
         title: "Login successful",
-        description: "Welcome to CivicTracker!",
+        description: userData.role === "admin"
+          ? "Welcome, Admin!"
+          : `Welcome, Department Head (${userData.department})!`,
       });
-      navigate('/dashboard');
+      navigate("/dashboard"); // <-- Redirect to Dashboard after login
     } else {
       toast({
         title: "Invalid credentials",
-        description: "Username or password is incorrect.",
+        description: "Email or password is incorrect.",
         variant: "destructive"
       });
     }
@@ -75,13 +112,13 @@ export default function Login() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id="username"
+                  id="email"
                   type="text"
-                  placeholder="Enter your username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
@@ -125,7 +162,7 @@ export default function Login() {
             {/* Demo Credentials */}
             <div className="mt-6 p-4 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground mb-2">Demo credentials:</p>
-              <p className="text-sm font-mono">Username: admin</p>
+              <p className="text-sm font-mono">Email: admin</p>
               <p className="text-sm font-mono">Password: admin</p>
             </div>
           </CardContent>

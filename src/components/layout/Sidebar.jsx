@@ -23,6 +23,7 @@ const navigation = [
   { name: 'Create Worker', href: '/create-profile', icon: User },
   { name: 'Worker List', href: '/assign-worker', icon: User }, // <-- Added Worker List
   { name: 'Profile', href: '/profile', icon: User },
+  { name: 'Head', href: '/CreateDepartmentHead', icon: User },
 ];
 
 export function Sidebar({ className, collapsed, setCollapsed }) {

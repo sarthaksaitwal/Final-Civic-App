@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase } from "firebase/database";
+import { getDatabase, ref, set } from "firebase/database";
 import { getAuth } from "firebase/auth";
 
 // TODO: Replace the following with your app's Firebase project configuration
@@ -18,3 +18,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const realtimeDb = getDatabase(app);
 export const auth = getAuth(app);
+
+export const uploadHeadData = async (form, id, headData) => {
+  const deptKey = Object.keys(DEPARTMENT_DISPLAY_MAP).find(
+    key => DEPARTMENT_DISPLAY_MAP[key] === form.department
+  );
+
+  await set(ref(realtimeDb, `department_heads/${deptKey}/${id}`), headData);
+};

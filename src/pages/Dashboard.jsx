@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/store/auth';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -129,17 +130,22 @@ const getIssueIcon = (type) => {
 
 export default function Dashboard() {
   const { issues, fetchIssues, loading } = useIssuesStore();
+  const { user } = useAuthStore(); // Get logged-in user
   const navigate = useNavigate();
   const [markerSize, setMarkerSize] = useState({ width: 20, height: 26 });
-
-  const getIssuesByStatus = (status) =>
-    issues.filter(issue => (issue.status || '').toLowerCase() === status.toLowerCase());
 
   // Fetch issues on mount
   useEffect(() => {
     fetchIssues();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only on mount, always subscribe
+  }, []);
+
+  // Filter issues by department if user is department head
+  const filteredIssues = user?.role === "admin" || !user?.department
+  ? issues
+  : issues.filter(issue => issue.category === user.department);
+
+  const getIssuesByStatus = (status) =>
+    filteredIssues.filter(issue => (issue.status || '').toLowerCase() === status.toLowerCase());
 
   // Responsive marker sizing
   useEffect(() => {
@@ -164,14 +170,14 @@ export default function Dashboard() {
   };
 
   // Sort issues by dateReported descending (newest first)
-  const sortedIssues = [...issues]
+  const sortedIssues = [...filteredIssues]
     .filter(issue => issue.dateReported instanceof Date)
     .sort((a, b) => b.dateReported - a.dateReported);
 
   // Get the latest 5 or 6 issues
   const recentIssues = sortedIssues.slice(0, 6);
 
-  const allIssues = issues;
+  const allIssues = filteredIssues;
   const totalIssues = allIssues.length;
   const completedIssues = getIssuesByStatus('completed').length;
   const completionRate = totalIssues > 0 ? Math.round((completedIssues / totalIssues) * 100) : 0;
@@ -250,7 +256,8 @@ export default function Dashboard() {
           <div className="space-y-4">
             {Object.keys(statusConfig).map((status) => {
               const config = statusConfig[status];
-              const count = issues.filter(issue => (issue.status || '').toLowerCase() === status.toLowerCase()).length;
+              // Use filteredIssues instead of issues for counting
+              const count = filteredIssues.filter(issue => (issue.status || '').toLowerCase() === status.toLowerCase()).length;
               const IconComponent = config.icon;
 
               return (
@@ -340,8 +347,8 @@ export default function Dashboard() {
                         </div>
                       </div>
                     </div>
-                  ))
-                )}
+                  )))
+                }
               </div>
             </CardContent>
           </Card>

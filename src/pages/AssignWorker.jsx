@@ -9,6 +9,7 @@ import { useIssuesStore } from '@/store/issues';
 import { useToast } from '@/components/ui/use-toast';
 import { useEffect, useState } from 'react';
 import { Loader2, User, Filter, Phone, MapPin, Briefcase } from 'lucide-react';
+import { useAuthStore } from '@/store/auth';
 
 
 const DEPARTMENT_DISPLAY_MAP = {
@@ -25,6 +26,8 @@ function getDepartmentDisplay(dept) {
 }
 
 export default function AssignWorker() {
+  const { user } = useAuthStore(); // Get logged-in user
+
   const normalize = str => (str || '').toLowerCase().replace(/\s+/g, '');
 
   const navigate = useNavigate();
@@ -78,6 +81,13 @@ export default function AssignWorker() {
       filteredWorkers = filteredWorkers.filter(
         (worker) =>
           normalize(worker.department) === normalize(departmentFilter)
+      );
+    }
+    // Filter by department for department head
+    if (user?.department) {
+      filteredWorkers = filteredWorkers.filter(
+        (worker) =>
+          normalize(worker.department) === normalize(user.department)
       );
     }
   }

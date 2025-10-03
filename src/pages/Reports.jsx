@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useWorkersStore } from '@/store/workers';
 import { useIssuesStore } from '@/store/issues';
+import { useAuthStore } from '@/store/auth';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, LineChart, Line, Area, AreaChart } from 'recharts';
 import {
   BarChart3,
@@ -38,6 +39,7 @@ const CHART_COLORS = {
 export default function Reports() {
   const { workers } = useWorkersStore();
   const { issues } = useIssuesStore();
+  const { user } = useAuthStore(); // Get logged-in user
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -50,9 +52,14 @@ export default function Reports() {
     }));
   };
 
+  // Filter issues by department if user is department head
+  const departmentIssues = user?.department
+    ? issues.filter(issue => issue.category === user.department)
+    : issues;
+
   // Worker occupancy stats with trends
   const workerStats = workers.map(worker => {
-    const assignedIssues = issues.filter(
+    const assignedIssues = departmentIssues.filter(
       issue =>
         (typeof issue.assignedTo === "object"
           ? issue.assignedTo.id
@@ -87,7 +94,7 @@ export default function Reports() {
 
   // Issues by category
   const categoryData = Object.entries(
-    issues.reduce((acc, issue) => {
+    departmentIssues.reduce((acc, issue) => {
       acc[issue.category] = (acc[issue.category] || 0) + 1;
       return acc;
     }, {})
@@ -98,8 +105,8 @@ export default function Reports() {
   }));
 
   // Key metrics with sparklines
-  const totalIssues = issues.length;
-  const resolvedIssues = issues.filter(i => (i.status || '').toLowerCase() === 'resolved').length;
+  const totalIssues = departmentIssues.length;
+  const resolvedIssues = departmentIssues.filter(i => (i.status || '').toLowerCase() === 'resolved').length;
   const resolutionRate = totalIssues ? Math.round((resolvedIssues / totalIssues) * 100) : 0;
   const avgResponseTime = '2.3 days';
   const activeWorkers = workers.length;
@@ -171,7 +178,7 @@ export default function Reports() {
     : selectedPeriod === "year" ? 365 * 24 * 60 * 60 * 1000
     : Infinity;
 
-  const filteredIssues = issues.filter(issue => {
+  const filteredIssues = departmentIssues.filter(issue => {
     if (selectedCategory !== "all" && issue.category !== selectedCategory) return false;
     if (issue.dateReported instanceof Date) {
       return now - issue.dateReported.getTime() <= periodMs;

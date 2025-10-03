@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useIssuesStore } from '@/store/issues';
+import { useAuthStore } from '@/store/auth';
 import 'leaflet/dist/leaflet.css';
 import {
   Search,
@@ -62,6 +63,7 @@ export default function Issues() {
   const location = useLocation();
   const navigate = useNavigate();
   const { issues, fetchIssues } = useIssuesStore();
+  const { user } = useAuthStore(); // Get logged-in user
 
   const [filteredIssues, setFilteredIssues] = useState(issues);
   const [searchTerm, setSearchTerm] = useState('');
@@ -85,6 +87,11 @@ export default function Issues() {
   useEffect(() => {
     let filtered = issues;
 
+    // Filter by department for department head
+    if (user?.department) {
+      filtered = filtered.filter(issue => issue.category === user.department);
+    }
+
     if (searchTerm) {
       filtered = filtered.filter(issue =>
         (issue.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -104,7 +111,7 @@ export default function Issues() {
     }
 
     setFilteredIssues(filtered);
-  }, [issues, searchTerm, statusFilter, categoryFilter]);
+  }, [issues, searchTerm, statusFilter, categoryFilter, user]);
 
   // Sort issues by dateReported descending (newest first)
   const sortedIssues = [...filteredIssues].sort((a, b) => {

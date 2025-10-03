@@ -17,6 +17,7 @@ import Reports from "./pages/Reports";
 import CreateProfile from "./pages/CreateProfile";
 import NotFound from "./pages/NotFound";
 import WorkerCreated from "./pages/WorkerCreated";
+import CreateDepartmentHead from "./pages/CreateDepartmentHead";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,8 @@ const App = () => (
           <Route path="/workers/:id" element={<WorkerDetails />} />
           <Route path="/create-profile" element={<CreateProfile />} />
           <Route path="/worker-created" element={<WorkerCreated />} />
+          <Route path="/CreateDepartmentHead" element={<CreateDepartmentHead />} />
+
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
