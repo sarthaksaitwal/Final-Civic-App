@@ -15,9 +15,28 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
   const { login } = useAuthStore();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const validateEmail = (value) => {
+    // Simple email regex for format validation
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(value);
+  };
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    if (!value) {
+      setEmailError('');
+    } else if (!validateEmail(value)) {
+      setEmailError('Please enter a valid email address.');
+    } else {
+      setEmailError('');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -118,9 +137,17 @@ export default function Login() {
                   type="text"
                   placeholder="Enter your email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
                   required
+                  autoFocus
+                  onBlur={() => {
+                    if (email && !validateEmail(email)) setEmailError('Please enter a valid email address.');
+                    else setEmailError('');
+                  }}
                 />
+                {emailError && (
+                  <span className="text-red-600 text-xs">{emailError}</span>
+                )}
               </div>
               
               <div className="space-y-2">
@@ -133,13 +160,16 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={!!emailError}
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    style={{ color: "#333" }}
                     onClick={() => setShowPassword(!showPassword)}
+                    disabled={!!emailError}
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -153,18 +183,18 @@ export default function Login() {
               <Button 
                 type="submit" 
                 className="w-full" 
-                disabled={isLoading}
+                disabled={isLoading || !!emailError}
               >
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
 
             {/* Demo Credentials */}
-            <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+            {/* <div className="mt-6 p-4 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground mb-2">Demo credentials:</p>
               <p className="text-sm font-mono">Email: admin</p>
               <p className="text-sm font-mono">Password: admin</p>
-            </div>
+            </div> */}
           </CardContent>
         </Card>
 

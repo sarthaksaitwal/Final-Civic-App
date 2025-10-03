@@ -6,6 +6,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { realtimeDb } from "@/lib/firebase";
 import { useNavigate } from "react-router-dom";
 import WorkerCreated from "@/pages/WorkerCreated";
+import { useAuthStore } from '@/store/auth';
 
 const CATEGORY_CODES = {
   garbage: 'GBG',
@@ -24,10 +25,14 @@ const DEPARTMENT_DISPLAY_MAP = {
 };
 
 export default function CreateProfile() {
+  const { user } = useAuthStore(); // Get logged-in user
+
+  const isAdmin = user?.role === "admin";
+
   const [form, setForm] = useState({
     name: '',
     phone: '',
-    department: '',
+    department: isAdmin ? '' : user?.department || '', // Admin can choose, others auto-fill
     pincode: '',
     password: '12345678', // still set in state for backend, but not shown in UI
   });
@@ -145,22 +150,38 @@ export default function CreateProfile() {
             <div className="flex flex-col gap-4">
               <div>
                 <label htmlFor="department" className="block text-sm font-medium text-foreground mb-1">Department</label>
-                <select
-                  id="department"
-                  name="department"
-                  value={form.department}
-                  onChange={(e) => setForm({ ...form, department: e.target.value })}
-                  required
-                  className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-primary bg-[#f6f6f6]"
-                >
-                  <option value="">Select Department</option>
-                  <option value="garbage">Garbage</option>
-                  <option value="streetlight">Streetlight</option>
-                  <option value="roaddamage">Road Damage</option>
-                  <option value="water">Water</option>
-                  <option value="drainage">Drainage & Sewerage</option>
-                </select>
-                <p className="text-xs text-muted-foreground mt-1">Select the department the worker will be assigned to.</p>
+                {isAdmin ? (
+                  <select
+                    id="department"
+                    name="department"
+                    value={form.department}
+                    onChange={handleChange}
+                    required
+                    className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-primary bg-[#f6f6f6]"
+                  >
+                    <option value="">Select Department</option>
+                    {Object.entries(DEPARTMENT_DISPLAY_MAP).map(([key, label]) => (
+                      <option key={key} value={key}>{label}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <select
+                    id="department"
+                    name="department"
+                    value={form.department}
+                    disabled
+                    className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-primary bg-[#f6f6f6] cursor-not-allowed"
+                  >
+                    <option value={form.department}>
+                      {DEPARTMENT_DISPLAY_MAP[form.department] || form.department}
+                    </option>
+                  </select>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">
+                  {isAdmin
+                    ? "Select the department for the worker."
+                    : "Department is set automatically based on your login."}
+                </p>
               </div>
               <div>
                 <label htmlFor="pincode" className="block text-sm font-medium text-foreground mb-1">Pincode</label>

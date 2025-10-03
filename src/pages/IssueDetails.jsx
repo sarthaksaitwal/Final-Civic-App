@@ -59,6 +59,7 @@ export default function IssueDetails() {
   const [realtimeIssue, setRealtimeIssue] = useState(null);
   const [showVoiceNote, setShowVoiceNote] = useState(false); // <-- move here
   const [showCompletionVoiceNote, setShowCompletionVoiceNote] = useState(false);
+  const [openVideo, setOpenVideo] = useState(null);
 
   // --- Realtime Issue State ---
   useEffect(() => {
@@ -77,11 +78,11 @@ export default function IssueDetails() {
         let videoTimestamps = [];
         if (data.media) {
           Object.values(data.media).forEach((item) => {
-            if (item.type === "photo" && item.url) {
+            if (item.type && item.type.toLowerCase() === "photo" && item.url) {
               photos.push(item.url);
               photoTimestamps.push(item.timestamp || null);
             }
-            if (item.type === "video" && item.url) {
+            if (item.type && item.type.toLowerCase() === "video" && item.url) {
               videos.push(item.url);
               videoTimestamps.push(item.timestamp || null);
             }
@@ -91,6 +92,9 @@ export default function IssueDetails() {
         data.videos = videos;
         data.photoTimestamps = photoTimestamps;
         data.videoTimestamps = videoTimestamps;
+
+        console.log("Raw media data:", data.media);
+        console.log("Extracted videos:", videos);
 
         setRealtimeIssue({ ...data, id });
         setIsLoading(false);
@@ -359,7 +363,7 @@ export default function IssueDetails() {
     </div>
   );
 
-  // --- Section: Citizen Submission (Photos, Description, Voice Note) ---
+  // --- Section: Citizen Submission (Photos, Videos, Description, Voice Note) ---
   const citizenSubmissionsSection = (
     <div>
       {/* Photos */}
@@ -405,6 +409,34 @@ export default function IssueDetails() {
                       })
                     : ""}
                 </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Videos */}
+      {issue.videos && issue.videos.length > 0 && (
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-2 font-bold text-black">
+            <VideoIcon className="h-5 w-5 text-black" />
+            Videos
+          </div>
+          <div className="flex gap-3 flex-wrap">
+            {issue.videos.map((videoUrl, index) => (
+              <div
+                key={index}
+                className="relative flex flex-col items-center cursor-pointer transition-transform duration-200 hover:scale-105 hover:shadow-lg"
+                onClick={() => setOpenVideo(videoUrl)}
+                title="Click to view fullscreen"
+              >
+                <video
+                  src={videoUrl}
+                  controls
+                  className="w-36 h-36 object-cover rounded-xl border border-gray-200"
+                  title={`Video ${index + 1}`}
+                  style={{ pointerEvents: "none" }} // Prevents controls in thumbnail
+                />
               </div>
             ))}
           </div>
@@ -855,6 +887,64 @@ export default function IssueDetails() {
     </div>
   ) : null;
 
+  // --- Section: Video Modal (Fullscreen) ---
+  const videoModal = openVideo ? (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+      <div className="relative">
+        {/* Close button */}
+        <button
+          className="absolute top-3 right-3 text-white bg-black/70 rounded-full p-2 hover:bg-red-600 hover:text-white transition text-2xl z-10"
+          onClick={() => setOpenVideo(null)}
+          aria-label="Close video"
+        >
+          &times;
+        </button>
+        <div className="relative flex flex-col items-center">
+          <video
+            src={openVideo}
+            controls
+            autoPlay
+            className="max-h-[80vh] max-w-[90vw] object-contain rounded-xl shadow-2xl border-4 border-white"
+            title="Full size video"
+          />
+          {/* Timestamp overlay on modal video */}
+          <span
+            className="absolute bottom-2 left-2 right-2 px-3 py-1 text-base text-white bg-black/60 rounded-b-xl text-center"
+            style={{
+              fontSize: "1rem",
+              lineHeight: "1.5rem",
+              borderBottomLeftRadius: "0.75rem",
+              borderBottomRightRadius: "0.75rem",
+            }}
+          >
+            {(() => {
+              // Find timestamp for openVideo
+              let idx = issue.videos?.findIndex((url) => url === openVideo);
+              if (idx !== undefined && idx !== -1) {
+                if (issue.videoTimestamps && issue.videoTimestamps[idx]) {
+                  return new Date(issue.videoTimestamps[idx]).toLocaleString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
+                } else if (issue.dateReported instanceof Date) {
+                  return issue.dateReported.toLocaleString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
+                }
+              }
+              return "";
+            })()}
+          </span>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   // --- Render ---
   return (
     <DashboardLayout>
@@ -873,8 +963,8 @@ export default function IssueDetails() {
           <CardContent className="pt-2 pb-6 px-6">{detailsSection}</CardContent>
         </Card>
 
-        {/* Citizen Submissions (Description, Voice Note, Photos) */}
-        {(issue.description || (issue.photos && issue.photos.length > 0) || issue.voiceNote) && (
+        {/* Citizen Submissions (Description, Voice Note, Photos, Videos) */}
+        {(issue.description || (issue.photos && issue.photos.length > 0) || issue.voiceNote || (issue.videos && issue.videos.length > 0)) && (
           <Card className="shadow-card border-2 border-gray-300 rounded-2xl bg-[#f6f6f6]">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-bold text-blue-700 flex items-center gap-2">
@@ -908,6 +998,7 @@ export default function IssueDetails() {
         {/* Modals */}
         {mapModal}
         {photoModal}
+        {videoModal}
       </div>
     </DashboardLayout>
   );

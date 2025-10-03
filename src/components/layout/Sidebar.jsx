@@ -22,7 +22,7 @@ const navigation = [
   { name: 'Reports & Analytics', href: '/reports', icon: BarChart3 },
   { name: 'Create Worker', href: '/create-profile', icon: User },
   { name: 'Worker List', href: '/assign-worker', icon: User }, // <-- Added Worker List
-  { name: 'Profile', href: '/profile', icon: User },
+  { name: 'Profile', href: '/Profile', icon: User },
   { name: 'Head', href: '/CreateDepartmentHead', icon: User },
 ];
 
